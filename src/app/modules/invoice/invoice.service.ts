@@ -6,6 +6,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { paymentService } from '../payment/payment.service';
 import { ObjectId } from 'mongodb';
+import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 
 const createInvoice = async (payload: IInvoice) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
@@ -159,6 +160,15 @@ const releaseInvoice = async (invoiceId: string, payload: { providerWorkShopId: 
      return paymentResult;
 };
 
+const resendInvoice = async (invoiceId: string) => {
+     const result = await getInvoiceById(invoiceId);
+     if (!result) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.*.');
+     }
+     await releaseInvoiceToWhatsApp(result);
+     return result;
+};
+
 export const invoiceService = {
      createInvoice,
      getAllInvoices,
@@ -168,4 +178,5 @@ export const invoiceService = {
      hardDeleteInvoice,
      getInvoiceById,
      releaseInvoice,
+     resendInvoice,
 };

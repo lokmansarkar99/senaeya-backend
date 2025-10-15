@@ -143,6 +143,14 @@ const createPayment = async (payload: Partial<Ipayment>) => {
           await session.commitTransaction();
           session.endSession();
 
+          const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
+          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+          const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', updatedInvoice._id.toString(), 'application/pdf');
+
+          updatedInvoice.invoiceAwsLink = invoiceAwsLink;
+          await updatedInvoice.save();
+
           // // send invoiceSheet to client
           if (payment.paymentStatus === PaymentStatus.PAID) {
                await releaseInvoiceToWhatsApp(updatedInvoice);

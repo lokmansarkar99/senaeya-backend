@@ -37,6 +37,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           finalCost: { type: Number, required: true },
           totalCostOfWorkShopExcludingTax: { type: Number, required: true },
           totalCostOfSparePartsExcludingTax: { type: Number, required: true },
+          invoiceAwsLink: { type: String, required: false },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },

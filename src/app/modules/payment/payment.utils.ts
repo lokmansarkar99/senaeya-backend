@@ -26,11 +26,24 @@ export const generatePDF = async (htmlContent: string) => {
      return pdfPath;
 };
 
+// export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
+//      const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
+//      const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+//      const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+//      const result = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', updatedInvoice._id.toString(), 'application/pdf');
+//      whatsAppHelper.sendWhatsAppPDFMessage({
+//           to: (updatedInvoice.client as any).clientId.contact,
+//           priority: 10,
+//           referenceId: '',
+//           msgId: '',
+//           mentions: '',
+//           filename: `${updatedInvoice._id.toString()}_invoice.pdf`,
+//           document: result,
+//           caption: 'Invoice',
+//      });
+// };
+
 export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
-     const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
-     const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
-     const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-     const result = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', updatedInvoice._id.toString(), 'application/pdf');
      whatsAppHelper.sendWhatsAppPDFMessage({
           to: (updatedInvoice.client as any).clientId.contact,
           priority: 10,
@@ -38,7 +51,7 @@ export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
           msgId: '',
           mentions: '',
           filename: `${updatedInvoice._id.toString()}_invoice.pdf`,
-          document: result,
+          document: updatedInvoice.invoiceAwsLink,
           caption: 'Invoice',
      });
 };

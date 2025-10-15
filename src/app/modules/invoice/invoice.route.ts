@@ -22,6 +22,7 @@ router.get('/unpaginated', invoiceController.getAllUnpaginatedInvoices);
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), invoiceController.hardDeleteInvoice);
 router.post('/release-invoice/:invoiceId', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), validateRequest(invoiceValidation.releaseInvoiceZodSchema), invoiceController.releaseInvoice);
+router.post('/resend-invoice/:invoiceId', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), validateRequest(invoiceValidation.releaseInvoiceZodSchema), invoiceController.resendInvoice);
 
 router.patch(
      '/:id',

@@ -29,6 +29,7 @@ export interface IInvoice {
      totalCostOfWorkShopExcludingTax: number;
      totalCostOfSparePartsExcludingTax: number;
      car: Types.ObjectId;
+     invoiceAwsLink?: string;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;
