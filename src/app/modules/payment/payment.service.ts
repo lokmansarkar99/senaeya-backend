@@ -10,13 +10,13 @@ import { WorkShop } from '../workShop/workShop.model';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { Payment } from './payment.model';
-import { generatePDF } from './payment.utils';
+import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import path from 'path';
 import fs from 'fs';
 import { FOLDER_NAMES } from '../../../enums/files';
 
-const createPayment = async (payload: Ipayment) => {
+const createPayment = async (payload: Partial<Ipayment>) => {
      // /**
      //  * for payment module ⬇️⬇️⬇️⬇️⬇️
      //  * check the paymentMethod
@@ -42,7 +42,7 @@ const createPayment = async (payload: Ipayment) => {
      const invoice = await Invoice.findOne({ _id: payload.invoice, providerWorkShopId: payload.providerWorkShopId });
 
      if (!invoice) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.');
      }
      const payloadFields = Object.keys(payload);
      if (invoice.paymentMethod === PaymentMethod.CASH) {
@@ -76,6 +76,7 @@ const createPayment = async (payload: Ipayment) => {
      payload.paymentStatus = invoice.paymentStatus;
      if (invoice.paymentMethod === PaymentMethod.POSTPAID) {
           payload.postPaymentDate = invoice.postPaymentDate;
+          payload.paymentStatus = PaymentStatus.PAID;
      } else if (invoice.paymentMethod === PaymentMethod.CASH && payload.isCashRecieved) {
           payload.paymentStatus = PaymentStatus.PAID;
      } else if (invoice.paymentMethod === PaymentMethod.TRANSFER && payload.isRecievedTransfer) {
@@ -124,7 +125,7 @@ const createPayment = async (payload: Ipayment) => {
                     },
                });
           if (!updatedInvoice) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found.');
+               throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found**.');
           }
 
           const updatedProviderWorkshop = await WorkShop.findByIdAndUpdate(
@@ -144,20 +145,7 @@ const createPayment = async (payload: Ipayment) => {
 
           // // send invoiceSheet to client
           if (payment.paymentStatus === PaymentStatus.PAID) {
-               const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
-               const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
-               const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-               const result = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', invoice._id.toString(), 'application/pdf');
-               whatsAppHelper.sendWhatsAppPDFMessage({
-                    to: (updatedInvoice.client as any).clientId.contact,
-                    priority: 10,
-                    referenceId: '',
-                    msgId: '',
-                    mentions: '',
-                    filename: `${invoice._id.toString()}_invoice.pdf`,
-                    document: result,
-                    caption: 'Invoice',
-               });
+               await releaseInvoiceToWhatsApp(updatedInvoice);
           }
 
           return payment;

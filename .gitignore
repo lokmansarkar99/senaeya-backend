@@ -3,6 +3,6 @@ dist
 coverage
 uploads
 .env
-.env.example
+# .env.example
 winston
 logs

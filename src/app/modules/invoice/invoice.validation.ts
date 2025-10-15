@@ -81,7 +81,18 @@ const updateInvoiceZodSchema = z.object({
      }),
 });
 
+const releaseInvoiceZodSchema = z.object({
+     body: z.object({
+          providerWorkShopId: z.string({ required_error: 'Provider WorkShop ID is required' }),
+          cardApprovalCode: z.string().optional()
+     }),
+     params: z.object({
+          invoiceId: z.string({ required_error: 'Invoice ID is required' }),
+     })
+});
+
 export const invoiceValidation = {
      createInvoiceZodSchema,
      updateInvoiceZodSchema,
+     releaseInvoiceZodSchema
 };

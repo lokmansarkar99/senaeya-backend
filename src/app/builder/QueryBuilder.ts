@@ -31,7 +31,13 @@ class QueryBuilder<T> {
           const queryObj = { ...this.query };
           excludeFields.forEach((el) => delete queryObj[el]);
 
-          this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+          // this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+
+          // Filter For Price and Rating
+          let queryStr = JSON.stringify(queryObj);
+          queryStr = queryStr.replace(/\b(gt|gte|lt|lte|ne)\b/g, (key) => `$${key}`);
+          console.log("🚀 ~ QueryBuilder ~ filter ~ queryStr:", queryStr)
+          this.modelQuery = this.modelQuery.find(JSON.parse(queryStr));
           return this;
      }
 

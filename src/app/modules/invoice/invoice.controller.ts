@@ -84,6 +84,18 @@ const getInvoiceById = catchAsync(async (req: Request, res: Response) => {
      });
 });  
 
+const releaseInvoice = catchAsync(async (req: Request, res: Response) => {
+     const { invoiceId } = req.params;
+     const result = await invoiceService.releaseInvoice(invoiceId,req.body);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Invoice retrieved successfully',
+          data: result || undefined,
+     });
+});  
+
 export const invoiceController = {
      createInvoice,
      getAllInvoices,
@@ -91,5 +103,6 @@ export const invoiceController = {
      updateInvoice,
      deleteInvoice,
      hardDeleteInvoice,
-     getInvoiceById
+     getInvoiceById,
+     releaseInvoice
 };

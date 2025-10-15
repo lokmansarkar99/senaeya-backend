@@ -4,7 +4,7 @@ import { PaymentMethod, PaymentStatus } from "./payment.enum";
 
 const PaymentSchema = new Schema<Ipayment>({
      providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
-     invoice: { type: Schema.Types.ObjectId, ref: 'Invoice', required: true },
+     invoice: { type: Schema.Types.ObjectId, ref: 'Invoice', required: true, unique: true },
      paymentMethod: { type: String, enum: PaymentMethod, required: true },
      paymentStatus: { type: String, enum: PaymentStatus, required: true },
      amount: { type: Number, required: true },
