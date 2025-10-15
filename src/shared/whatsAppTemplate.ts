@@ -1,22 +1,20 @@
-import { IInvoice } from "../app/modules/invoice/invoice.interface"
+import { IInvoice } from '../app/modules/invoice/invoice.interface';
 
-const createAccount = (values: {name:string,otp:number,contact:string}) => {
+const createAccount = (values: { name: string; otp: number; contact: string }) => {
      return `Hello ${values.name},
      Your single use code is: ${values.otp}
      This code is valid for 3 minutes.
-     `
-}
+     `;
+};
 
-const forgetPassword = (values: {name:string,password:string,contact:string}) => {
+const forgetPassword = (values: { name: string; password: string; contact: string }) => {
      return `Hello ${values.name},
      Your password is: ${values.password}
-     `
-}
+     `;
+};
 
-
-
-const createInvoice = (updatedInvoice : IInvoice) => {
-     console.log("🚀 ~ createInvoice ~ updatedInvoice:", updatedInvoice)
+const createInvoice = (updatedInvoice: IInvoice) => {
+     console.log('🚀 ~ createInvoice ~ updatedInvoice:', updatedInvoice);
      return `
      <!DOCTYPE html>
      <html lang="ar" dir="rtl">
@@ -412,7 +410,11 @@ const createInvoice = (updatedInvoice : IInvoice) => {
                          </tr>
                      </thead>
                      <tbody>
-                         ${updatedInvoice.worksList ? updatedInvoice.worksList.map((work:any, index:any) => `
+                         ${
+                              updatedInvoice.worksList
+                                   ? updatedInvoice.worksList
+                                          .map(
+                                               (work: any, index: any) => `
                              <tr>
                                  <td>${index + 1}</td>
                                  <td>${work._id}</td>
@@ -421,7 +423,11 @@ const createInvoice = (updatedInvoice : IInvoice) => {
                                  <td>${work.finalCost}</td>
                                  <td>${work.finalCost * work.quantity}</td>
                              </tr>
-                         `).join('') : ''}
+                         `,
+                                          )
+                                          .join('')
+                                   : ''
+                         }
                      </tbody>
                  </table>
              </div>
@@ -440,7 +446,11 @@ const createInvoice = (updatedInvoice : IInvoice) => {
                          </tr>
                      </thead>
                      <tbody>
-                         ${updatedInvoice.sparePartsList ? updatedInvoice.sparePartsList.map((part:any, index:any) => `
+                         ${
+                              updatedInvoice.sparePartsList
+                                   ? updatedInvoice.sparePartsList
+                                          .map(
+                                               (part: any, index: any) => `
                              <tr>
                                  <td>${index + 1}</td>
                                  <td>${part._id}</td>
@@ -449,7 +459,11 @@ const createInvoice = (updatedInvoice : IInvoice) => {
                                  <td>${part.finalCost}</td>
                                  <td>${part.finalCost * part.quantity}</td>
                              </tr>
-                         `).join('') : ''}
+                         `,
+                                          )
+                                          .join('')
+                                   : ''
+                         }
                      </tbody>
                  </table>
              </div>
@@ -487,15 +501,109 @@ const createInvoice = (updatedInvoice : IInvoice) => {
      </body>
      </html>
      `;
- };
- 
+};
+
+const createReport = (report: any) => {
+     const saved = report?.numberOfUnpaidNonPostpaidInvoices ?? 0;
+     const postpaid = report?.numberOfUnpaidPostpaidInvoices ?? 0;
+     const completed = report?.numberOfPaidInvoices ?? 0;
+
+     const collected = Number(report?.totalIncomeCollected ?? 0);
+     const recorded = Number(report?.totalAllIncomeRecorded ?? 0);
+     const postpaidSaved = Math.max(0, recorded - collected);
+     const expenses = Number(report?.totalExpenses ?? 0);
+
+     const balCollected = Number(report?.collectedFinancialBalance ?? collected - expenses);
+     const balRecorded = Number(report?.recordedFinancialBalance ?? recorded - expenses);
+
+     const cars = report?.numberOfCars ?? 0;
+
+     const s = report?.range?.start ? new Date(report.range.start) : null;
+     const e = report?.range?.end ? new Date(report.range.end) : null;
+     const fmtDate = (x: Date) => `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`;
+     const dur = s && e ? Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000) + 1) : undefined;
+     const dateRange = s && e ? `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}` : '';
+
+     const fmt = (n: number) =>
+          n.toLocaleString(undefined, {
+               minimumFractionDigits: 2,
+               maximumFractionDigits: 2,
+          });
+
+     return `<!doctype html><html lang="ar" dir="rtl"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Financial Report - Senaeya App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+  body{font-family:'Cairo',Arial,Helvetica,sans-serif;background:#f4f5f7;color:#000;margin:0}
+  .c{max-width:1100px;margin:0 auto;background:#fff}
+  .h{background:#1771b7;color:#fff;padding:20px 28px;text-align:center}
+  .h h1{margin:0;font-size:24px}.h p{margin:6px 0 0;font-size:14px}
+  .v{background:#cb3c40;color:#fff;padding:8px 28px;display:flex;justify-content:space-between;font:600 13px Arial}
+  .cnt{padding:24px 28px}
+  .t{color:#1771b7;font:700 22px Arial;text-align:right;margin:0 0 18px}
+  .dr{background:#d1d1d1;padding:12px 18px;text-align:center;font:700 16px Arial;border-radius:4px;margin:0 0 18px}
+  .g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 18px}
+  .card{background:#f4f5f7;padding:18px;text-align:center;border-radius:4px}
+  .lb{font:600 14px Arial;margin:0 0 8px}
+  .r .lb{color:#cb3c40}.o .lb{color:#ff9900}.gr .lb{color:#11c84e}
+  .val{font:700 34px Arial}
+  .r .val{color:#cb3c40}.o .val{color:#ff9900}.gr .val{color:#11c84e}
+  .bar{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-radius:4px;color:#fff;margin:0 0 12px}
+  .b{background:#1771b7}.rr{background:#cb3c40}.gy{background:#959595}
+  .amt{display:flex;align-items:center;gap:10px;font:700 26px Arial}.cur{font-size:22px}
+  .lbl{font:600 16px Arial}
+  .bg{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:22px 0}
+  .bx{padding:18px;border-radius:4px;text-align:center}
+  .bu{background:#f0f7fc}.re{background:#fcf0f0}
+  .bt{font:700 18px Arial;margin:0 0 10px}.bu .bt{color:#1771b7}.re .bt{color:#cb3c40}
+  .fml{font:600 12px Arial}
+  .bam{display:flex;justify-content:center;gap:10px;font:700 28px Arial;margin-top:10px}
+  .car{background:#d1d1d1;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;border-radius:4px;margin:0 0 18px}
+  .cl{font:700 18px Arial}.cv{font:700 24px Arial}
+  .ft{background:#1771b7;color:#fff;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;font:400 13px Arial}
+  .ph{background:#cb3c40;padding:6px 12px;border-radius:4px;font:700 13px Arial}
+  @media(max-width:760px){.g{grid-template-columns:1fr}.bg{grid-template-columns:1fr}.bar,.car,.ft{flex-direction:column;gap:8px;text-align:center}.h{padding:16px 20px}.v{padding:8px 20px}.cnt{padding:20px}.t{font-size:18px}}
+  </style></head>
+  <body><div class="c">
+    <div class="h"><h1>مركز محمد لصيانة السيارات</h1><p>مؤسسة محمد علي التجارية</p></div>
+    <div class="v"><span>VAT - 3xxxxxxxxxxxxxx3</span><span>CR - 1010347328</span></div>
+    <div class="cnt">
+      <h2 class="t">Report issued by Senaeya App</h2>
+      <div class="dr">${dateRange}</div>
+      <div class="g">
+        <div class="card r"><div class="lb">Number of<br>saved invoices</div><div class="val">${saved}</div></div>
+        <div class="card o"><div class="lb">Number of<br>Postpaid Invoices</div><div class="val">${postpaid}</div></div>
+        <div class="card gr"><div class="lb">Number of<br>completed invoices</div><div class="val">${completed}</div></div>
+      </div>
+      <div class="bar b"><div class="amt"><span class="cur">﷼</span><span>${fmt(collected)}</span></div><div class="lbl">Total income collected</div></div>
+      <div class="bar rr"><div class="amt"><span class="cur">﷼</span><span>${fmt(postpaidSaved)}</span></div><div class="lbl">Total postpaid and saved income</div></div>
+      <div class="bar gy"><div class="amt"><span class="cur">﷼</span><span>${fmt(expenses)}</span></div><div class="lbl">Total expenses paid</div></div>
+      <div class="bg">
+        <div class="bx bu"><div class="bt">Collected financial balance</div><div class="fml">All income collected</div><div class="fml">-</div><div class="fml">All expenses paid</div><div class="bam"><span class="cur">﷼</span><span>${fmt(balCollected)}</span></div></div>
+        <div class="bx re"><div class="bt">Recorded financial balance</div><div class="fml">All income recorded</div><div class="fml">-</div><div class="fml">All expenses paid</div><div class="bam"><span class="cur">﷼</span><span>${fmt(balRecorded)}</span></div></div>
+      </div>
+      <div class="car"><div class="cl">Cars</div><div class="cv">${cars}</div><div class="cl">Number of cars serviced</div></div>
+    </div>
+    <div class="ft"><div>You can issue multiple reports via Senaeya App.<br>Daily - Weekly - Monthly - Annual Report - and more</div><div><span class="ph">966-5xxxxxxxx</span> <span>Riyadh - old Industrial - ali st.</span></div></div>
+  </div></body></html>`;
+};
+
+// const createReport = (report: any) => {
+//     return `Hello ${report.name},
+//     Your single use code is: ${report.otp}
+//     This code is valid for 3 minutes.
+//     `
+// }
 
 export const whatsAppTemplate = {
-    createAccount,
-    forgetPassword,
-    createInvoice,
-    // resetPassword,
-    // resetPasswordByUrl,
-    // contactFormTemplate,
-    // contact,
+     createAccount,
+     forgetPassword,
+     createInvoice,
+     createReport,
+     // resetPassword,
+     // resetPasswordByUrl,
+     // contactFormTemplate,
+     // contact,
 };
