@@ -65,4 +65,10 @@ export default {
           region: process.env.AWS_REGION,
           bucket_name: process.env.AWS_BUCKET_NAME,
      },
+     clickpay: {
+          apiEndpoint: process.env.CLICKPAY_API_ENDPOINT,
+          serverKey: process.env.CLICKPAY_SERVER_KEY,
+          profileId: process.env.CLICKPAY_PROFILE_ID,
+          authScheme: process.env.CLICKPAY_AUTH_SCHEME,
+     },
 };
