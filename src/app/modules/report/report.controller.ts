@@ -5,7 +5,7 @@ import { reportService } from './report.service';
 
 const getAllReportsByCreatedDateRange = catchAsync(async (req: Request, res: Response) => {
      const { providerWorkShopId } = req.body;
-     const result = await reportService.getAllReportsByCreatedDateRange(req.query,req.user);
+     const result = await reportService.getAllReportsByCreatedDateRange(req.query, providerWorkShopId, req.user);
 
      sendResponse(res, {
           statusCode: 200,
