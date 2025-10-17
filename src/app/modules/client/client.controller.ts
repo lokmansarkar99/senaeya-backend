@@ -84,6 +84,19 @@ const getClientById = catchAsync(async (req: Request, res: Response) => {
      });
 });  
 
+const getClientByClientContact = catchAsync(async (req: Request, res: Response) => {
+     const { contact } = req.params;
+     const {providerWorkShopId} = req.body;
+     const result = await clientService.getClientByClientContact(contact, providerWorkShopId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Client retrieved successfully',
+          data: result || undefined,
+     });
+});
+
 export const clientController = {
      createClient,
      getAllClients,
@@ -91,5 +104,6 @@ export const clientController = {
      updateClient,
      deleteClient,
      hardDeleteClient,
-     getClientById
+     getClientById,
+     getClientByClientContact
 };

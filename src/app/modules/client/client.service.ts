@@ -240,6 +240,14 @@ const getClientById = async (id: string): Promise<IClient | null> => {
      return result;
 };
 
+const getClientByClientContact = async (contact: string, providerWorkShopId: string): Promise<IClient | null> => {
+     const result = await Client.findOne({ contact, providerWorkShopId });
+     if (!result) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+     }
+     return result;
+};
+
 export const clientService = {
      createClient,
      getAllClients,
@@ -248,4 +256,5 @@ export const clientService = {
      deleteClient,
      hardDeleteClient,
      getClientById,
+     getClientByClientContact,
 };

@@ -9,7 +9,7 @@ import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
 
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
-     console.log("🚀 ~ createCar ~ payload:", payload)
+     console.log('🚀 ~ createCar ~ payload:', payload);
      if (payload.carType == CLIENT_CAR_TYPE.SAUDI) {
           // payload must include plateNumberForSaudi
           if (
@@ -62,8 +62,7 @@ const createCar = async (payload: IcarCreate): Promise<ICar> => {
      return result;
 };
 
-
-const createCarWithSession = async (payload: IcarCreate, session: any)=> {
+const createCarWithSession = async (payload: IcarCreate, session: any) => {
      if (payload.carType == CLIENT_CAR_TYPE.SAUDI) {
           // payload must include plateNumberForSaudi
           if (
@@ -117,13 +116,23 @@ const createCarWithSession = async (payload: IcarCreate, session: any)=> {
 };
 
 const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     const queryBuilder = new QueryBuilder(Car.find(), query);
-     const result = await queryBuilder
-          .filter()
-          .sort()
-          .paginate()
-          .fields()
-          .search(['vin', 'model', 'year',  'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     const queryBuilder = new QueryBuilder(
+          Car.find()
+               .populate({
+                    path: 'client',
+                    populate: {
+                         path: 'clientId',
+                    },
+               })
+               .populate({
+                    path: 'brand',
+                    populate: {
+                         path: 'country',
+                    },
+               }),
+          query,
+     );
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };

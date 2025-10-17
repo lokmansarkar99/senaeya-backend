@@ -36,7 +36,6 @@ class QueryBuilder<T> {
           // Filter For Price and Rating
           let queryStr = JSON.stringify(queryObj);
           queryStr = queryStr.replace(/\b(gt|gte|lt|lte|ne)\b/g, (key) => `$${key}`);
-          console.log("🚀 ~ QueryBuilder ~ filter ~ queryStr:", queryStr)
           this.modelQuery = this.modelQuery.find(JSON.parse(queryStr));
           return this;
      }

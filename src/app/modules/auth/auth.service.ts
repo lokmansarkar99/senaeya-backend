@@ -15,6 +15,8 @@ import { verifyToken } from '../../../utils/verifyToken';
 import { createToken } from '../../../utils/createToken';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { USER_ROLES } from '../../../enums/user';
+import { workShopService } from '../workShop/workShop.service';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -43,8 +45,14 @@ const loginUserFromDB = async (payload: ILoginData) => {
      if (!(await User.isMatchPassword(password, isExistUser.password || ''))) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
      }
-
-     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, subscribedPackage: isExistUser.subscribedPackage || null };
+     const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, subscribedPackage: isExistUser.subscribedPackage || null };
+     if (isExistUser.role === USER_ROLES.WORKSHOP_MEMBER || isExistUser.role === USER_ROLES.WORKSHOP_OWNER) {
+          const userWorkShops = await workShopService.getAllWorkShops({ ownerId: isExistUser._id, fields: '_id' });
+          if (userWorkShops.result.length > 0) {
+               const workShopsIds = userWorkShops.result.map((workShop) => workShop._id!.toString());
+               jwtData.workShops = workShopsIds;
+          }
+     }
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);

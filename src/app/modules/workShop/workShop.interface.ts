@@ -15,6 +15,7 @@ export interface IWorkingSubSchedule {
 }
 
 export interface IworkShop {
+     _id?: Types.ObjectId | string;
      workshopNameEnglish: string;
      workshopNameArabic: string;
      unn: string; // unified national number | total digit: 10; startingWith: 7

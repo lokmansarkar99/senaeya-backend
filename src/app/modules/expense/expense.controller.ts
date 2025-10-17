@@ -84,6 +84,17 @@ const getExpenseById = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getMonthlyYearlyExpenses = catchAsync(async (req: Request, res: Response) => {
+     const result = await expenseService.getMonthlyYearlyExpenses(req.query,req.body.providerWorkShopId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Expenses retrieved successfully',
+          data: result,
+     });
+});
+
 export const expenseController = {
      createExpense,
      getAllExpenses,
@@ -92,4 +103,5 @@ export const expenseController = {
      deleteExpense,
      hardDeleteExpense,
      getExpenseById,
+     getMonthlyYearlyExpenses,
 };

@@ -20,7 +20,15 @@ const updateExpenseZodSchema = z.object({
      }),
 });
 
+const getMonthlyYearlyExpensesZodSchema = z.object({
+     query: z.object({
+          year: z.string().optional(),
+          month: z.string().optional(),
+     }),
+});
+
 export const expenseValidation = {
      createExpenseZodSchema,
      updateExpenseZodSchema,
+     getMonthlyYearlyExpensesZodSchema,
 };

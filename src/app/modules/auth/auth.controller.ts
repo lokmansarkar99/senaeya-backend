@@ -118,7 +118,7 @@ const googleAuthCallback = catchAsync(async (req, res) => {
                role: user.role, 
                email: user.email || '',
                contact: user.contact || '',
-               subscribedPackage: user.subscribedPackage || null
+               subscribedPackage: user.subscribedPackage || null,
           };
           
           const accessToken = jwtHelper.createToken(

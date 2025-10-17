@@ -12,6 +12,8 @@ router.post('/', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), va
 
 router.get('/', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), expenseController.getAllExpenses);
 
+router.get('/monthly-yearly-expenses', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), validateRequest(expenseValidation.getMonthlyYearlyExpensesZodSchema), expenseController.getMonthlyYearlyExpenses);
+
 router.get('/unpaginated', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), expenseController.getAllUnpaginatedExpenses);
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), expenseController.hardDeleteExpense);
