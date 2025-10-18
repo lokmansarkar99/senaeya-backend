@@ -24,7 +24,7 @@ const getAllCarBrandCountriess = async (query: Record<string, any>): Promise<{ m
 };
 
 const getAllUnpaginatedCarBrandCountriess = async (): Promise<IcarBrandCountries[]> => {
-     const result = await CarBrandCountries.find();
+     const result = await CarBrandCountries.find().select('_id image title');
      return result;
 };
 

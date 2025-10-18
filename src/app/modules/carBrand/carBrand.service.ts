@@ -18,13 +18,13 @@ const createCarBrand = async (payload: IcarBrand): Promise<IcarBrand> => {
 
 const getAllCarBrands = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number; }; result: IcarBrand[]; }> => {
      const queryBuilder = new QueryBuilder(CarBrand.find(), query);
-     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
+     const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
 
 const getAllUnpaginatedCarBrands = async (): Promise<IcarBrand[]> => {
-     const result = await CarBrand.find();
+     const result = await CarBrand.find().select('_id image title country');
      return result;
 };
 

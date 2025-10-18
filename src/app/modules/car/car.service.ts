@@ -126,8 +126,10 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
                })
                .populate({
                     path: 'brand',
+                    select: '_id image title',
                     populate: {
                          path: 'country',
+                         select: '_id image title',
                     },
                }),
           query,
