@@ -36,8 +36,10 @@ export interface IworkShop {
      updatedAt: Date;
      isDeleted: boolean;
      deletedAt?: Date;
+     subscribedPackage?: Types.ObjectId | null;
      subscriptionId?: Types.ObjectId | null;
      generatedInvoiceCount: number;
+     isUsedTrial:boolean;
 }
 
 export type IworkShopFilters = {

@@ -16,6 +16,7 @@ import { invoiceRoutes } from '../app/modules/invoice/invoice.route';
 import { paymentRoutes } from '../app/modules/payment/payment.route';
 import { reportRoutes } from '../app/modules/report/report.route';
 import { clickpayRoutes } from '../app/modules/payment/clickpay/clickpay.route';
+import { PackageRoutes } from '../app/modules/package/package.routes';
 const router = express.Router();
 const routes = [
      {
@@ -85,7 +86,11 @@ const routes = [
      {
           path: '/clickpay',
           route: clickpayRoutes,
-     }    
+     },
+     {
+          path: '/packages',
+          route: PackageRoutes,
+     },
 ];
 
 routes.forEach((element) => {

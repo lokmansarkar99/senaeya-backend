@@ -4,7 +4,7 @@ import config from '../../../../config';
 
 // Determine auth scheme: 'Bearer' (default) or 'Raw'
 
-export async function initiatePayment(request: ClickPayPaymentRequest) {
+export async function initiatePaymentService(request: ClickPayPaymentRequest) {
      // Never log server keys in production
      try {
           const profileIdNum = Number(config.clickpay.profileId);

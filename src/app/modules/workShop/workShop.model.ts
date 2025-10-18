@@ -1,5 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 import { IworkShop, IWorkingSubSchedule } from './workShop.interface';
+import { MAX_FREE_INVOICE_COUNT } from './workshop.enum';
 
 const DaysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as const;
 
@@ -80,7 +81,21 @@ const WorkShopSchema = new Schema<IworkShop>(
           description: { type: String, required: false },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
-          generatedInvoiceCount: { type: Number, default: 0 },
+          generatedInvoiceCount: { type: Number, default: 0,max: MAX_FREE_INVOICE_COUNT },
+          subscribedPackage: {
+               type: Types.ObjectId,
+               ref: 'Package',
+               default: null,
+          },
+          subscriptionId: {
+               type: Types.ObjectId,
+               ref: 'Subscription',
+               default: null,
+          },
+          isUsedTrial:{
+               type: Boolean,
+               default: true,
+          }
      },
      { timestamps: true },
 );

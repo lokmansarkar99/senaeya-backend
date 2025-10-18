@@ -3,17 +3,17 @@ import { ISubscription, SubscriptionModel } from './subscription.interface';
 
 const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
      {
-          customerId: {
-               type: String,
-               required: true,
-          },
+          // customerId: {
+          //      type: String,
+          //      required: true,
+          // },
           price: {
                type: Number,
                required: true,
           },
-          userId: {
+          workshop: {
                type: Schema.Types.ObjectId,
-               ref: 'User',
+               ref: 'WorkShop',
                required: true,
           },
           package: {
@@ -26,10 +26,10 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                required: false,
                default: '',
           },
-          subscriptionId: {
-               type: String,
-               required: true,
-          },
+          // subscriptionId: {
+          //      type: String,
+          //      required: true,
+          // },
           currentPeriodStart: {
                type: String,
                required: true,
@@ -38,10 +38,10 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                type: String,
                required: true,
           },
-          remaining: {
-               type: Number,
-               required: true,
-          },
+          // remaining: {
+          //      type: Number,
+          //      required: true,
+          // },
           status: {
                type: String,
                enum: ['expired', 'active', 'cancel', 'deactivated'],

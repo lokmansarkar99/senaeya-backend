@@ -21,7 +21,6 @@ export type IUser = {
           expireAt: Date;
      };
      helperUserId?: Types.ObjectId | null;
-     subscribedPackage?: Types.ObjectId | null;
      fingerPrintId?: string;
 };
 

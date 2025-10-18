@@ -6,13 +6,6 @@ import AppError from '../../../errors/AppError';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 const createPackageToDB = async (payload: IPackage): Promise<IPackage | null> => {
-     const productPayload = {
-          title: payload.title,
-          description: payload.description,
-          duration: payload.duration,
-          price: Number(payload.price),
-     };
-
      const result = await Package.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to created Package');
@@ -27,9 +20,6 @@ const updatePackageToDB = async (id: string, payload: IPackage): Promise<IPackag
           throw new AppError(StatusCodes.NOT_FOUND, 'Package not found');
      }
 
-     
-
-     
      const updatedPackage = await Package.findByIdAndUpdate(id, payload, {
           new: true,
           runValidators: true,
@@ -89,7 +79,6 @@ const deletePackageToDB = async (id: string): Promise<IPackage | null> => {
      }
 
      try {
-
           // Update the package status in your DB
           const result = await Package.findByIdAndUpdate(
                { _id: id },

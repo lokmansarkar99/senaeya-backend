@@ -211,6 +211,8 @@ const getPaymentById = async (id: string): Promise<Ipayment | null> => {
      return result;
 };
 
+const updatePaymentStatus = async (...args: any[])=> {};
+
 export const paymentService = {
      createPayment,
      getAllPayments,
@@ -219,4 +221,5 @@ export const paymentService = {
      deletePayment,
      hardDeletePayment,
      getPaymentById,
+     updatePaymentStatus,
 };

@@ -7,6 +7,8 @@ import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { paymentService } from '../payment/payment.service';
 import { ObjectId } from 'mongodb';
 import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
+import { WorkShop } from '../workShop/workShop.model';
+import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
 
 const createInvoice = async (payload: IInvoice) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
@@ -27,6 +29,12 @@ const createInvoice = async (payload: IInvoice) => {
      const result = await invoice.save();
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
+     }
+     // get the workshop
+     const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
+     if (!workshop!.subscribedPackage) {
+          workshop!.generatedInvoiceCount += 1;
+          await workshop!.save();
      }
      const populatedResult = await Invoice.findById(result._id)
           .populate({

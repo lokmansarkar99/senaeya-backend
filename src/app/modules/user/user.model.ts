@@ -94,11 +94,6 @@ const userSchema = new Schema<IUser, UserModel>(
                ref: 'User',
                default: null,
           },
-          subscribedPackage: {
-               type: Types.ObjectId,
-               ref: 'Package',
-               default: null,
-          },
           fingerPrintId: {
                type: String,
           },

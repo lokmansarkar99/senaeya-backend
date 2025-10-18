@@ -1,13 +1,18 @@
 import { Model } from 'mongoose';
+import { PackageDuration, PackagePaymentType, PackageSubscriptionType, PackageStatus } from './package.enum';
 
 export type IPackage = {
      title: string; // "Standard"
      description: string;
+     features: string[];
+     monthlyBasePrice: number;
+     yearlyBasePrice: number;
      price: number;
-     duration: '1 month' | '3 months' | '6 months' | '1 year';
-     paymentType: 'Monthly' | 'Yearly';
-     subscriptionType: 'app' | 'web';
-     status: 'active' | 'inactive';
+     duration: PackageDuration;
+     paymentType: PackagePaymentType;
+     subscriptionType: PackageSubscriptionType;
+     status: PackageStatus;
+     discountPercentage: number;
      isDeleted: boolean;
 };
 

@@ -39,31 +39,26 @@ const cancelSubscription = catchAsync(async (req, res) => {
 const createCheckoutSession = catchAsync(async (req, res) => {
      const { id }: any = req.user;
      const packageId = req.params.id;
-     const result = await SubscriptionService.createSubscriptionCheckoutSession(id, packageId);
+     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(id, packageId);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
           message: 'Create checkout session successfully',
-          data: {
-               sessionId: result.sessionId,
-               url: result.url,
-          },
+          data: result,
      });
 });
 // update subscriptions
 const updateSubscription = catchAsync(async (req, res) => {
      const { id }: any = req.user;
      const packageId = req.params.id;
-     const result = await SubscriptionService.upgradeSubscriptionToDB(id, packageId);
+     const result = await SubscriptionService.upgradeSubscriptionToDB(id, packageId, req.body.providerWorkShopId);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
           message: 'Update checkout session successfully',
-          data: {
-               url: result.url,
-          },
+          data: result,
      });
 });
 const orderSuccess = catchAsync(async (req, res) => {
