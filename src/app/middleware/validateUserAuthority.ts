@@ -20,7 +20,7 @@ const validateUserAuthority = () => async (req: Request, res: Response, next: Ne
                          if (workShop.generatedInvoiceCount <= MAX_FREE_INVOICE_COUNT) {
                               throw new Error('Plz do subscribe');
                          }
-                    } else if (workShop.subscribedPackage) {
+                    } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {
                          const currentDate = new Date();
                          const currentPeriodEnd = new Date((workShop as any).subscriptionId.currentPeriodEnd);
 

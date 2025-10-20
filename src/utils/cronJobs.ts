@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import { User } from '../app/modules/user/user.model';
 import figlet from 'figlet';
 import chalk from 'chalk';
+import { Subscription } from '../app/modules/subscription/subscription.model';
 // ====== CRON JOB SCHEDULERS ======
 // 1. Check for users expiring in 24 hours (send warning email)
 const scheduleTrialWarningCheck = () => {
@@ -18,16 +18,16 @@ const scheduleTrialWarningCheck = () => {
                today.setHours(23, 59, 59, 999); // End of today
 
                // Find users whose trial expires tomorrow
-               const usersExpiringTomorrow = await User.find({
-                    isFreeTrial: true,
-                    hasAccess: true,
-                    trialExpireAt: {
+               const subscriptionsExpiringTomorrow = await Subscription.countDocuments({
+                    // isFreeTrial: true,
+                    // hasAccess: true,
+                    currentPeriodEnd: {
                          $gte: today,
                          $lte: tomorrow,
                     },
                });
 
-               console.log(`📧 Found ${usersExpiringTomorrow.length} users expiring tomorrow`);
+               console.log(`📧 Found ${subscriptionsExpiringTomorrow} users expiring tomorrow`);
                console.log('✅ Trial warning emails sent');
           } catch (error) {
                console.error('❌ Error in trial warning check:', error);
@@ -44,25 +44,25 @@ const scheduleTrialExpiryCheck = () => {
                const now = new Date();
 
                // Find users whose trial has expired
-               const expiredUsers = await User.find({
-                    isFreeTrial: true,
-                    trialExpireAt: { $lt: now },
+               const expiredUsers = await Subscription.find({
+                    // isFreeTrial: true,
+                    // trialExpireAt: { $lt: now },
+                    currentPeriodEnd: { $lt: now },
                });
 
                if (expiredUsers.length > 0) {
                     console.log(`🚫 Found ${expiredUsers.length} expired trial users`);
 
                     // Update expired users
-                    const updateResult = await User.updateMany(
+                    const updateResult = await Subscription.updateMany(
                          {
-                              isFreeTrial: true,
-                              trialExpireAt: { $lt: now },
+                              // isFreeTrial: true,
+                              // trialExpireAt: { $lt: now },
+                              currentPeriodEnd: { $lt: now },
                          },
                          {
                               $set: {
-                                   isFreeTrial: false,
-                                   hasAccess: false,
-                                   trialExpiredAt: now, // Track when trial expired
+                                   status: 'expired',
                               },
                               $inc: { tokenVersion: 1 },
                          },
