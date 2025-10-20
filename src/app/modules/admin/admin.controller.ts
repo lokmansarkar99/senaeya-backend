@@ -38,8 +38,19 @@ const getAdmin = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getDashboard = catchAsync(async (req: Request, res: Response) => {
+     const result = await AdminService.getDashboard(req.query);
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Dashboard Retrieved Successfully',
+          data: result,
+     });
+});
+
 export const AdminController = {
      deleteAdmin,
      createAdmin,
      getAdmin,
+     getDashboard,
 };

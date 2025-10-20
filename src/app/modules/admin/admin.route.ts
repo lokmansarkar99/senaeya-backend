@@ -10,6 +10,9 @@ router.post('/create-admin', auth(USER_ROLES.SUPER_ADMIN), validateRequest(Admin
 
 router.get('/get-admin', auth(USER_ROLES.SUPER_ADMIN), AdminController.getAdmin);
 
+
+router.get('/dashboard', auth(USER_ROLES.SUPER_ADMIN), validateRequest(AdminValidation.getDashboardZodSchema), AdminController.getDashboard);
+
 router.delete('/:id', auth(USER_ROLES.SUPER_ADMIN), AdminController.deleteAdmin);
 
 export const AdminRoutes = router;

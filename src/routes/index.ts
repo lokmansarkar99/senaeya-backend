@@ -17,6 +17,7 @@ import { paymentRoutes } from '../app/modules/payment/payment.route';
 import { reportRoutes } from '../app/modules/report/report.route';
 import { clickpayRoutes } from '../app/modules/payment/clickpay/clickpay.route';
 import { PackageRoutes } from '../app/modules/package/package.routes';
+import { AdminRoutes } from '../app/modules/admin/admin.route';
 const router = express.Router();
 const routes = [
      {
@@ -90,6 +91,10 @@ const routes = [
      {
           path: '/packages',
           route: PackageRoutes,
+     },
+     {
+          path: '/admin',
+          route: AdminRoutes,
      },
 ];
 
