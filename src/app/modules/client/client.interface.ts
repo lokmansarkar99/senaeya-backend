@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { CLIENT_TYPE } from './client.enum';
+import { CLIENT_TYPE, CLIENT_STATUS } from './client.enum';
 
 export interface IClient {
      providerWorkShopId: Types.ObjectId;
@@ -13,8 +13,12 @@ export interface IClient {
      updatedAt: Date;
      isDeleted: boolean;
      deletedAt?: Date;
+     status?: CLIENT_STATUS;
 }
 
 export type IClientFilters = {
      searchTerm?: string;
-};
+     status?: CLIENT_STATUS;
+     clientType?: CLIENT_TYPE;
+     providerWorkShopId?: Types.ObjectId;
+     };

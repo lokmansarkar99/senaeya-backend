@@ -80,7 +80,17 @@ const updateClientZodSchema = z.object({
      }),
 });
 
+const toggleClientStatusZodSchema = z.object({
+     body: z.object({
+          providerWorkShopId: z.string({ required_error: 'WorkShopId is required' }),
+     }),
+     params: z.object({
+          id: z.string({ required_error: 'Id is required' }),
+     }),
+});
+
 export const clientValidation = {
      createClientZodSchema,
      updateClientZodSchema,
+     toggleClientStatusZodSchema
 };

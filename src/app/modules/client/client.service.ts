@@ -4,7 +4,7 @@ import { IClient } from './client.interface';
 import { Client } from './client.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
-import { CLIENT_CAR_TYPE, CLIENT_TYPE } from './client.enum';
+import { CLIENT_CAR_TYPE, CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
 import { WorkShop } from '../workShop/workShop.model';
 import { User } from '../user/user.model';
 import { USER_ROLES } from '../../../enums/user';
@@ -13,6 +13,8 @@ import { Car } from '../car/car.model';
 import { carService } from '../car/car.service';
 import mongoose from 'mongoose';
 import { imageService } from '../image/image.service';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 
 /** steps
  * client type check user or workshop
@@ -199,7 +201,7 @@ const getAllUnpaginatedClients = async (): Promise<IClient[]> => {
 };
 
 const updateClient = async (id: string, payload: Partial<IClient>): Promise<IClient | null> => {
-     const isExist = await Client.findById(id);
+     const isExist = await Client.findOne({ _id: id });
      if (!isExist) {
           if (payload.document) {
                unlinkFile(payload.document);
@@ -214,7 +216,7 @@ const updateClient = async (id: string, payload: Partial<IClient>): Promise<ICli
 };
 
 const deleteClient = async (id: string): Promise<IClient | null> => {
-     const result = await Client.findById(id);
+     const result = await Client.findOne({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
@@ -225,7 +227,7 @@ const deleteClient = async (id: string): Promise<IClient | null> => {
 };
 
 const hardDeleteClient = async (id: string): Promise<IClient | null> => {
-     const result = await Client.findByIdAndDelete(id);
+     const result = await Client.findOneAndDelete({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
@@ -236,7 +238,7 @@ const hardDeleteClient = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientById = async (id: string): Promise<IClient | null> => {
-     const result = await Client.findById(id);
+     const result = await Client.findOne({ _id: id });
      return result;
 };
 
@@ -248,6 +250,27 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
      return result;
 };
 
+const toggleClientStatus = async (id: string): Promise<IClient | null> => {
+     const [result] = await Client.find({ _id: id });
+     if (!result) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+     }
+     result.status = result.status === CLIENT_STATUS.ACTIVE ? CLIENT_STATUS.BLOCK : CLIENT_STATUS.ACTIVE;
+     await result.save();
+     return result;
+};
+
+const sendMessageToRecieveCar = async (id: string) => {
+     const [result] = await Client.find({ _id: id });
+     if (!result) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+     }
+     //send message
+     const values = { contact: result.contact };
+     const message = whatsAppTemplate.getRecieveCar(values);
+     await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
+};
+
 export const clientService = {
      createClient,
      getAllClients,
@@ -257,4 +280,6 @@ export const clientService = {
      hardDeleteClient,
      getClientById,
      getClientByClientContact,
+     toggleClientStatus,
+     sendMessageToRecieveCar,
 };

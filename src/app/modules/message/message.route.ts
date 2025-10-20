@@ -1,9 +1,6 @@
 import express from 'express';
 import { messageController } from './message.controller';
 import auth from '../../middleware/auth';
-import fileUploadHandler from '../../middleware/fileUploadHandler';
-import parseFileData from '../../middleware/parseFileData';
-import { FOLDER_NAMES } from '../../../enums/files';
 import validateRequest from '../../middleware/validateRequest';
 import { messageValidation } from './message.validation';
 import { USER_ROLES } from '../../../enums/user';

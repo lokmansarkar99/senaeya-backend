@@ -7,3 +7,9 @@ export enum CLIENT_CAR_TYPE {
      SAUDI = 'Saudi',
      INTERNATIONAL = 'International',
 }
+
+
+export enum CLIENT_STATUS {
+     ACTIVE = 'Active',
+     BLOCK = 'Block',
+}

@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IClient } from './client.interface';
-import { CLIENT_TYPE } from './client.enum';
+import { CLIENT_TYPE, CLIENT_STATUS } from './client.enum';
 
 const ClientSchema = new Schema<IClient>({
      providerWorkShopId:{ type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
@@ -12,6 +12,7 @@ const ClientSchema = new Schema<IClient>({
      document: { type: String, required: true },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },
+     status: { type: String, enum: CLIENT_STATUS, default: CLIENT_STATUS.ACTIVE },
 }, { timestamps: true });
 
 ClientSchema.pre('find', function (next) {
@@ -20,12 +21,12 @@ ClientSchema.pre('find', function (next) {
 });
 
 ClientSchema.pre('findOne', function (next) {
-     this.findOne({ isDeleted: false });
+     this.findOne({ isDeleted: false, status: CLIENT_STATUS.ACTIVE });
      next();
 });
 
 ClientSchema.pre('aggregate', function (next) {
-     this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+     this.pipeline().unshift({ $match: { isDeleted: { $ne: true }, status: CLIENT_STATUS.ACTIVE } });
      next();
 });       
 

@@ -13,6 +13,12 @@ const forgetPassword = (values: { name: string; password: string; contact: strin
      `;
 };
 
+const getRecieveCar = (values: { contact: string }) => {
+     return `Hello,
+     Please come to the workshop to receive your car.
+     `;
+};
+
 const createInvoice = (updatedInvoice: IInvoice) => {
      console.log('🚀 ~ createInvoice ~ updatedInvoice:', updatedInvoice);
      return `
@@ -602,6 +608,7 @@ export const whatsAppTemplate = {
      forgetPassword,
      createInvoice,
      createReport,
+     getRecieveCar,
      // resetPassword,
      // resetPasswordByUrl,
      // contactFormTemplate,

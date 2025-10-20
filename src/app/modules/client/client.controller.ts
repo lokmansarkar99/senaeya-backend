@@ -82,11 +82,11 @@ const getClientById = catchAsync(async (req: Request, res: Response) => {
           message: 'Client retrieved successfully',
           data: result || undefined,
      });
-});  
+});
 
 const getClientByClientContact = catchAsync(async (req: Request, res: Response) => {
      const { contact } = req.params;
-     const {providerWorkShopId} = req.body;
+     const { providerWorkShopId } = req.body;
      const result = await clientService.getClientByClientContact(contact, providerWorkShopId);
 
      sendResponse(res, {
@@ -94,6 +94,29 @@ const getClientByClientContact = catchAsync(async (req: Request, res: Response) 
           success: true,
           message: 'Client retrieved successfully',
           data: result || undefined,
+     });
+});
+
+const toggleClientStatus = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     const result = await clientService.toggleClientStatus(id);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Client status toggled successfully',
+          data: result || undefined,
+     });
+});
+
+const sendMessageToRecieveCar = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     await clientService.sendMessageToRecieveCar(id);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Message sent successfully',
      });
 });
 
@@ -105,5 +128,7 @@ export const clientController = {
      deleteClient,
      hardDeleteClient,
      getClientById,
-     getClientByClientContact
+     getClientByClientContact,
+     toggleClientStatus,
+     sendMessageToRecieveCar,
 };
