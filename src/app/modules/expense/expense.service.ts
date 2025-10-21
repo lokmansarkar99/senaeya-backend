@@ -9,10 +9,8 @@ import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 const createExpense = async (payload: Iexpense): Promise<Iexpense> => {
      // Translate multiple properties dynamically
-    const [titleObj] : [Iexpense['title']]  = await Promise.all([
-      buildTranslatedField(payload.title as any)
-    ]);
-    payload.title = titleObj;
+     const [titleObj]: [Iexpense['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+     payload.title = titleObj;
      const formattedDate = convertToDate(payload.spendingDate as unknown as string);
      payload.spendingDate = formattedDate;
      const result = await Expense.create(payload);
@@ -35,11 +33,18 @@ const getAllUnpaginatedExpenses = async (): Promise<Iexpense[]> => {
 };
 
 const updateExpense = async (id: string, payload: Partial<Iexpense>): Promise<Iexpense | null> => {
+     if (payload.title) {
+          const [titleObj]: [Iexpense['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+          payload.title = titleObj;
+     }
      const isExist = await Expense.findById(id);
      if (!isExist) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Expense not found.');
      }
-
+     if (payload.spendingDate) {
+          const formattedDate = convertToDate(payload.spendingDate as unknown as string);
+          payload.spendingDate = formattedDate;
+     }
      return await Expense.findByIdAndUpdate(id, payload, { new: true });
 };
 
@@ -69,7 +74,7 @@ const getExpenseById = async (id: string): Promise<Iexpense | null> => {
 
 const getMonthlyYearlyExpenses = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: Iexpense[] }> => {
      const { year, month } = query;
-     console.log("🚀 ~ getMonthlyYearlyExpenses ~ query:", query)
+     console.log('🚀 ~ getMonthlyYearlyExpenses ~ query:', query);
 
      // Determine target year/month, defaulting to current if not provided/invalid
      const now = new Date();
