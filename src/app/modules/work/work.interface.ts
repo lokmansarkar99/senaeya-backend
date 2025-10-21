@@ -2,9 +2,16 @@ import { Types } from 'mongoose';
 import { WorkType } from './work.enum';
 
 export interface Iwork {
-     title: string;
+     title: {
+          ar: string;
+          bn: string;
+          ur: string;
+          hi: string;
+          tl: string;
+          en: string;
+     };
      worksCategories: Types.ObjectId;
-     type: WorkType | string; 
+     type: WorkType | string;
      code: string;
      cost: number;
      createdAt: Date;

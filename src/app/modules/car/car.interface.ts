@@ -4,7 +4,7 @@ import { CLIENT_CAR_TYPE } from "../client/client.enum";
 export interface ICar {
      providerWorkShopId: Types.ObjectId;
      brand: Types.ObjectId;
-     model: string;
+     model: Types.ObjectId;
      year: string;
      vin: string;
      client?: Types.ObjectId | null;

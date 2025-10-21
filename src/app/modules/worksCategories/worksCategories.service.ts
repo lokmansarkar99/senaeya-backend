@@ -4,11 +4,18 @@ import { IworksCategories } from './worksCategories.interface';
 import { WorksCategories } from './worksCategories.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 const createWorksCategories = async (payload: IworksCategories): Promise<IworksCategories> => {
+     const [titleObj, descriptionObj]: [IworksCategories['title'], IworksCategories['description']] = await Promise.all([
+          buildTranslatedField(payload.title as any),
+          buildTranslatedField(payload.description as any),
+     ]);
+     payload.title = titleObj;
+     payload.description = descriptionObj;
      const result = await WorksCategories.create(payload);
      if (!result) {
-          if(payload.image){
+          if (payload.image) {
                unlinkFile(payload.image);
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'WorksCategories not found.');
@@ -16,7 +23,7 @@ const createWorksCategories = async (payload: IworksCategories): Promise<IworksC
      return result;
 };
 
-const getAllWorksCategoriess = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number; }; result: IworksCategories[]; }> => {
+const getAllWorksCategoriess = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworksCategories[] }> => {
      const queryBuilder = new QueryBuilder(WorksCategories.find(), query);
      const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
@@ -31,14 +38,22 @@ const getAllUnpaginatedWorksCategoriess = async (): Promise<IworksCategories[]> 
 const updateWorksCategories = async (id: string, payload: Partial<IworksCategories>): Promise<IworksCategories | null> => {
      const isExist = await WorksCategories.findById(id);
      if (!isExist) {
-          if(payload.image){
+          if (payload.image) {
                unlinkFile(payload.image);
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'WorksCategories not found.');
      }
 
-     if(isExist.image){
+     if (isExist.image) {
           unlinkFile(isExist.image);
+     }
+     if (payload.title) {
+          const [titleObj]: [IworksCategories['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+          payload.title = titleObj;
+     }
+     if (payload.description) {
+          const [descriptionObj]: [IworksCategories['description']] = await Promise.all([buildTranslatedField(payload.description as any)]);
+          payload.description = descriptionObj;
      }
      return await WorksCategories.findByIdAndUpdate(id, payload, { new: true });
 };
@@ -59,7 +74,7 @@ const hardDeleteWorksCategories = async (id: string): Promise<IworksCategories |
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'WorksCategories not found.');
      }
-     if(result.image){
+     if (result.image) {
           unlinkFile(result.image);
      }
      return result;
@@ -68,7 +83,7 @@ const hardDeleteWorksCategories = async (id: string): Promise<IworksCategories |
 const getWorksCategoriesById = async (id: string): Promise<IworksCategories | null> => {
      const result = await WorksCategories.findById(id);
      return result;
-};   
+};
 
 export const worksCategoriesService = {
      createWorksCategories,
@@ -77,5 +92,5 @@ export const worksCategoriesService = {
      updateWorksCategories,
      deleteWorksCategories,
      hardDeleteWorksCategories,
-     getWorksCategoriesById
+     getWorksCategoriesById,
 };

@@ -6,13 +6,13 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
 import { getXLXStoJSON } from './work.utils';
 import mongoose, { ClientSession } from 'mongoose';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 const createWork = async (payload: Iwork): Promise<Iwork> => {
+     const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+     payload.title = titleObj;
      const result = await Work.create(payload);
      if (!result) {
-          // if(payload.image){
-          //      unlinkFile(payload.image);
-          // }
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
      }
      return result;
@@ -87,6 +87,10 @@ const updateWork = async (id: string, payload: Partial<Iwork>): Promise<Iwork | 
      if (!isExist) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
      }
+     if (payload.title) {
+          const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+          payload.title = titleObj;
+     }
 
      console.log('🚀 ~ updateWork ~ payload:', payload);
      return await Work.findByIdAndUpdate(id, payload, { new: true });
@@ -108,9 +112,6 @@ const hardDeleteWork = async (id: string): Promise<Iwork | null> => {
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
      }
-     // if (result.image) {
-     //      unlinkFile(result.image);
-     // }
      return result;
 };
 

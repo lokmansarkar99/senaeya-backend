@@ -45,7 +45,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
      if (!(await User.isMatchPassword(password, isExistUser.password || ''))) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
      }
-     const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, subscribedPackage: isExistUser.subscribedPackage || null };
+     const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact };
      if (isExistUser.role === USER_ROLES.WORKSHOP_MEMBER || isExistUser.role === USER_ROLES.WORKSHOP_OWNER) {
           const userWorkShops = await workShopService.getAllWorkShops({ ownerId: isExistUser._id, fields: '_id' });
           if (userWorkShops.result.length > 0) {
@@ -73,7 +73,7 @@ const loginUserWithFingerPrint = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You do not have permission to access this content. It looks like your account has been blocked.');
      }
 
-     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, subscribedPackage: isExistUser.subscribedPackage || null };
+     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact };
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
@@ -171,7 +171,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
           await User.findOneAndUpdate({ _id: isExistUser._id }, { verified: true, authentication: { oneTimeCode: null, expireAt: null } });
           //create token
           accessToken = jwtHelper.createToken(
-               { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact || '', subscribedPackage: isExistUser.subscribedPackage || null },
+               { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact || '' },
                config.jwt.jwt_secret as Secret,
                config.jwt.jwt_expire_in as string,
           );
@@ -310,7 +310,6 @@ const refreshToken = async (token: string) => {
           role: activeUser?.role,
           email: activeUser.email || '',
           contact: activeUser.contact || '',
-          subscribedPackage: activeUser.subscribedPackage || null,
      };
 
      const accessToken = jwtHelper.createToken(jwtPayload, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);

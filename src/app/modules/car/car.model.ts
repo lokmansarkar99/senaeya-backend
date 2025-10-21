@@ -5,7 +5,7 @@ const CarSchema = new Schema<ICar>(
      {
           providerWorkShopId:{ type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
           brand: { type: Schema.Types.ObjectId, ref: 'CarBrand', required: true },
-          model: { type: String, required: true },
+          model: { type: Schema.Types.ObjectId, ref: 'CarModel', required: true },
           year: { type: String, required: true },
           vin: { type: String, required: true, unique: true },
           client: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
