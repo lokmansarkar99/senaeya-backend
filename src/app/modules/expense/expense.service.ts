@@ -5,8 +5,14 @@ import { Expense } from './expense.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
 import { convertToDate } from './expense.utils';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 const createExpense = async (payload: Iexpense): Promise<Iexpense> => {
+     // Translate multiple properties dynamically
+    const [titleObj] : [Iexpense['title']]  = await Promise.all([
+      buildTranslatedField(payload.title as any)
+    ]);
+    payload.title = titleObj;
      const formattedDate = convertToDate(payload.spendingDate as unknown as string);
      payload.spendingDate = formattedDate;
      const result = await Expense.create(payload);

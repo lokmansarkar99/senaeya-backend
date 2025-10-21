@@ -1,11 +1,18 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export interface Iexpense {
      providerWorkShopId: Types.ObjectId;
-     item: string; // title
+     title: {
+          ar: string;
+          bn: string;
+          ur: string;
+          hi: string;
+          tl: string;
+          en: string;
+     };
      amount: number;
      spendingDate: Date;
-     description?:string;
+     description?: string;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

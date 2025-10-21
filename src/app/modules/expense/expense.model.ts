@@ -3,7 +3,14 @@ import { Iexpense } from './expense.interface';
 
 const ExpenseSchema = new Schema<Iexpense>({
      providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
-     item: { type: String, required: true },
+     title: { type: {
+          ar: String,
+          bn: String,
+          ur: String,
+          hi: String,
+          tl: String,
+          en: String,
+     }, required: true },
      amount: { type: Number,required: true },
      spendingDate: { type: Date,required: true },
      description: { type: String,required: false },
