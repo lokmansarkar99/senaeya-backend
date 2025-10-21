@@ -82,10 +82,25 @@ const getAllUnpaginatedInvoices = async (): Promise<IInvoice[]> => {
      return result;
 };
 
-const updateInvoice = async (id: string, payload: Partial<IInvoice>): Promise<IInvoice | null> => {
+const updateInvoice = async (id: string, payload: Partial<IInvoice & { extraTimeForUnpaidPostpaidInvoice: number }>): Promise<IInvoice | null> => {
      const isExist = await Invoice.findById(id);
      if (!isExist) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**.');
+     }
+
+     if (isExist?.paymentMethod === PaymentMethod.POSTPAID && isExist.paymentStatus === PaymentStatus.UNPAID && isExist?.postPaymentDate) {
+          if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string' ) {
+               payload.postPaymentDate = new Date(payload.postPaymentDate);
+               // check its not in the past
+               if (payload.postPaymentDate < new Date() ||  isExist?.postPaymentDate <= payload.postPaymentDate) {
+                    throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past or less than the previous post payment date');
+               }
+          }
+          if (!payload.postPaymentDate && payload.extraTimeForUnpaidPostpaidInvoice) {
+               payload.postPaymentDate = isExist.postPaymentDate;
+               payload.postPaymentDate.setDate(payload.postPaymentDate.getDate() + payload.extraTimeForUnpaidPostpaidInvoice);
+          }
+          
      }
 
      return await Invoice.findByIdAndUpdate(id, payload, { new: true });
