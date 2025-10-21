@@ -8,6 +8,16 @@ export interface IInvoiceWork {
      finalCost: number; // work.cost * quantity
 }
 
+
+export enum TranslatedFieldEnum {
+     en,
+     ar,
+     ur,
+     hi,
+     bn,
+     tl,
+}
+
 export interface IInvoice {
      _id?: Types.ObjectId;
      providerWorkShopId: Types.ObjectId;

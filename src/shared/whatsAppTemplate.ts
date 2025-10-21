@@ -1,4 +1,6 @@
-import { IInvoice } from '../app/modules/invoice/invoice.interface';
+import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
+import { buildTranslatedField } from '../utils/buildTranslatedField';
+
 
 const createAccount = (values: { name: string; otp: number; contact: string }) => {
      return `Hello ${values.name},
@@ -19,15 +21,39 @@ const getRecieveCar = (values: { contact: string }) => {
      `;
 };
 
-const createInvoice = (updatedInvoice: IInvoice) => {
+const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum) => {
      console.log('🚀 ~ createInvoice ~ updatedInvoice:', updatedInvoice);
+     let titleTag = 'Invoice Report - فاتورة ضريبية مبسطة';
+     let invoiceTitle = 'Simplified Tax Invoice';
+     let simplifiedLable = 'ورة ضريبية مبسطة';
+     let invoiceNo = 'Invoice No.';
+     let invoiceDate = 'Invoice Date';
+     let client = 'Client';
+
+     const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
+          buildTranslatedField(titleTag as any),
+          buildTranslatedField(invoiceTitle as any),
+          buildTranslatedField(simplifiedLable as any),
+          buildTranslatedField(invoiceNo as any),
+          buildTranslatedField(invoiceDate as any),
+          buildTranslatedField(client as any),
+     ]);
+
+     // modify the fields as per require translation
+     titleTag = titleTagObj[lang];
+     invoiceTitle = invoiceTitleObj[lang];
+     simplifiedLable = simplifiedLableObj[lang];
+     invoiceNo = invoiceNoObj[lang];
+     invoiceDate = invoiceDateObj[lang];
+     client = clientObj[lang];
+
      return `
      <!DOCTYPE html>
-     <html lang="ar" dir="rtl">
+     <html lang="${lang}" dir="rtl">
      <head>
          <meta charset="UTF-8">
          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <title>Invoice Report - فاتورة ضريبية مبسطة</title>
+         <title>${titleTag}</title>
          <style>
              * {
                  margin: 0;
@@ -366,17 +392,17 @@ const createInvoice = (updatedInvoice: IInvoice) => {
              <div class="invoice-info">
                  <div class="invoice-left">
                      <div>
-                         <span class="invoice-label">Invoice No.</span>
+                         <span class="invoice-label">${invoiceNo}</span>
                          <div class="invoice-value">${updatedInvoice._id || ''}</div>
                      </div>
                      <div style="margin-top: 10px;">
-                         <span class="invoice-label">Invoice Date</span>
+                         <span class="invoice-label">${invoiceDate}</span>
                          <div class="invoice-value">${new Date(updatedInvoice.createdAt).toLocaleDateString() || ''}</div>
                      </div>
                  </div>
                  <div class="invoice-center">
-                     <div class="simplified-label">فاتورة ضريبية مبسطة</div>
-                     <div class="invoice-title">Simplified Tax Invoice</div>
+                     <div class="simplified-label">${simplifiedLable}</div>
+                     <div class="invoice-title">${invoiceTitle}</div>
                      <div class="payment-type">${updatedInvoice.paymentMethod || ''}</div>
                  </div>
                  <div class="invoice-right">
@@ -396,7 +422,7 @@ const createInvoice = (updatedInvoice: IInvoice) => {
                  </div>
                  <div class="vehicle-right">
                      <div class="vehicle-detail">
-                         <div class="vehicle-detail-label">Client</div>
+                         <div class="vehicle-detail-label">${client}</div>
                          <div class="vehicle-detail-value">${updatedInvoice.client || ''}</div>
                      </div>
                  </div>

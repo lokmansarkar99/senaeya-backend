@@ -8,15 +8,13 @@ import { PaymentStatus } from './payment.enum';
 import mongoose from 'mongoose';
 import { WorkShop } from '../workShop/workShop.model';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { Payment } from './payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
 import { S3Helper } from '../../../helpers/aws/s3helper';
-import path from 'path';
-import fs from 'fs';
-import { FOLDER_NAMES } from '../../../enums/files';
+import fs from 'fs';;
+import { TranslatedFieldEnum } from '../invoice/invoice.interface';
 
-const createPayment = async (payload: Partial<Ipayment>) => {
+const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedFieldEnum }>) => {
      // /**
      //  * for payment module ⬇️⬇️⬇️⬇️⬇️
      //  * check the paymentMethod
@@ -143,7 +141,7 @@ const createPayment = async (payload: Partial<Ipayment>) => {
           await session.commitTransaction();
           session.endSession();
 
-          const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
+          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(updatedInvoice, payload.lang || TranslatedFieldEnum.en);
           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
           const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', updatedInvoice._id.toString(), 'application/pdf');

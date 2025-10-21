@@ -242,12 +242,28 @@ const getClientById = async (id: string): Promise<IClient | null> => {
      return result;
 };
 
-const getClientByClientContact = async (contact: string, providerWorkShopId: string): Promise<IClient | null> => {
-     const result = await Client.findOne({ contact, providerWorkShopId });
-     if (!result) {
+const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
+     const client = await Client.findOne({ contact, providerWorkShopId }).select('_id');
+     if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
-     return result;
+
+     const carOfClient = await Car.findOne({ client: client._id })
+          .populate({
+               path: 'client',
+               populate: {
+                    path: 'clientId',
+               },
+          })
+          .populate({
+               path: 'brand',
+               select: '_id image title',
+               populate: {
+                    path: 'country',
+                    select: '_id image title',
+               },
+          });
+     return [carOfClient];
 };
 
 const toggleClientStatus = async (id: string): Promise<IClient | null> => {

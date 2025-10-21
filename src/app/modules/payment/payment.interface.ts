@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { PaymentMethod, PaymentStatus } from "./payment.enum";
+import { TranslatedFieldEnum } from "../invoice/invoice.interface";
 
 export interface Ipayment {
      providerWorkShopId: Types.ObjectId;
@@ -19,4 +20,5 @@ export interface Ipayment {
 
 export type IpaymentFilters = {
      searchTerm?: string;
+     lang?: TranslatedFieldEnum;
 };

@@ -1,7 +1,7 @@
 import { detectLanguage } from './detectLanguageByFranc';
 import { translateTextToTargetLang } from './translateTextToTargetLang';
 
-interface TranslatedField {
+ export interface TranslatedField {
      en: string;
      bn: string;
      ar: string;
@@ -20,14 +20,14 @@ export const buildTranslatedField = async (text: string): Promise<TranslatedFiel
           throw new Error('Text too short to translate');
      }
 
-     /*---------------------------------
+     // ---------------------------------
 
      // 1️⃣ Detect the language
      let detectedLang = await detectLanguage(cleanText);
      const originalLang = detectedLang || 'en';
 
      // 3️⃣ Build the translation object
-     const result: TranslatedField = { en: '', bn: '', ar: '', ur: '', hi: '', tl: '' };
+     const result: TranslatedField | any = { en: '', bn: '', ar: '', ur: '', hi: '', tl: '' };
 
      const requiredTranslation = ['en', 'bn', 'ar', 'ur', 'hi', 'tl'];
      const excludeOriginalLang = requiredTranslation.filter((lang) => lang !== originalLang);
@@ -38,9 +38,9 @@ export const buildTranslatedField = async (text: string): Promise<TranslatedFiel
           result[lang as keyof TranslatedField] = await translateTextToTargetLang(cleanText, lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl');
      }
 
-       ---------------------------------*/
+     //   ---------------------------------
 
-     const result: TranslatedField = { en: 'Testing', bn: 'টেস্টিং', ar: 'اختبار', ur: 'ٹیسٹینگ', hi: 'तेस्टिंग', tl: 'Testing' }; // 🧪 FOR_TESTING
+     // const result: TranslatedField = { en: 'Testing', bn: 'টেস্টিং', ar: 'اختبار', ur: 'ٹیسٹینگ', hi: 'तेस्टिंग', tl: 'Testing' }; // 🧪 FOR_TESTING
 
      return result;
 };

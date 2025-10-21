@@ -78,6 +78,7 @@ const updateInvoiceZodSchema = z.object({
           paymentMethod: z.nativeEnum(PaymentMethod, { required_error: 'Payment Method is required' }).optional(),
           paymentStatus: z.nativeEnum(PaymentStatus, { required_error: 'Payment Status is required' }).optional(),
           postPaymentDate: z.string().optional(),
+          extraTimeForUnpaidPostpaidInvoice: z.number().default(5).optional(),
      }),
 });
 
