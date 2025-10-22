@@ -16,9 +16,9 @@ router.get('/unpaginated', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), carController.hardDeleteCar);
 
-router.patch('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), validateRequest(carValidation.updateCarZodSchema), carController.updateCar);
+router.patch('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), validateRequest(carValidation.updateCarZodSchema), carController.updateCar);
 
-router.delete('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), carController.deleteCar);
+router.delete('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), carController.deleteCar);
 
 router.get('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), carController.getCarById);
 

@@ -1,4 +1,4 @@
 export enum WorkType {
-     SERVICE = 'service',
-     SPARE_PARTS = 'spare parts',
+     SERVICE = 'SERVICE',
+     SPARE_PARTS = 'SPARE PARTS',
 }

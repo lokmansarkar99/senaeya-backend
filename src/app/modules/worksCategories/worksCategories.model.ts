@@ -3,7 +3,8 @@ import { IworksCategories } from './worksCategories.interface';
 
 const WorksCategoriesSchema = new Schema<IworksCategories>(
      {
-          image: { type: String, required: true },
+          image: { type: String, required: false },
+          workCategoryName: { type: String, required: true, unique: true },
           title: {
                type: {
                     ar: String,
@@ -13,7 +14,7 @@ const WorksCategoriesSchema = new Schema<IworksCategories>(
                     tl: String,
                     en: String,
                },
-               required: true,
+               required: false,
           },
           description: {
                type: {

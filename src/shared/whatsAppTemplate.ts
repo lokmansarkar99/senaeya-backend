@@ -30,22 +30,22 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
      let invoiceDate = 'Invoice Date';
      let client = 'Client';
 
-     const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
-          buildTranslatedField(titleTag as any),
-          buildTranslatedField(invoiceTitle as any),
-          buildTranslatedField(simplifiedLable as any),
-          buildTranslatedField(invoiceNo as any),
-          buildTranslatedField(invoiceDate as any),
-          buildTranslatedField(client as any),
-     ]);
+    //  const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
+    //       buildTranslatedField(titleTag as any),
+    //       buildTranslatedField(invoiceTitle as any),
+    //       buildTranslatedField(simplifiedLable as any),
+    //       buildTranslatedField(invoiceNo as any),
+    //       buildTranslatedField(invoiceDate as any),
+    //       buildTranslatedField(client as any),
+    //  ]);
 
-     // modify the fields as per require translation
-     titleTag = titleTagObj[lang];
-     invoiceTitle = invoiceTitleObj[lang];
-     simplifiedLable = simplifiedLableObj[lang];
-     invoiceNo = invoiceNoObj[lang];
-     invoiceDate = invoiceDateObj[lang];
-     client = clientObj[lang];
+    //  // modify the fields as per require translation
+    //  titleTag = titleTagObj[lang];
+    //  invoiceTitle = invoiceTitleObj[lang];
+    //  simplifiedLable = simplifiedLableObj[lang];
+    //  invoiceNo = invoiceNoObj[lang];
+    //  invoiceDate = invoiceDateObj[lang];
+    //  client = clientObj[lang];
 
      return `
      <!DOCTYPE html>

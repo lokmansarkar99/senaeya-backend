@@ -6,13 +6,26 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
-const createWorksCategories = async (payload: IworksCategories): Promise<IworksCategories> => {
-     const [titleObj, descriptionObj]: [IworksCategories['title'], IworksCategories['description']] = await Promise.all([
-          buildTranslatedField(payload.title as any),
-          buildTranslatedField(payload.description as any),
-     ]);
-     payload.title = titleObj;
-     payload.description = descriptionObj;
+const createWorksCategories = async (payload: IworksCategories & { titleObj?: IworksCategories['title']; descriptionObj?: IworksCategories['description'] }): Promise<IworksCategories> => {
+     if (payload.title && payload.description) {
+          delete payload.titleObj;
+          delete payload.descriptionObj;
+          const [titleObj, descriptionObj]: [IworksCategories['title'], IworksCategories['description']] = await Promise.all([
+               buildTranslatedField(payload.title as any),
+               buildTranslatedField(payload.description as any),
+          ]);
+          payload.title = titleObj;
+          payload.workCategoryName = payload.title.en;
+          payload.description = descriptionObj;
+     }
+     if (payload.titleObj) {
+          payload.title = payload.titleObj;
+          payload.workCategoryName = payload.titleObj.en;
+     }
+     if (payload.descriptionObj) {
+          payload.description = payload.descriptionObj;
+     }
+
      const result = await WorksCategories.create(payload);
      if (!result) {
           if (payload.image) {
@@ -25,7 +38,7 @@ const createWorksCategories = async (payload: IworksCategories): Promise<IworksC
 
 const getAllWorksCategoriess = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworksCategories[] }> => {
      const queryBuilder = new QueryBuilder(WorksCategories.find(), query);
-     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
+     const result = await queryBuilder.filter().search(['workCategoryName']).sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
@@ -35,7 +48,10 @@ const getAllUnpaginatedWorksCategoriess = async (): Promise<IworksCategories[]> 
      return result;
 };
 
-const updateWorksCategories = async (id: string, payload: Partial<IworksCategories>): Promise<IworksCategories | null> => {
+const updateWorksCategories = async (
+     id: string,
+     payload: Partial<IworksCategories & { titleObj?: IworksCategories['title']; descriptionObj?: IworksCategories['description'] }>,
+): Promise<IworksCategories | null> => {
      const isExist = await WorksCategories.findById(id);
      if (!isExist) {
           if (payload.image) {
@@ -48,12 +64,19 @@ const updateWorksCategories = async (id: string, payload: Partial<IworksCategori
           unlinkFile(isExist.image);
      }
      if (payload.title) {
+          delete payload.titleObj;
           const [titleObj]: [IworksCategories['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
           payload.title = titleObj;
+          payload.workCategoryName = payload.title.en;
+     } else if (payload.titleObj) {
+          payload.title = payload.titleObj;
+          payload.workCategoryName = payload.titleObj.en;
      }
-     if (payload.description) {
+     if (payload.description && !payload.descriptionObj) {
           const [descriptionObj]: [IworksCategories['description']] = await Promise.all([buildTranslatedField(payload.description as any)]);
           payload.description = descriptionObj;
+     } else if (payload.descriptionObj) {
+          payload.description = payload.descriptionObj;
      }
      return await WorksCategories.findByIdAndUpdate(id, payload, { new: true });
 };

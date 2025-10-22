@@ -15,7 +15,7 @@ const updateExpenseZodSchema = z.object({
           providerWorkShopId: z.string().optional(),
           title: z.string().optional(),
           amount: z.number().optional(),
-          spendingDate: z.date().optional(),
+          spendingDate: z.string().optional(),
           description: z.string().optional(),
      }),
 });

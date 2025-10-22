@@ -1,16 +1,27 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../errors/AppError';
 import { Iwork } from './work.interface';
-import { Work } from './work.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
 import { getXLXStoJSON } from './work.utils';
 import mongoose, { ClientSession } from 'mongoose';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
+import { WorksCategories } from '../worksCategories/worksCategories.model';
+import { Work } from './work.model';
 
-const createWork = async (payload: Iwork): Promise<Iwork> => {
-     const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
-     payload.title = titleObj;
+const createWork = async (payload: Iwork & { titleObj?: Iwork['title']; workCategoryName: string }): Promise<Iwork> => {
+     const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: payload.workCategoryName });
+     if (!isExistWorkCategoryName) {
+          const createdWorkCategory = await WorksCategories.create({ workCategoryName: payload.workCategoryName });
+          payload.workCategoryName = createdWorkCategory.workCategoryName;
+     }
+     if (payload.title) {
+          delete payload.titleObj;
+          const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+          payload.title = titleObj;
+     } else if (payload.titleObj) {
+          payload.title = payload.titleObj;
+     }
      const result = await Work.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
@@ -23,7 +34,31 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
      const docLocation = payload.document;
      const backToRootFolderPath = '../../../../uploads/document';
      const xlxsToJsonParsedData = getXLXStoJSON(docLocation, backToRootFolderPath);
-     console.log('🚀 ~ createManyWorksByXLXS ~ xlxsToJsonParsedData:', xlxsToJsonParsedData);
+     // console.log('🚀 ~ createManyWorksByXLXS ~ xlxsToJsonParsedData:', xlxsToJsonParsedData);
+
+     const structuredData = await Promise.all(
+          xlxsToJsonParsedData.map(async (element: any) => {
+               const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: element.workCategoryName });
+               if (!isExistWorkCategoryName) {
+                    const createdWorkCategory = await WorksCategories.create({ workCategoryName: element.workCategoryName });
+                    element.workCategoryName = createdWorkCategory.workCategoryName;
+               }
+               return {
+                    title: {
+                         ar: element.ar,
+                         bn: element.bn,
+                         en: element.en,
+                         hi: element.hi,
+                         tl: element.tl,
+                         ur: element.ur,
+                    },
+                    workCategoryName: element.workCategoryName,
+                    code: element.code,
+               };
+          }),
+     );
+     console.log('🚀 ~ createManyWorksByXLXS ~ structuredData:', structuredData);
+     // throw new Error("test");
 
      // use mongoose transaction
      const maxRetries = 3;
@@ -35,7 +70,7 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
           session.startTransaction();
           try {
                // Create the examination
-               const result = await Work.insertMany(xlxsToJsonParsedData, { session });
+               const result = await Work.insertMany(structuredData, { session });
                console.log('🚀 ~ createManyWorksByXLXS ~ result:', result);
 
                if (!result) {
@@ -82,14 +117,17 @@ const getAllUnpaginatedWorks = async (): Promise<Iwork[]> => {
      return result;
 };
 
-const updateWork = async (id: string, payload: Partial<Iwork>): Promise<Iwork | null> => {
+const updateWork = async (id: string, payload: Partial<Iwork & { titleObj?: Iwork['title'] }>): Promise<Iwork | null> => {
      const isExist = await Work.findById(id);
      if (!isExist) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
      }
      if (payload.title) {
+          delete payload.titleObj;
           const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
           payload.title = titleObj;
+     } else if (payload.titleObj) {
+          payload.title = payload.titleObj;
      }
 
      console.log('🚀 ~ updateWork ~ payload:', payload);

@@ -1,6 +1,7 @@
 export interface IworksCategories {
-     image: string;
-     title: {
+     image?: string;
+     workCategoryName: string;
+     title?: {
           ar: string;
           bn: string;
           ur: string;

@@ -10,10 +10,10 @@ export interface Iwork {
           tl: string;
           en: string;
      };
-     worksCategories: Types.ObjectId;
-     type: WorkType | string;
+     workCategoryName: string;
+     type?: WorkType | string;
      code: string;
-     cost: number;
+     cost?: number;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;
