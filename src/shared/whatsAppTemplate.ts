@@ -1,24 +1,22 @@
+import { CLIENT_STATUS } from '../app/modules/client/client.enum';
 import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
 import { buildTranslatedField } from '../utils/buildTranslatedField';
 
-
 const createAccount = (values: { name: string; otp: number; contact: string }) => {
-     return `Hello ${values.name},
-     Your single use code is: ${values.otp}
-     This code is valid for 3 minutes.
+     return `OTP code: ${values.otp}   We are happy to serve you in Senaeya app.
+     رمز تفعيل رقم الجوال: ${values.otp} نسعد بخدمتكم في تطبيق الصناعية.
      `;
 };
 
 const forgetPassword = (values: { name: string; password: string; contact: string }) => {
-     return `Hello ${values.name},
-     Your password is: ${values.password}
-     `;
+     return `New password: ${values.password}   Use the password to log in to your account. You can change your password from your profile page.
+كلمة المرور الجديدة: ${values.password} استخدم كلمة المرور للدخول إلى حسابك ، بإمكانك تعديل كلمة المرور من صفحة الملف الشخصي.
+ `;
 };
 
-const getRecieveCar = (values: { contact: string }) => {
-     return `Hello,
-     Please come to the workshop to receive your car.
-     `;
+const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; workshopNameArabic: string }) => {
+     return `Your car is ready for collection at ${values.workshopNameEnglish}
+     سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
 };
 
 const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum) => {
@@ -30,22 +28,22 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
      let invoiceDate = 'Invoice Date';
      let client = 'Client';
 
-    //  const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
-    //       buildTranslatedField(titleTag as any),
-    //       buildTranslatedField(invoiceTitle as any),
-    //       buildTranslatedField(simplifiedLable as any),
-    //       buildTranslatedField(invoiceNo as any),
-    //       buildTranslatedField(invoiceDate as any),
-    //       buildTranslatedField(client as any),
-    //  ]);
+     //  const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
+     //       buildTranslatedField(titleTag as any),
+     //       buildTranslatedField(invoiceTitle as any),
+     //       buildTranslatedField(simplifiedLable as any),
+     //       buildTranslatedField(invoiceNo as any),
+     //       buildTranslatedField(invoiceDate as any),
+     //       buildTranslatedField(client as any),
+     //  ]);
 
-    //  // modify the fields as per require translation
-    //  titleTag = titleTagObj[lang];
-    //  invoiceTitle = invoiceTitleObj[lang];
-    //  simplifiedLable = simplifiedLableObj[lang];
-    //  invoiceNo = invoiceNoObj[lang];
-    //  invoiceDate = invoiceDateObj[lang];
-    //  client = clientObj[lang];
+     //  // modify the fields as per require translation
+     //  titleTag = titleTagObj[lang];
+     //  invoiceTitle = invoiceTitleObj[lang];
+     //  simplifiedLable = simplifiedLableObj[lang];
+     //  invoiceNo = invoiceNoObj[lang];
+     //  invoiceDate = invoiceDateObj[lang];
+     //  client = clientObj[lang];
 
      return `
      <!DOCTYPE html>
@@ -622,12 +620,28 @@ const createReport = (report: any) => {
   </div></body></html>`;
 };
 
-// const createReport = (report: any) => {
-//     return `Hello ${report.name},
-//     Your single use code is: ${report.otp}
-//     This code is valid for 3 minutes.
-//     `
-// }
+const defaulterList = ({ status }: { status: string }) => {
+     const message =
+          status === CLIENT_STATUS.BLOCK
+               ? `Sorry... your name has been added to the defaulters list.
+    عذرا … لقد تم وضع اسمكم في قائمة المتعثرين عن السداد.`
+               : `The invoice has been paid and your name has been removed from the defaulters list.
+    تم تسديد الفاتورة وإزالة اسمكم من قائمة المتعثرين عن السداد.
+`;
+     return message;
+};
+
+const subscriptionExtended = (values: { daysCount: number }) => {
+     return `Your subscription to Senaeya app has been extended for ${values.daysCount} days.
+    تم تمديد اشتراككم في تطبيق الصناعية لمدة ${values.daysCount} يوم.
+    `;
+};
+
+const scheduleInvoiceWarningMessage = ({ workshopNameEnglish, workshopNameArabic }: { workshopNameEnglish: string; workshopNameArabic: string }) => {
+     return `You have an overdue invoice for ${workshopNameEnglish}. Please pay the invoice within 3 days, so that your name is not placed on the defaulters list.
+لديك فاتورة متأخرة السداد في ${workshopNameArabic} ، نرجو منكم سداد الفاتورة خلال 3 أيام ، حتى لا يتم وضع اسمكم في قائمة المتعثرين عن السداد.
+     `;
+};
 
 export const whatsAppTemplate = {
      createAccount,
@@ -635,6 +649,9 @@ export const whatsAppTemplate = {
      createInvoice,
      createReport,
      getRecieveCar,
+     defaulterList,
+     subscriptionExtended,
+     scheduleInvoiceWarningMessage,
      // resetPassword,
      // resetPasswordByUrl,
      // contactFormTemplate,

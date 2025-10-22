@@ -2,38 +2,63 @@ import cron from 'node-cron';
 import figlet from 'figlet';
 import chalk from 'chalk';
 import { Subscription } from '../app/modules/subscription/subscription.model';
+import { Invoice } from '../app/modules/invoice/invoice.model';
+import { PaymentStatus } from '../app/modules/payment/payment.enum';
+import { whatsAppTemplate } from '../shared/whatsAppTemplate';
+import { whatsAppHelper } from '../helpers/whatsAppHelper';
+import { sendNotifications } from '../helpers/notificationsHelper';
 // ====== CRON JOB SCHEDULERS ======
-// 1. Check for users expiring in 24 hours (send warning email)
 const scheduleTrialWarningCheck = () => {
-     // Run every day at 9:00 AM '0 9 * * *'
-     cron.schedule('*/1 * * * *', async () => {
+     // Run every 5 days at 9:00 AM '0 9 */5 * *'
+     cron.schedule('0 9 */5 * *', async () => {
           try {
-               console.log('🔔 Checking for trials expiring in 24 hours...');
+               console.log('🔔 Checking for subscriptions expiring in 5 days...');
 
-               const tomorrow = new Date();
-               tomorrow.setDate(tomorrow.getDate() + 1);
-               tomorrow.setHours(23, 59, 59, 999); // End of tomorrow
+               const fiveDaysLater = new Date();
+               fiveDaysLater.setDate(fiveDaysLater.getDate() + 5);
+               fiveDaysLater.setHours(23, 59, 59, 999); // End of the 5th day
 
                const today = new Date();
                today.setHours(23, 59, 59, 999); // End of today
 
-               // Find users whose trial expires tomorrow
-               const subscriptionsExpiringTomorrow = await Subscription.countDocuments({
-                    // isFreeTrial: true,
-                    // hasAccess: true,
+               // Find users whose subscription expires in exactly 5 days
+               const subscriptionsExpiringInFiveDays = await Subscription.find({
                     currentPeriodEnd: {
-                         $gte: today,
-                         $lte: tomorrow,
+                         $gte: fiveDaysLater,
+                         $lt: fiveDaysLater.setDate(fiveDaysLater.getDate() + 1), // 5th day at midnight
                     },
-               });
+               })
+                    .select('workshop')
+                    .populate({
+                         path: 'workshop',
+                         select: 'ownerId workshopNameEnglish',
+                         populate: {
+                              path: 'ownerId',
+                              select: 'contact _id',
+                         },
+                    });
 
-               console.log(`📧 Found ${subscriptionsExpiringTomorrow} users expiring tomorrow`);
-               console.log('✅ Trial warning emails sent');
+               console.log(`📧 Found ${subscriptionsExpiringInFiveDays.length} subscriptions expiring in 5 days`);
+               if (subscriptionsExpiringInFiveDays.length > 0) {
+                    subscriptionsExpiringInFiveDays.forEach(async (subscription) => {
+                         const message = `Sorry, there are 5 days left until the subscription expires.`;
+                         await whatsAppHelper.sendWhatsAppTextMessage({ to: (subscription.workshop as any).ownerId.contact, body: message });
+
+                         await sendNotifications({
+                              title: `${(subscription.workshop as any)?.workshopNameEnglish}`,
+                              receiver: (subscription.workshop as any).ownerId._id,
+                              message: `Sorry... 5 days left until the subscription expires`,
+                              type: 'ALERT',
+                         });
+                    });
+                    console.log('✅ Subscription warning WhatsApp messages sent');
+               }
           } catch (error) {
-               console.error('❌ Error in trial warning check:', error);
+               console.error('❌ Error in subscription warning check:', error);
           }
      });
 };
+
 // 2. Check for expired trials every hour
 const scheduleTrialExpiryCheck = () => {
      // Run every hour '0 * * * *'
@@ -78,6 +103,42 @@ const scheduleTrialExpiryCheck = () => {
      });
 };
 
+// 3. warn unpaid-due invoices' clients "You have an overdue invoice for (workshop name shown on invoice). Please pay the invoice within 3 days, so that your name is not placed on the defaulters list."
+const scheduleInvoiceWarningCheck = () => {
+     // Run every 3 days at 9:00 AM '0 9 */3 * *'
+     cron.schedule('0 9 */3 * *', async () => {
+          try {
+               console.log('⏰ Checking for unpaid invoices...');
+
+               const now = new Date();
+
+               // Find users whose postpaid invoices are unpaid and overdue
+               const expiredPostpaidInvoices = await Invoice.find({
+                    paymentType: 'postpaid',
+                    paymentStatus: PaymentStatus.UNPAID,
+                    postPaymentDate: { $lt: now },
+               })
+                    .select('client providerWorkShopId')
+                    .populate('client', 'contact')
+                    .populate('providerWorkShopId', 'workshopNameEnglish workshopNameArabic');
+
+               if (expiredPostpaidInvoices.length > 0) {
+                    expiredPostpaidInvoices.forEach(async (invoice) => {
+                         const message = whatsAppTemplate.scheduleInvoiceWarningMessage({
+                              workshopNameEnglish: (invoice.providerWorkShopId as any).workshopNameEnglish,
+                              workshopNameArabic: (invoice.providerWorkShopId as any).workshopNameArabic,
+                         });
+                         await whatsAppHelper.sendWhatsAppTextMessage({ to: (invoice.client as any).contact, body: message });
+                    });
+               } else {
+                    console.log('✅ No unpaid invoices found');
+               }
+          } catch (error) {
+               console.error('❌ Error in invoice warning check:', error);
+          }
+     });
+};
+
 // ASCII Art Title
 figlet('Senaeya', (err, data) => {
      if (err) {
@@ -100,5 +161,6 @@ const setupTimeManagement = () => {
      // Start all cron jobs
      scheduleTrialExpiryCheck(); // Every hour
      scheduleTrialWarningCheck(); // Daily at 9 AM
+     scheduleInvoiceWarningCheck(); // Daily at 9 AM
 };
 export default setupTimeManagement;

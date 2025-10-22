@@ -13,6 +13,7 @@ import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';;
 import { TranslatedFieldEnum } from '../invoice/invoice.interface';
+import { sendNotifications} from '../../../helpers/notificationsHelper';
 
 const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedFieldEnum }>) => {
      // /**
@@ -151,6 +152,12 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
 
           // // send invoiceSheet to client
           if (payment.paymentStatus === PaymentStatus.PAID) {
+               await sendNotifications({
+                    title: `${(updatedInvoice.client as any).clientId.name}`,
+                    receiver: (updatedInvoice.client as any).clientId._id,
+                    message: `Invoice No. ${updatedInvoice._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+                    type: 'ALERT',
+               });
                await releaseInvoiceToWhatsApp(updatedInvoice);
           }
 

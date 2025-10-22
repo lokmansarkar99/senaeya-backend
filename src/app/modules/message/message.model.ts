@@ -4,7 +4,8 @@ import { Imessage } from './message.interface';
 const MessageSchema = new Schema<Imessage>({
      providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
      message: { type: String, required: true },
-     name: { type: String,required: true },
+     data: { type: [Object], required: true },
+     name: { type: String,required: false },
      contact: { type: String,required: true },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },

@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { WorkType } from './work.enum';
 
 export interface Iwork {

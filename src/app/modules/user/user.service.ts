@@ -12,6 +12,7 @@ import AppError from '../../../errors/AppError';
 import generateOTP from '../../../utils/generateOTP';
 import { AuthService } from '../auth/auth.service';
 import mongoose from 'mongoose';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 // create user
 const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string } }) => {
      //set role
@@ -49,6 +50,13 @@ const createUserToDB = async (payload: IUser & { helperUserId: { contact: string
           // login also
           const result = await AuthService.loginUserFromDB({ contact: createUser.contact!, password: payload.password! });
 
+          await sendNotifications({
+               title: `${createUser?.name}`,
+               receiver: createUser.id,
+               message: `Workshop manager data has been modified successfully.
+`,
+               type: 'ALERT',
+          });
           return result;
      } catch (error) {
           // Abort the transaction on error
@@ -85,6 +93,12 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
      };
      await User.findOneAndUpdate({ _id: createAdmin._id }, { $set: { authentication } });
 
+     await sendNotifications({
+          title: `${createAdmin?.name}`,
+          receiver: createAdmin.id,
+          message: `Admin data has been modified successfully.`,
+          type: 'ALERT',
+     });
      return createAdmin;
 };
 

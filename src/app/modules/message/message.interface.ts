@@ -3,7 +3,8 @@ import { Types } from "mongoose";
 export interface Imessage {
      providerWorkShopId: Types.ObjectId;
      message:string;
-     name:string;
+     data: any[];
+     name?:string;
      contact:string;
      createdAt: Date;
      updatedAt: Date;

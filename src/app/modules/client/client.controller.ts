@@ -111,7 +111,7 @@ const toggleClientStatus = catchAsync(async (req: Request, res: Response) => {
 
 const sendMessageToRecieveCar = catchAsync(async (req: Request, res: Response) => {
      const { id } = req.params;
-     await clientService.sendMessageToRecieveCar(id);
+     await clientService.sendMessageToRecieveCar(id,req.body.providerWorkShopId);
 
      sendResponse(res, {
           statusCode: 200,

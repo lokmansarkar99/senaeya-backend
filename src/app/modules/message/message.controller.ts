@@ -4,7 +4,7 @@ import sendResponse from '../../../shared/sendResponse';
 import { messageService } from './message.service';
 
 const createMessage = catchAsync(async (req: Request, res: Response) => {
-     const result = await messageService.createMessage(req.body);
+     const result = await messageService.createMessage(req.body, req.user);
 
      sendResponse(res, {
           statusCode: 200,

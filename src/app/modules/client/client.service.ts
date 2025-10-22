@@ -273,16 +273,19 @@ const toggleClientStatus = async (id: string): Promise<IClient | null> => {
      }
      result.status = result.status === CLIENT_STATUS.ACTIVE ? CLIENT_STATUS.BLOCK : CLIENT_STATUS.ACTIVE;
      await result.save();
+     const message = whatsAppTemplate.defaulterList({status:result.status});
+     await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
      return result;
 };
 
-const sendMessageToRecieveCar = async (id: string) => {
+const sendMessageToRecieveCar = async (id: string,providerWorkShopId:string) => {
      const [result] = await Client.find({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
+     const workShop = await WorkShop.findById(providerWorkShopId).select('workshopNameEnglish workshopNameArabic');
      //send message
-     const values = { contact: result.contact };
+     const values = { contact: result.contact,workshopNameEnglish:workShop!.workshopNameEnglish,workshopNameArabic:workShop!.workshopNameArabic };
      const message = whatsAppTemplate.getRecieveCar(values);
      await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
 };

@@ -52,6 +52,8 @@ export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
           mentions: '',
           filename: `${updatedInvoice._id.toString()}_invoice.pdf`,
           document: updatedInvoice.invoiceAwsLink,
-          caption: 'Invoice',
+          caption: `Invoice file pdf ${updatedInvoice._id.toString()}
+          ملف الفاتورة pdf ${updatedInvoice._id.toString()}
+          `,
      });
 };

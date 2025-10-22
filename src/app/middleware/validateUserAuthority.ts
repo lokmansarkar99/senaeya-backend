@@ -4,6 +4,7 @@ import { WorkShop } from '../modules/workShop/workShop.model';
 import { IUser } from '../modules/user/user.interface';
 import { USER_ROLES } from '../../enums/user';
 import { MAX_FREE_INVOICE_COUNT } from '../modules/workShop/workshop.enum';
+import { sendNotifications } from '../../helpers/notificationsHelper';
 
 const validateUserAuthority = () => async (req: Request, res: Response, next: NextFunction) => {
      try {
@@ -25,7 +26,14 @@ const validateUserAuthority = () => async (req: Request, res: Response, next: Ne
                          const currentPeriodEnd = new Date((workShop as any).subscriptionId.currentPeriodEnd);
 
                          if (currentDate >= currentPeriodEnd) {
-                              throw new Error('Please renew your subscription');
+                              await sendNotifications({
+                                   title: `${(workShop as any)?.workshopNameEnglish}`,
+                                   receiver: (workShop as any).ownerId._id,
+                                   message: `Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.`,
+                                   type: 'ALERT',
+                              });
+                              throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
+                                   انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
                          }
                     }
                }

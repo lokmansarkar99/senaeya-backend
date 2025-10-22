@@ -9,6 +9,7 @@ import { ObjectId } from 'mongodb';
 import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 import { WorkShop } from '../workShop/workShop.model';
 import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const createInvoice = async (payload: IInvoice) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
@@ -89,10 +90,10 @@ const updateInvoice = async (id: string, payload: Partial<IInvoice & { extraTime
      }
 
      if (isExist?.paymentMethod === PaymentMethod.POSTPAID && isExist.paymentStatus === PaymentStatus.UNPAID && isExist?.postPaymentDate) {
-          if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string' ) {
+          if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string') {
                payload.postPaymentDate = new Date(payload.postPaymentDate);
                // check its not in the past
-               if (payload.postPaymentDate < new Date() ||  isExist?.postPaymentDate <= payload.postPaymentDate) {
+               if (payload.postPaymentDate < new Date() || isExist?.postPaymentDate <= payload.postPaymentDate) {
                     throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past or less than the previous post payment date');
                }
           }
@@ -100,7 +101,6 @@ const updateInvoice = async (id: string, payload: Partial<IInvoice & { extraTime
                payload.postPaymentDate = isExist.postPaymentDate;
                payload.postPaymentDate.setDate(payload.postPaymentDate.getDate() + payload.extraTimeForUnpaidPostpaidInvoice);
           }
-          
      }
 
      return await Invoice.findByIdAndUpdate(id, payload, { new: true });
@@ -136,7 +136,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                select: 'clientId clientType',
                populate: {
                     path: 'clientId',
-                    select: 'name contact',
+                    select: 'name contact _id',
                },
           })
           .populate({
@@ -188,6 +188,12 @@ const resendInvoice = async (invoiceId: string) => {
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.*.');
      }
+     await sendNotifications({
+          title: `${(result.client as any).clientId.name}`,
+          receiver: (result.client as any).clientId._id,
+          message: `Invoice No. ${invoiceId} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+          type: 'ALERT',
+     });
      await releaseInvoiceToWhatsApp(result);
      return result;
 };

@@ -4,7 +4,8 @@ import { Imessage } from './message.interface';
 import { Message } from './message.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const createMessage = async (payload: Imessage): Promise<Imessage> => {
+const createMessage = async (payload: Imessage, user: any): Promise<Imessage> => {
+     payload.contact = user.contact;
      const result = await Message.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Message not found.');

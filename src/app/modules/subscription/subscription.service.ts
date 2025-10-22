@@ -9,6 +9,9 @@ import config from '../../../config';
 import { WorkShop } from '../workShop/workShop.model';
 import { PackageDuration } from '../package/package.enum';
 import { Types } from 'mongoose';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const subscriptionDetailsFromDB = async (id: string): Promise<{ subscription: ISubscription | {} }> => {
      const subscription = await Subscription.findOne({ userId: id }).populate('package', 'title credit duration').lean();
@@ -166,8 +169,7 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
      if (!isExistPackage) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Package not found');
      }
-     const workshop = await WorkShop.findById(workShopId);
-     console.log('🚀 ~ createSubscriptionByPackageIdForWorkshop ~ workshop:', workshop?._id);
+     const workshop = await WorkShop.findById(workShopId).select('ownerId _id').populate('ownerId', 'contact');
      if (!workshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'User or Stripe Customer ID not found');
      }
@@ -195,7 +197,6 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
           currentPeriodEnd: currentPeriodEnd.toString(),
           status: 'active',
      };
-     console.log('🚀 ~ createSubscriptionByPackageIdForWorkshop ~ payload:', payload);
 
      try {
           const subscription = await Subscription.create(payload);
@@ -204,6 +205,26 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
           workshop.subscriptionId = subscription._id;
           workshop.subscribedPackage = new Types.ObjectId(packageId);
           await workshop.save();
+
+          const extendedDaysCount = new Date().getTime() - new Date(payload.currentPeriodEnd).getTime();
+          const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount });
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: (workshop.ownerId as any).contact, body: message });
+
+          await sendNotifications({
+               title: `${workshop?.workshopNameEnglish}`,
+               receiver: (workshop.ownerId as any)._id,
+               message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.
+`,
+               type: 'ALERT',
+          });
+          
+          const superAdminId = await User.findOne({ role: 'SUPER_ADMIN' }).select('_id name');
+          await sendNotifications({
+               title: `${superAdminId?.name}`,
+               receiver: superAdminId?._id,
+               message: `The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp`,
+               type: 'ALERT',
+          });
           return subscription;
      } catch (error: any) {
           throw error;

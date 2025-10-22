@@ -146,6 +146,7 @@ import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils'
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any) => {
      const { startDate, endDate } = query;
@@ -247,7 +248,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      const createReportTemplate = whatsAppTemplate.createReport(report);
      const reportInpdfPath = await generatePDF(createReportTemplate);
      const fileBuffer = fs.readFileSync(reportInpdfPath);
-     const fileName = `report_${startDate}_to_${endDate}`;
+     const fileName = `Report file pdf_${startDate}_to_${endDate}`;
      const reportAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', fileName, 'application/pdf');
      await whatsAppHelper.sendWhatsAppPDFMessage({
           to: user.contact,
@@ -257,7 +258,15 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           mentions: '',
           filename: `${fileName}_report.pdf`,
           document: reportAwsLink,
-          caption: `Report from ${startDate} to ${endDate}`,
+          caption: `Report file pdf from ${startDate} to ${endDate}
+          ملف التقرير pdf من ${startDate} إلى ${endDate}`,
+     });
+
+     await sendNotifications({
+          title: `${user.name}`,
+          receiver: user._id,
+          message: `The report was issued and sent to the workshop manager's mobile phone via WhatsApp.`,
+          type: 'ALERT',
      });
 
      return report;

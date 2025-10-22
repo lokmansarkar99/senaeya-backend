@@ -6,6 +6,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
 import { USER_ROLES } from '../../../enums/user';
 import { User } from '../user/user.model';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop> => {
      const userIs = await User.findById(user.id);
@@ -20,6 +21,13 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'WorkShop not found.');
      }
+
+     await sendNotifications({
+          title: `${userIs?.name}`,
+          receiver: user.id,
+          message: `The workshop has been successfully registered.`,
+          type: 'ALERT',
+     });
      return result;
 };
 
@@ -49,8 +57,8 @@ const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any
           }
      }
 
-     const isExist = await WorkShop.findById(id);
-     if (!isExist) {
+     const isExistWorkshop = await WorkShop.findById(id);
+     if (!isExistWorkshop) {
           if (payload.image) {
                unlinkFile(payload.image);
           }
@@ -58,15 +66,23 @@ const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any
      }
 
      if (user.role === USER_ROLES.WORKSHOP_OWNER) {
-          if (isExist.ownerId.toString() !== user.id.toString()) {
+          if (isExistWorkshop.ownerId.toString() !== user.id.toString()) {
                throw new AppError(StatusCodes.FORBIDDEN, 'You are not authorized to update this workShop.');
           }
      }
 
-     if (isExist.image) {
-          unlinkFile(isExist.image);
+     if (isExistWorkshop.image) {
+          unlinkFile(isExistWorkshop.image);
      }
-     return await WorkShop.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+     await WorkShop.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+
+     await sendNotifications({
+          title: `${isExistWorkshop?.workshopNameEnglish}`,
+          receiver: isExistWorkshop.ownerId,
+          message: `Workshop data has been modified successfully.`,
+          type: 'ALERT',
+     });
+     return await WorkShop.findById(id);
 };
 
 const deleteWorkShop = async (id: string): Promise<IworkShop | null> => {
