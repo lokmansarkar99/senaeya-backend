@@ -26,10 +26,10 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You are already subscribed');
      }
 
-     const createdSubcription = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.body.providerWorkShopId as string, req.params.packageId as string);
-     if (!createdSubcription) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
-     }
+     // const createdSubcription = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.body.providerWorkShopId as string, req.params.packageId as string);
+     // if (!createdSubcription) {
+     //      throw new AppError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
+     // }
 
      const paymentRequest = {
           cart_amount: isExistPackage.price,
@@ -39,7 +39,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
 

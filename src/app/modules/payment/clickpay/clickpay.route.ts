@@ -15,6 +15,7 @@ router.post('/callback', clickpayController.paymentCallback);
 
 // make a success route with html return
 router.get('/success', async (req, res) => {
+     await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.query.providerWorkShopId as string, req.query.packageId as string);
      res.send('<h1>Payment successful</h1>');
 });
 
