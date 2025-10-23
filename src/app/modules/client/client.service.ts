@@ -15,6 +15,7 @@ import mongoose from 'mongoose';
 import { imageService } from '../image/image.service';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { workShopService } from '../workShop/workShop.service';
 
 /** steps
  * client type check user or workshop
@@ -48,24 +49,25 @@ const createClient = async (payload: any) => {
           throw new AppError(StatusCodes.NOT_FOUND, 'Provider Workshop not found.');
      }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          if (payload.providerWorkShopId == payload.workShopIdAsClient) {
-               if (payload.document) {
-                    unlinkFile(payload.document);
-               }
-               throw new AppError(StatusCodes.BAD_REQUEST, 'Provider Workshop and Workshop ID should be different.');
-          }
-          const isExistWorkShop = await WorkShop.findById(payload.workShopIdAsClient);
+          // if (payload.providerWorkShopId == payload.workShopIdAsClient) {
+          //      if (payload.document) {
+          //           unlinkFile(payload.document);
+          //      }
+          //      throw new AppError(StatusCodes.BAD_REQUEST, 'Provider Workshop and Workshop ID should be different.');
+          // }
+          // const isExistWorkShop = await WorkShop.findById(payload.workShopIdAsClient);
+          const isExistWorkShop = await workShopService.getWorkShopByContact(payload.contact);
           if (!isExistWorkShop) {
                if (payload.document) {
                     unlinkFile(payload.document);
                }
                throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found..');
           }
-          let isExistClient = await Client.findOne({ clientId: payload.workShopIdAsClient, clientType: CLIENT_TYPE.WORKSHOP });
+          let isExistClient = await Client.findOne({ clientId: isExistWorkShop._id, clientType: CLIENT_TYPE.WORKSHOP });
           if (!isExistClient) {
                isExistClient = await Client.create({
                     clientType: payload.clientType,
-                    clientId: payload.workShopIdAsClient,
+                    clientId: isExistWorkShop._id,
                     document: payload.document || null,
                     documentNumber: payload.documentNumber,
                     providerWorkShopId: payload.providerWorkShopId,
