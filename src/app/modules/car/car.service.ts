@@ -7,9 +7,17 @@ import unlinkFile from '../../../shared/unlinkFile';
 import { CLIENT_CAR_TYPE } from '../client/client.enum';
 import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
+import { CarModel } from '../carModel/carModel.model';
 
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
      console.log('🚀 ~ createCar ~ payload:', payload);
+     const isExistCarModel = await CarModel.findOne({
+          model: payload.model,
+          brand: payload.brand,
+     });
+     if (!isExistCarModel) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car model not found.');
+     }
      if (payload.carType == CLIENT_CAR_TYPE.SAUDI) {
           // payload must include plateNumberForSaudi
           if (

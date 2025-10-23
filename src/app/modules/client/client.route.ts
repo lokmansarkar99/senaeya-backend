@@ -20,8 +20,8 @@ router.use('/car-brands', carBrandRoutes);
 router.post(
      '/',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
-     fileUploadHandler(),
-     parseFileData(FOLDER_NAMES.DOCUMENT),
+     // fileUploadHandler(),
+     // parseFileData(FOLDER_NAMES.DOCUMENT),
      validateUserAuthority(),
      validateRequest(clientValidation.createClientZodSchema),
      clientController.createClient,
@@ -52,8 +52,8 @@ router.post(
 router.patch(
      '/:id',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
-     fileUploadHandler(),
-     parseFileData(FOLDER_NAMES.DOCUMENT),
+     // fileUploadHandler(),
+     // parseFileData(FOLDER_NAMES.DOCUMENT),
      validateUserAuthority(),
      validateRequest(clientValidation.updateClientZodSchema),
      clientController.updateClient,

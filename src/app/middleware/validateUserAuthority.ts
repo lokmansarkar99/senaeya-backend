@@ -6,7 +6,9 @@ import { USER_ROLES } from '../../enums/user';
 import { MAX_FREE_INVOICE_COUNT } from '../modules/workShop/workshop.enum';
 import { sendNotifications } from '../../helpers/notificationsHelper';
 
-const validateUserAuthority = () => async (req: Request, res: Response, next: NextFunction) => {
+const validateUserAuthority = () => {
+     return async (req: Request, res: Response, next: NextFunction) => {
+          console.log("🚀 ~ validateUserAuthority ~ req:", req.body)
      try {
           const user = req.user as IUser & { id: string };
           if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
@@ -47,6 +49,7 @@ const validateUserAuthority = () => async (req: Request, res: Response, next: Ne
      } catch (error) {
           next(error);
      }
+};
 };
 
 export default validateUserAuthority;

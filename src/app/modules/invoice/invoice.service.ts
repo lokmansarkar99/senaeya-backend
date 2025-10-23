@@ -71,7 +71,14 @@ const createInvoice = async (payload: IInvoice) => {
 };
 
 const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
-     const queryBuilder = new QueryBuilder(Invoice.find(), query);
+     const queryBuilder = new QueryBuilder(Invoice.find().populate({
+          path:'car',
+          select:'model brand year plateNumberForInternational plateNumberForSaudi providerWorkShopId slugForSaudiCarPlateNumber ',
+          populate:{
+               path:'brand plateNumberForSaudi.symbol model',
+               select:'title image',
+          }
+     }), query);
      console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['description']).modelQuery;
      const meta = await queryBuilder.countTotal();

@@ -213,8 +213,7 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
           await sendNotifications({
                title: `${workshop?.workshopNameEnglish}`,
                receiver: (workshop.ownerId as any)._id,
-               message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.
-`,
+               message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
                type: 'ALERT',
           });
           

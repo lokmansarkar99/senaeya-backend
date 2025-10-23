@@ -66,7 +66,8 @@ const createClient = async (payload: any) => {
                isExistClient = await Client.create({
                     clientType: payload.clientType,
                     clientId: payload.workShopIdAsClient,
-                    document: payload.document,
+                    document: payload.document || null,
+                    documentNumber: payload.documentNumber,
                     providerWorkShopId: payload.providerWorkShopId,
                     contact: payload.contact,
                });
@@ -116,7 +117,8 @@ const createClient = async (payload: any) => {
                               {
                                    clientType: payload.clientType,
                                    clientId: isExistUser._id,
-                                   document: payload.document,
+                                   document: payload.document || null,
+                                   documentNumber: payload.documentNumber,
                                    providerWorkShopId: payload.providerWorkShopId,
                                    contact: payload.contact,
                               },
@@ -273,19 +275,19 @@ const toggleClientStatus = async (id: string): Promise<IClient | null> => {
      }
      result.status = result.status === CLIENT_STATUS.ACTIVE ? CLIENT_STATUS.BLOCK : CLIENT_STATUS.ACTIVE;
      await result.save();
-     const message = whatsAppTemplate.defaulterList({status:result.status});
+     const message = whatsAppTemplate.defaulterList({ status: result.status });
      await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
      return result;
 };
 
-const sendMessageToRecieveCar = async (id: string,providerWorkShopId:string) => {
+const sendMessageToRecieveCar = async (id: string, providerWorkShopId: string) => {
      const [result] = await Client.find({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
      const workShop = await WorkShop.findById(providerWorkShopId).select('workshopNameEnglish workshopNameArabic');
      //send message
-     const values = { contact: result.contact,workshopNameEnglish:workShop!.workshopNameEnglish,workshopNameArabic:workShop!.workshopNameArabic };
+     const values = { contact: result.contact, workshopNameEnglish: workShop!.workshopNameEnglish, workshopNameArabic: workShop!.workshopNameArabic };
      const message = whatsAppTemplate.getRecieveCar(values);
      await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
 };
