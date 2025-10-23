@@ -82,7 +82,19 @@ const getWorkShopById = catchAsync(async (req: Request, res: Response) => {
           message: 'WorkShop retrieved successfully',
           data: result || undefined,
      });
-});  
+}); 
+
+const getWorkShopByContact = catchAsync(async (req: Request, res: Response) => {
+     const { contact } = req.params;
+     const result = await workShopService.getWorkShopByContact(contact);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'WorkShop retrieved successfully',
+          data: result || undefined,
+     });
+});
 
 export const workShopController = {
      createWorkShop,
@@ -91,5 +103,6 @@ export const workShopController = {
      updateWorkShop,
      deleteWorkShop,
      hardDeleteWorkShop,
-     getWorkShopById
+     getWorkShopById,
+     getWorkShopByContact
 };

@@ -23,6 +23,7 @@ const createWorkShopZodSchema = z.object({
      body: z.object({
           workshopNameEnglish: z.string({ required_error: 'workshopNameEnglish is required' }).trim(),
           workshopNameArabic: z.string({ required_error: 'workshopNameArabic is required' }).trim(),
+          contact: z.string({ required_error: 'contact is required' }).trim(),
           unn: z
                .string({ required_error: 'unn is required' })
                .trim()
@@ -58,6 +59,7 @@ const updateWorkShopZodSchema = z.object({
      body: z.object({
           workshopNameEnglish: z.string().trim().optional(),
           workshopNameArabic: z.string().trim().optional(),
+          contact: z.string().trim().optional(),
           unn: z
                .string()
                .trim()

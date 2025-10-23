@@ -112,6 +112,11 @@ const getWorkShopById = async (id: string): Promise<IworkShop | null> => {
      return result;
 };
 
+const getWorkShopByContact = async (contact: string): Promise<IworkShop | null> => {
+     const result = await WorkShop.findOne({ contact:contact.trim() });
+     return result;
+};
+
 export const workShopService = {
      createWorkShop,
      getAllWorkShops,
@@ -120,4 +125,5 @@ export const workShopService = {
      deleteWorkShop,
      hardDeleteWorkShop,
      getWorkShopById,
+     getWorkShopByContact,
 };

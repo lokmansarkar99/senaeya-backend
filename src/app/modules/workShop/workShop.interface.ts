@@ -18,6 +18,7 @@ export interface IworkShop {
      _id?: Types.ObjectId | string;
      workshopNameEnglish: string;
      workshopNameArabic: string;
+     contact: string;
      unn: string; // unified national number | total digit: 10; startingWith: 7
      crn: string; // commercial registration number | total digit: 10;
      mln: string; // municipality license number | unique | total digit: 11; startingWith: 4
