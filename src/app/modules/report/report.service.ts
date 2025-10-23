@@ -149,7 +149,7 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any) => {
-     const { startDate, endDate } = query;
+     const { startDate, endDate, income, outlay, noOfCars, lang } = query;
 
      // Normalize date range to be inclusive of the whole end day
      const start = new Date(startDate);
@@ -234,13 +234,13 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           numberOfPaidInvoices,
           numberOfUnpaidPostpaidInvoices,
           numberOfUnpaidNonPostpaidInvoices,
-          totalAllIncomeRecorded,
-          totalIncomeCollected,
-          totalUnpaidPostpaidFinalCost,
-          totalExpenses,
-          collectedFinancialBalance,
-          recordedFinancialBalance,
-          numberOfCars,
+          totalAllIncomeRecorded : income ? totalAllIncomeRecorded : undefined,
+          totalIncomeCollected : income ? totalIncomeCollected : undefined,
+          totalUnpaidPostpaidFinalCost : income ? totalUnpaidPostpaidFinalCost : undefined,
+          totalExpenses : outlay ? totalExpenses : undefined,
+          collectedFinancialBalance : income ? collectedFinancialBalance : undefined,
+          recordedFinancialBalance : income ? recordedFinancialBalance : undefined,
+          numberOfCars : noOfCars ? numberOfCars : undefined,
           range: { start, end },
           scopedByProviderWorkShopId: !!providerWorkShopId,
      };
