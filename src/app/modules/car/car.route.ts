@@ -20,6 +20,6 @@ router.patch('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER,
 
 router.delete('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), carController.deleteCar);
 
-router.get('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), carController.getCarById);
+router.get('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), carController.getCarById);
 
 export const carRoutes = router;
