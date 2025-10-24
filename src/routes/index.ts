@@ -19,6 +19,8 @@ import { clickpayRoutes } from '../app/modules/payment/clickpay/clickpay.route';
 import { PackageRoutes } from '../app/modules/package/package.routes';
 import { AdminRoutes } from '../app/modules/admin/admin.route';
 import { carModelRoutes } from '../app/modules/carModel/carModel.route';
+import { checkPhoneNumberRoutes } from '../app/modules/checkPhoneNumber/checkPhoneNumber.route';
+import { sparePartsRoutes } from '../app/modules/spareParts/spareParts.route';
 const router = express.Router();
 const routes = [
      {
@@ -70,6 +72,10 @@ const routes = [
           route: workRoutes,
      },
      {
+          path: '/spare-parts',
+          route: sparePartsRoutes,
+     },
+     {
           path: '/expenses',
           route: expenseRoutes,
      },
@@ -100,6 +106,10 @@ const routes = [
      {
           path: '/car-models',
           route: carModelRoutes,
+     },
+     {
+          path: '/check-phone-number',
+          route: checkPhoneNumberRoutes,
      },
 ];
 

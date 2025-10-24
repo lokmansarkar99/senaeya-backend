@@ -1,17 +1,23 @@
 import { Schema, Types, model } from 'mongoose';
-import { IInvoice, IInvoiceWork } from './invoice.interface';
+import { IInvoice, IInvoiceWork, IInvoiceSpareParts } from './invoice.interface';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { default_discount, default_vat, DiscountType } from './invoice.enum';
 import { Client } from '../client/client.model';
 import AppError from '../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { Work } from '../work/work.model';
-import { WorkType } from '../work/work.enum';
 import Settings from '../settings/settings.model';
 import { Car } from '../car/car.model';
+import { SpareParts } from '../spareParts/spareParts.model';
 
 const InvoiceWorkSchema = new Schema<IInvoiceWork>({
      work: { type: Schema.Types.ObjectId, ref: 'Work', required: true },
+     quantity: { type: Number, required: true },
+     finalCost: { type: Number, required: true },
+});
+
+const InvoiceSparePartsSchema = new Schema<IInvoiceSpareParts>({
+     item: { type: Schema.Types.ObjectId, ref: 'SpareParts', required: true },
      quantity: { type: Number, required: true },
      finalCost: { type: Number, required: true },
 });
@@ -24,7 +30,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           discount: { type: Number, required: false },
           discountType: { type: String, enum: DiscountType, required: false },
           worksList: { type: [InvoiceWorkSchema], required: true, default: [] },
-          sparePartsList: { type: [InvoiceWorkSchema], required: false, default: [] },
+          sparePartsList: { type: [InvoiceSparePartsSchema], required: false, default: [] },
           totalCostExcludingTax: { type: Number, required: true },
           taxPercentage: { type: Number, required: true },
           taxAmount: { type: Number, required: true },
@@ -88,7 +94,7 @@ InvoiceSchema.pre('validate', async function (next) {
 
      if (payload.worksList) {
           const worksIds = payload.worksList.map((work) => new Types.ObjectId(work.work));
-          isExistWorks = await Work.find({ _id: { $in: worksIds }, cost:{ $gt: 0 }});
+          isExistWorks = await Work.find({ _id: { $in: worksIds }, cost: { $gt: 0 } });
           if (!isExistWorks || isExistWorks.length !== payload.worksList.length) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.*');
           }
@@ -102,13 +108,14 @@ InvoiceSchema.pre('validate', async function (next) {
      }
 
      if (payload.sparePartsList) {
-          const sparePartsIds = payload.sparePartsList.map((sparePart) => new Types.ObjectId(sparePart.work));
-          isExistSpareParts = await Work.find({ _id: { $in: sparePartsIds }, cost:{ $gt: 0 }});
+          const sparePartsIds = payload.sparePartsList.map((sparePart) => new Types.ObjectId(sparePart.item));
+          isExistSpareParts = await SpareParts.find({ _id: { $in: sparePartsIds }, cost: { $gt: 0 } });
+          console.log('🚀 ~ sparePartsIds:', isExistSpareParts);
           if (!isExistSpareParts || isExistSpareParts.length !== payload.sparePartsList.length) {
                throw new AppError(StatusCodes.NOT_FOUND, 'SparePart not found.');
           }
           payload.sparePartsList.forEach((sparePart) => {
-               const isExistSparePart = isExistSpareParts.find((isExistSparePart) => isExistSparePart._id.toString() === sparePart.work.toString());
+               const isExistSparePart = isExistSpareParts.find((isExistSparePart) => isExistSparePart._id.toString() === sparePart.item.toString());
                if (isExistSparePart) {
                     sparePart.finalCost = isExistSparePart.cost * sparePart.quantity;
                }
@@ -134,10 +141,10 @@ InvoiceSchema.pre('validate', async function (next) {
      }
 
      // taxAmount
-     let taxAmount = totalCostExcludingTax * (vat / 100);
+     let taxAmountForWorkCost = totalCostOfWorkShopExcludingTax * (vat / 100);
 
      // totalCostIncludingTax
-     let totalCostIncludingTax = totalCostExcludingTax + taxAmount;
+     let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
 
      // discount
      let finalDiscountInFlatAmount = default_discount;
@@ -146,10 +153,10 @@ InvoiceSchema.pre('validate', async function (next) {
      }
 
      // finalCost
-     let finalCost = totalCostExcludingTax + taxAmount - finalDiscountInFlatAmount;
+     let finalCost = totalCostExcludingTax + taxAmountForWorkCost - finalDiscountInFlatAmount;
 
      payload.totalCostExcludingTax = totalCostExcludingTax;
-     payload.taxAmount = taxAmount;
+     payload.taxAmount = taxAmountForWorkCost;
      payload.totalCostIncludingTax = totalCostIncludingTax;
      payload.finalDiscountInFlatAmount = finalDiscountInFlatAmount;
      payload.taxPercentage = vat;

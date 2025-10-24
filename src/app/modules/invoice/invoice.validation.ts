@@ -18,7 +18,7 @@ const createInvoiceZodSchema = z.object({
                sparePartsList: z
                     .array(
                          z.object({
-                              work: z.string({ required_error: 'Work is required' }),
+                              item: z.string({ required_error: 'Item is required' }),
                               quantity: z.number({ required_error: 'Quantity is required' }),
                          }),
                     )
@@ -68,7 +68,7 @@ const updateInvoiceZodSchema = z.object({
           sparePartsList: z
                .array(
                     z.object({
-                         work: z.string({ required_error: 'Work is required' }),
+                         item: z.string({ required_error: 'Item is required' }),
                          quantity: z.number({ required_error: 'Quantity is required' }),
                     }),
                )

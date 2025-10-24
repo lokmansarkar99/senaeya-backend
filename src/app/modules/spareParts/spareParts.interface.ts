@@ -1,6 +1,7 @@
-import { WorkType } from './work.enum';
+import { WorkType } from './spareParts.enum';
+import { Types } from 'mongoose';
 
-export interface Iwork {
+export interface ISpareParts {
      title: {
           ar: string;
           bn: string;
@@ -9,8 +10,8 @@ export interface Iwork {
           tl: string;
           en: string;
      };
-     workCategoryName: string;
-     type: WorkType.SERVICE;
+     providerWorkShopId: Types.ObjectId;
+     type: WorkType.SPARE_PART;
      code: string;
      cost?: number;
      createdAt: Date;
@@ -19,6 +20,6 @@ export interface Iwork {
      deletedAt?: Date;
 }
 
-export type IworkFilters = {
+export type ISparePartsFilters = {
      searchTerm?: string;
 };

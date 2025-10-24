@@ -8,6 +8,12 @@ export interface IInvoiceWork {
      finalCost: number; // work.cost * quantity
 }
 
+export interface IInvoiceSpareParts {
+     item: Types.ObjectId;
+     quantity: number;
+     finalCost: number; // item.cost * quantity
+}
+
 
 export enum TranslatedFieldEnum {
      en,
@@ -25,7 +31,7 @@ export interface IInvoice {
      discount?: number;
      discountType?: DiscountType;
      worksList?: IInvoiceWork[]; // work.type === 'service'
-     sparePartsList?: IInvoiceWork[]; // work.type === 'spare parts'
+     sparePartsList?: IInvoiceSpareParts[]; // work.type === 'spare parts'
      paymentMethod?: PaymentMethod | null;
      paymentStatus: PaymentStatus;
      postPaymentDate?: Date | null; // only if the paymentMethod is postpaid

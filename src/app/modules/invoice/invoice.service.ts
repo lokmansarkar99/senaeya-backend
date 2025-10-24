@@ -59,6 +59,14 @@ const createInvoice = async (payload: IInvoice) => {
                },
           })
           .populate({
+               path: 'sparePartsList',
+               select: 'item quantity finalCost',
+               populate: {
+                    path: 'item',
+                    select: 'title cost',
+               },
+          })
+          .populate({
                path: 'car',
                select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                populate: {
@@ -155,6 +163,14 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                select: 'work quantity finalCost',
                populate: {
                     path: 'work',
+                    select: 'title cost',
+               },
+          })
+          .populate({
+               path: 'sparePartsList',
+               select: 'item quantity finalCost',
+               populate: {
+                    path: 'item',
                     select: 'title cost',
                },
           })

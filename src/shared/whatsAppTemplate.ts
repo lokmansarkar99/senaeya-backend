@@ -2,7 +2,7 @@ import { CLIENT_STATUS } from '../app/modules/client/client.enum';
 import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
 import { buildTranslatedField } from '../utils/buildTranslatedField';
 
-const createAccount = (values: { name: string; otp: number; contact: string }) => {
+const createAccount = (values: { name?: string; otp: number; contact: string }) => {
      return `OTP code: ${values.otp}   We are happy to serve you in Senaeya app.
      رمز تفعيل رقم الجوال: ${values.otp} نسعد بخدمتكم في تطبيق الصناعية.
      `;
@@ -484,7 +484,7 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                              <tr>
                                  <td>${index + 1}</td>
                                  <td>${part._id}</td>
-                                 <td>${part.work}</td>
+                                 <td>${part.item}</td>
                                  <td>${part.quantity}</td>
                                  <td>${part.finalCost}</td>
                                  <td>${part.finalCost * part.quantity}</td>
@@ -625,8 +625,8 @@ const defaulterList = ({ status }: { status: string }) => {
           status === CLIENT_STATUS.BLOCK
                ? `Sorry... your name has been added to the defaulters list.
     عذرا … لقد تم وضع اسمكم في قائمة المتعثرين عن السداد.`
-               : `The invoice has been paid and your name has been removed from the defaulters list.
-    تم تسديد الفاتورة وإزالة اسمكم من قائمة المتعثرين عن السداد.
+               : `Your name has been removed from the defaulters list.
+    إزالة اسمكم من قائمة المتعثرين عن السداد.
 `;
      return message;
 };

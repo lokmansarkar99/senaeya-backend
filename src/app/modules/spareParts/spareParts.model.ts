@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { Iwork } from './work.interface';
-import { WorkType } from './work.enum';
+import { ISpareParts } from './spareParts.interface';
+import { WorkType } from './spareParts.enum';
 
-const WorkSchema = new Schema<Iwork>(
+const SparePartsSchema = new Schema<ISpareParts>(
      {
           title: { type: {
                ar: String,
@@ -12,8 +12,8 @@ const WorkSchema = new Schema<Iwork>(
                tl: String,
                en: String,
           }, required: true },
-          workCategoryName: { type: String, required: true},
-          type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SERVICE},
+          providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
+          type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SPARE_PART},
           code: { type: String, required: true, unique: true },
           cost: { type: Number, required: false, min: 0 },
           isDeleted: { type: Boolean, default: false },
@@ -22,19 +22,19 @@ const WorkSchema = new Schema<Iwork>(
      { timestamps: true },
 );
 
-WorkSchema.pre('find', function (next) {
+SparePartsSchema.pre('find', function (next) {
      this.find({ isDeleted: false });
      next();
 });
 
-WorkSchema.pre('findOne', function (next) {
+SparePartsSchema.pre('findOne', function (next) {
      this.findOne({ isDeleted: false });
      next();
 });
 
-WorkSchema.pre('aggregate', function (next) {
+SparePartsSchema.pre('aggregate', function (next) {
      this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
      next();
 });
 
-export const Work = model<Iwork>('Work', WorkSchema);
+export const SpareParts = model<ISpareParts>('SpareParts', SparePartsSchema);

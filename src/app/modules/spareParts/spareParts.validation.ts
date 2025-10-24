@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { WorkType } from './work.enum';
+import { WorkType } from './spareParts.enum';
 
-const createWorkZodSchema = z.object({
+const createSparePartsZodSchema = z.object({
      body: z.object({
-          workCategoryName: z.string(),
-          type: z.nativeEnum(WorkType).default(WorkType.SERVICE).optional(),
+          providerWorkShopId: z.string(),
+          type: z.nativeEnum(WorkType).default(WorkType.SPARE_PART).optional(),
           title: z.string().optional(),
           titleObj: z
                .object({
@@ -21,10 +21,10 @@ const createWorkZodSchema = z.object({
      }),
 });
 
-const updateWorkZodSchema = z.object({
+const updateSparePartsZodSchema = z.object({
      body: z.object({
-          workCategoryName: z.string().optional(),
-          type: z.nativeEnum(WorkType).default(WorkType.SERVICE).optional(),
+          providerWorkShopId: z.string().optional(),
+          type: z.nativeEnum(WorkType).default(WorkType.SPARE_PART).optional(),
           title: z.string().optional(),
           titleObj: z
                .object({
@@ -41,7 +41,7 @@ const updateWorkZodSchema = z.object({
      }),
 });
 
-export const workValidation = {
-     createWorkZodSchema,
-     updateWorkZodSchema,
+export const sparePartsValidation = {
+     createSparePartsZodSchema,
+     updateSparePartsZodSchema,
 };
