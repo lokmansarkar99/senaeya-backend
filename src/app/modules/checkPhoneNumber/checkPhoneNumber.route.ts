@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.post('/', validateRequest(checkPhoneNumberValidation.createCheckPhoneNumberZodSchema), checkPhoneNumberController.createCheckPhoneNumber);
 
-router.patch('/:phoneNumber', validateRequest(checkPhoneNumberValidation.verifyPhoneNumber), checkPhoneNumberController.getCheckPhoneNumberByPhoneNumber);
+router.post('/:phoneNumber', validateRequest(checkPhoneNumberValidation.verifyPhoneNumber), checkPhoneNumberController.getCheckPhoneNumberByPhoneNumber);
 
 export const checkPhoneNumberRoutes = router;
