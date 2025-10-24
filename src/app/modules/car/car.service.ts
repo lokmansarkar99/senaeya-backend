@@ -12,7 +12,7 @@ import { CarModel } from '../carModel/carModel.model';
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
      console.log('🚀 ~ createCar ~ payload:', payload);
      const isExistCarModel = await CarModel.findOne({
-          model: payload.model,
+          _id: payload.model,
           brand: payload.brand,
      });
      if (!isExistCarModel) {

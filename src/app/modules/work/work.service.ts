@@ -52,6 +52,8 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
                          tl: element.tl,
                          ur: element.ur,
                     },
+                    type: element.type,
+                    cost: element.cost,
                     workCategoryName: element.workCategoryName,
                     code: element.code,
                };

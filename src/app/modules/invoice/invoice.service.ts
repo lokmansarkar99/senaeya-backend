@@ -78,6 +78,10 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
                path:'brand plateNumberForSaudi.symbol model',
                select:'title image',
           }
+     }).
+     populate({
+          path:'payment',
+          select:'createdAt',
      }), query);
      console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['description']).modelQuery;

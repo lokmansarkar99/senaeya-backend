@@ -8,7 +8,6 @@ import { sendNotifications } from '../../helpers/notificationsHelper';
 
 const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
-          console.log("🚀 ~ validateUserAuthority ~ req:", req.body)
      try {
           const user = req.user as IUser & { id: string };
           if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {

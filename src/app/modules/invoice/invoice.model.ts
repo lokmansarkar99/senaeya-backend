@@ -29,7 +29,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           taxPercentage: { type: Number, required: true },
           taxAmount: { type: Number, required: true },
           totalCostIncludingTax: { type: Number, required: true },
-          paymentMethod: { type: String, enum: PaymentMethod, required: true },
+          paymentMethod: { type: String, enum: PaymentMethod, required: false, default: null },
           paymentStatus: { type: String, enum: PaymentStatus, required: true, default: PaymentStatus.UNPAID },
           postPaymentDate: { type: Date, required: false, default: null },
           payment: { type: Schema.Types.ObjectId, ref: 'Payment', required: false, default: null },
@@ -88,9 +88,9 @@ InvoiceSchema.pre('validate', async function (next) {
 
      if (payload.worksList) {
           const worksIds = payload.worksList.map((work) => new Types.ObjectId(work.work));
-          isExistWorks = await Work.find({ _id: { $in: worksIds }, type: WorkType.SERVICE });
+          isExistWorks = await Work.find({ _id: { $in: worksIds }, cost:{ $gt: 0 }});
           if (!isExistWorks || isExistWorks.length !== payload.worksList.length) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
+               throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.*');
           }
           payload.worksList.forEach((work) => {
                const isExistWork = isExistWorks.find((isExistWork) => isExistWork._id.toString() === work.work.toString());
@@ -103,7 +103,7 @@ InvoiceSchema.pre('validate', async function (next) {
 
      if (payload.sparePartsList) {
           const sparePartsIds = payload.sparePartsList.map((sparePart) => new Types.ObjectId(sparePart.work));
-          isExistSpareParts = await Work.find({ _id: { $in: sparePartsIds }, type: WorkType.SPARE_PARTS });
+          isExistSpareParts = await Work.find({ _id: { $in: sparePartsIds }, cost:{ $gt: 0 }});
           if (!isExistSpareParts || isExistSpareParts.length !== payload.sparePartsList.length) {
                throw new AppError(StatusCodes.NOT_FOUND, 'SparePart not found.');
           }

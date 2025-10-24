@@ -71,7 +71,7 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
      }
      // finalize payload
      payload.amount = invoice.finalCost;
-     payload.paymentMethod = invoice.paymentMethod;
+     payload.paymentMethod = invoice.paymentMethod!;
      payload.paymentStatus = invoice.paymentStatus;
      if (invoice.paymentMethod === PaymentMethod.POSTPAID) {
           payload.postPaymentDate = invoice.postPaymentDate;
