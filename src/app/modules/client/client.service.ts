@@ -260,6 +260,10 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
                },
           })
           .populate({
+               path: 'model',
+               select: 'title',
+          })
+          .populate({
                path: 'brand',
                select: '_id image title',
                populate: {
