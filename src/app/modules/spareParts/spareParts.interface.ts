@@ -1,4 +1,4 @@
-import { WorkType } from './spareParts.enum';
+import { SparePartType } from './spareParts.enum';
 import { Types } from 'mongoose';
 
 export interface ISpareParts {
@@ -10,10 +10,10 @@ export interface ISpareParts {
           tl: string;
           en: string;
      };
-     providerWorkShopId: Types.ObjectId;
-     type: WorkType.SPARE_PART;
+     itemName: string;
+     providerWorkShopId?: Types.ObjectId | null;
+     type: SparePartType.SPARE_PART;
      code: string;
-     cost?: number;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

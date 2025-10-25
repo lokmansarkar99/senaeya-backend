@@ -286,7 +286,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 
      await sendNotifications({
           title: `${user.name}`,
-          receiver: user._id,
+          receiver: user.id,
           message: `The report was issued and sent to the workshop manager's mobile phone via WhatsApp.`,
           type: 'ALERT',
      });

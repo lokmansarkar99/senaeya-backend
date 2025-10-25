@@ -12,7 +12,6 @@ export interface Iwork {
      workCategoryName: string;
      type: WorkType.SERVICE;
      code: string;
-     cost?: number;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

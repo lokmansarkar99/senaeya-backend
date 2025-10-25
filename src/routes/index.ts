@@ -21,6 +21,7 @@ import { AdminRoutes } from '../app/modules/admin/admin.route';
 import { carModelRoutes } from '../app/modules/carModel/carModel.route';
 import { checkPhoneNumberRoutes } from '../app/modules/checkPhoneNumber/checkPhoneNumber.route';
 import { sparePartsRoutes } from '../app/modules/spareParts/spareParts.route';
+import { NotificationRoutes } from '../app/modules/notification/notification.routes';
 const router = express.Router();
 const routes = [
      {
@@ -110,6 +111,10 @@ const routes = [
      {
           path: '/check-phone-number',
           route: checkPhoneNumberRoutes,
+     },
+     {
+          path: '/notification',
+          route: NotificationRoutes,
      },
 ];
 

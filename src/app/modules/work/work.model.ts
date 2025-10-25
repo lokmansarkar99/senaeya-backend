@@ -15,7 +15,6 @@ const WorkSchema = new Schema<Iwork>(
           workCategoryName: { type: String, required: true},
           type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SERVICE},
           code: { type: String, required: true, unique: true },
-          cost: { type: Number, required: false, min: 0 },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },

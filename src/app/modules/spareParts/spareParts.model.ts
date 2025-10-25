@@ -1,21 +1,24 @@
 import { Schema, model } from 'mongoose';
 import { ISpareParts } from './spareParts.interface';
-import { WorkType } from './spareParts.enum';
+import { SparePartType } from './spareParts.enum';
 
 const SparePartsSchema = new Schema<ISpareParts>(
      {
-          title: { type: {
-               ar: String,
-               bn: String,
-               ur: String,
-               hi: String,
-               tl: String,
-               en: String,
-          }, required: true },
-          providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
-          type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SPARE_PART},
-          code: { type: String, required: true, unique: true },
-          cost: { type: Number, required: false, min: 0 },
+          title: {
+               type: {
+                    ar: String,
+                    bn: String,
+                    ur: String,
+                    hi: String,
+                    tl: String,
+                    en: String,
+               },
+               required: true,
+          },
+          itemName: { type: String, required: true },
+          providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: false, default: null },
+          type: { type: String, enum: Object.values(SparePartType), required: true, default: SparePartType.SPARE_PART },
+          code: { type: String, required: true, unique: true, lowerCase: true },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },

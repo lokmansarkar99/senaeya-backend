@@ -9,16 +9,25 @@ import { Work } from '../work/work.model';
 import Settings from '../settings/settings.model';
 import { Car } from '../car/car.model';
 import { SpareParts } from '../spareParts/spareParts.model';
+import { WorkType } from '../work/work.enum';
+import { SparePartType } from '../spareParts/spareParts.enum';
+import { sparePartsService } from '../spareParts/spareParts.service';
+import { ISpareParts } from '../spareParts/spareParts.interface';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 const InvoiceWorkSchema = new Schema<IInvoiceWork>({
      work: { type: Schema.Types.ObjectId, ref: 'Work', required: true },
      quantity: { type: Number, required: true },
+     cost: { type: Number, required: true },
      finalCost: { type: Number, required: true },
 });
 
 const InvoiceSparePartsSchema = new Schema<IInvoiceSpareParts>({
-     item: { type: Schema.Types.ObjectId, ref: 'SpareParts', required: true },
+     // item: { type: String, required: true },
+     itemName: { type: String, required: true },
      quantity: { type: Number, required: true },
+     cost: { type: Number, required: true },
+     code: { type: String, required: true },
      finalCost: { type: Number, required: true },
 });
 
@@ -99,30 +108,17 @@ InvoiceSchema.pre('validate', async function (next) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.*');
           }
           payload.worksList.forEach((work) => {
-               const isExistWork = isExistWorks.find((isExistWork) => isExistWork._id.toString() === work.work.toString());
-               if (isExistWork) {
-                    work.finalCost = isExistWork.cost * work.quantity;
-               }
+               work.finalCost = Number(work.cost) * Number(work.quantity);
                return work;
           });
      }
 
      if (payload.sparePartsList) {
-          const sparePartsIds = payload.sparePartsList.map((sparePart) => new Types.ObjectId(sparePart.item));
-          isExistSpareParts = await SpareParts.find({ _id: { $in: sparePartsIds }, cost: { $gt: 0 } });
-          console.log('🚀 ~ sparePartsIds:', isExistSpareParts);
-          if (!isExistSpareParts || isExistSpareParts.length !== payload.sparePartsList.length) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'SparePart not found.');
-          }
-          payload.sparePartsList.forEach((sparePart) => {
-               const isExistSparePart = isExistSpareParts.find((isExistSparePart) => isExistSparePart._id.toString() === sparePart.item.toString());
-               if (isExistSparePart) {
-                    sparePart.finalCost = isExistSparePart.cost * sparePart.quantity;
-               }
+          payload.sparePartsList.forEach(async (sparePart) => {
+               sparePart.finalCost = Number(sparePart.cost) * Number(sparePart.quantity);
                return sparePart;
           });
      }
-
      // totalCostExcludingTax
      let totalCostOfWorkShopExcludingTax = 0;
      if (payload.worksList) {

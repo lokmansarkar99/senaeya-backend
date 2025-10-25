@@ -10,8 +10,11 @@ import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 import { WorkShop } from '../workShop/workShop.model';
 import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { sparePartsService } from '../spareParts/spareParts.service';
+import { SpareParts } from '../spareParts/spareParts.model';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
-const createInvoice = async (payload: IInvoice) => {
+const createInvoice = async (payload: Partial<IInvoice>) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
           payload.postPaymentDate = null;
      } else {
@@ -24,73 +27,116 @@ const createInvoice = async (payload: IInvoice) => {
                }
           }
      }
-     const invoice = new Invoice(payload);
-     // Validate the order data
-     await invoice.validate();
-     const result = await invoice.save();
-     if (!result) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
+     try {
+          const invoice = new Invoice(payload);
+          // Validate the order data
+          await invoice.validate();
+
+          if (payload.sparePartsList) {
+               // Process all spare parts in parallel and wait for all to complete
+               await Promise.all(payload.sparePartsList.map(async (sparePart) => {
+                    try {
+                         // Check if spare part with this code already exists
+                         const existingSparePart = await SpareParts.findOne({
+                              code: sparePart.code.toLowerCase(),
+                              providerWorkShopId: payload.providerWorkShopId
+                         });
+
+                         if (!existingSparePart) {
+                              const title = await buildTranslatedField(sparePart.itemName);
+                              const sparePartData = {
+                                   providerWorkShopId: payload.providerWorkShopId,
+                                   item: sparePart.itemName,
+                                   cost: sparePart.cost,
+                                   code: sparePart.code.toLowerCase(),
+                                   title,
+                              };
+
+                              const newSparePart = new SpareParts(sparePartData);
+                              console.log("🚀 ~ createInvoice ~ newSparePart:", newSparePart)
+                              await newSparePart.save();
+                         }
+                    } catch (error) {
+                         console.error('Error saving spare part:', error);
+                         // Continue with other spare parts even if one fails
+                    }
+               }));
+          }
+          // throw new Error("test");
+          
+          const result = await invoice.save();
+
+          if (!result) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
+          }
+          // get the workshop
+          const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
+          if (!workshop!.subscribedPackage) {
+               workshop!.generatedInvoiceCount += 1;
+               await workshop!.save();
+          }
+          const populatedResult = await Invoice.findById(result._id)
+               .populate({
+                    path: 'providerWorkShopId',
+                    select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
+               })
+               .populate({
+                    path: 'client',
+                    select: 'clientId clientType',
+                    populate: {
+                         path: 'clientId',
+                         select: 'name contact',
+                    },
+               })
+               .populate({
+                    path: 'worksList sparePartsList',
+                    select: 'work quantity finalCost',
+                    populate: {
+                         path: 'work',
+                         select: 'title cost',
+                    },
+               })
+               .populate({
+                    path: 'sparePartsList',
+                    select: 'item quantity finalCost',
+                    populate: {
+                         path: 'item',
+                         select: 'title cost',
+                    },
+               })
+               .populate({
+                    path: 'car',
+                    select: 'model brand year plateNumberForInternational plateNumberForSaudi',
+                    populate: {
+                         path: 'brand plateNumberForSaudi.symbol model',
+                         // model: 'CarBrand',
+                         // select: 'title image',
+                    },
+               });
+          return populatedResult;
+     } catch (error) {
+          console.log('🚀 ~ createInvoice ~ error:', error);
+          throw error;
      }
-     // get the workshop
-     const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
-     if (!workshop!.subscribedPackage) {
-          workshop!.generatedInvoiceCount += 1;
-          await workshop!.save();
-     }
-     const populatedResult = await Invoice.findById(result._id)
-          .populate({
-               path: 'providerWorkShopId',
-               select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
-          })
-          .populate({
-               path: 'client',
-               select: 'clientId clientType',
-               populate: {
-                    path: 'clientId',
-                    select: 'name contact',
-               },
-          })
-          .populate({
-               path: 'worksList sparePartsList',
-               select: 'work quantity finalCost',
-               populate: {
-                    path: 'work',
-                    select: 'title cost',
-               },
-          })
-          .populate({
-               path: 'sparePartsList',
-               select: 'item quantity finalCost',
-               populate: {
-                    path: 'item',
-                    select: 'title cost',
-               },
-          })
-          .populate({
-               path: 'car',
-               select: 'model brand year plateNumberForInternational plateNumberForSaudi',
-               populate: {
-                    path: 'brand plateNumberForSaudi.symbol',
-                    // model: 'CarBrand',
-                    // select: 'title image',
-               },
-          });
-     return populatedResult;
 };
 
 const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
-     const queryBuilder = new QueryBuilder(Invoice.find().populate({
-          path:'car',
-          select:'model brand year plateNumberForInternational plateNumberForSaudi providerWorkShopId slugForSaudiCarPlateNumber ',
-          populate:{
-               path:'brand plateNumberForSaudi.symbol model',
-               select:'title image',
-          }
-     }).
-     populate({
-          path:'payment',
-          select:'createdAt',
-     }), query);
+     const queryBuilder = new QueryBuilder(
+          Invoice.find()
+               .populate({
+                    path: 'car',
+                    select: 'model brand year plateNumberForInternational plateNumberForSaudi providerWorkShopId slugForSaudiCarPlateNumber ',
+                    populate: {
+                         path: 'brand plateNumberForSaudi.symbol model',
+                         select: 'title image',
+                    },
+               })
+               .populate({
+                    path: 'payment',
+                    select: 'createdAt',
+               }),
+          query,
+     );
      console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['description']).modelQuery;
      const meta = await queryBuilder.countTotal();
@@ -147,10 +193,6 @@ const hardDeleteInvoice = async (id: string): Promise<IInvoice | null> => {
 const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      const result = await Invoice.findById(id)
           .populate({
-               path: 'providerWorkShopId',
-               select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
-          })
-          .populate({
                path: 'client',
                select: 'clientId clientType',
                populate: {
@@ -178,8 +220,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                path: 'car',
                select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                populate: {
-                    path: 'brand plateNumberForSaudi.symbol',
-                    // model: 'CarBrand',
+                    path: 'brand plateNumberForSaudi.symbol model',
                     // select: 'title image',
                },
           });
@@ -194,7 +235,7 @@ const releaseInvoice = async (invoiceId: string, payload: { providerWorkShopId: 
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.*.');
      }
-     if (result.paymentMethod === PaymentMethod.TRANSFER && !payload.cardApprovalCode) {
+     if (result.paymentMethod === PaymentMethod.CARD && !payload.cardApprovalCode) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'cardApprovalCode is required for TRANSFER payment method');
      }
 

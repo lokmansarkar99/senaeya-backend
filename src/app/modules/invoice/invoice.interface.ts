@@ -5,12 +5,15 @@ import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 export interface IInvoiceWork {
      work: Types.ObjectId;
      quantity: number;
+     cost: number;
      finalCost: number; // work.cost * quantity
 }
 
 export interface IInvoiceSpareParts {
-     item: Types.ObjectId;
+     itemName: string;
      quantity: number;
+     cost: number;
+     code: string;
      finalCost: number; // item.cost * quantity
 }
 

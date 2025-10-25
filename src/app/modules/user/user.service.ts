@@ -11,9 +11,10 @@ import { User } from './user.model';
 import AppError from '../../../errors/AppError';
 import generateOTP from '../../../utils/generateOTP';
 import { AuthService } from '../auth/auth.service';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { checkPhoneNumberService } from '../checkPhoneNumber/checkPhoneNumber.service';
+import session from 'express-session';
 // create user
 const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string } }) => {
      // check is phone number verified
@@ -119,7 +120,7 @@ const getUserProfileFromDB = async (user: JwtPayload): Promise<Partial<IUser>> =
 };
 
 // update user profile
-const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser>): Promise<Partial<IUser | null>> => {
+const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser & { helperUserId: { contact: string; password: string } | Types.ObjectId }>): Promise<Partial<IUser | null>> => {
      const { id } = user;
      const isExistUser = await User.isExistUserById(id);
      if (!isExistUser) {
@@ -129,6 +130,15 @@ const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser>): Pro
      //unlink file here
      if (payload.image) {
           unlinkFile(isExistUser.image);
+     }
+
+     let helperUser = null;
+     if (payload.helperUserId && (payload.helperUserId as any)?.contact && (payload.helperUserId as any)?.password) {
+          helperUser = await User.create({ ...payload.helperUserId, role: USER_ROLES.WORKSHOP_MEMBER });
+          if (!helperUser) {
+               throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create helper user');
+          }
+          payload.helperUserId = helperUser._id;
      }
 
      const updateDoc = await User.findOneAndUpdate({ _id: id }, payload, {

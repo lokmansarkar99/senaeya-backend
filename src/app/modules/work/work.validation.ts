@@ -17,7 +17,6 @@ const createWorkZodSchema = z.object({
                })
                .optional(),
           code: z.string().optional(),
-          cost: z.number().optional(),
      }),
 });
 
@@ -37,7 +36,6 @@ const updateWorkZodSchema = z.object({
                })
                .optional(),
           code: z.string().optional(),
-          cost: z.number().optional(),
      }),
 });
 

@@ -4,6 +4,8 @@ export const createUserZodSchema = z.object({
      body: z.object({
           name: z.string({ required_error: 'Name is required' }).min(2, 'Name must be at least 2 characters long'),
           email: z.string().optional(),
+          deviceToken: z.string().optional(),
+          fcmToken: z.string().optional(),
           password: z.string({ required_error: 'Password is required' }).min(8, 'Password must be at least 8 characters long'),
           contact: string().min(11, 'Contact must be at least 11 characters long'),
           helperUserId: z
@@ -20,6 +22,8 @@ const createBusinessUserZodSchema = z.object({
           name: z.string({ required_error: 'Name is required' }),
           contact: z.string({ required_error: 'Contact is required' }),
           email: z.string().optional(),
+          deviceToken: z.string().optional(),
+          fcmToken: z.string().optional(),
           password: z.string({ required_error: 'Password is required' }).min(8, 'Password must be at least 8 characters long'),
           profile: z.string().optional(),
      }),
@@ -34,6 +38,11 @@ const updateUserZodSchema = z.object({
           password: z.string().optional(),
           image: z.string().optional(),
           fingerPrintId: z.string().optional(),
+          deviceToken: z.string().optional(),
+          fcmToken: z.string().optional(),
+          helperUserId: z
+               .union([z.string(), z.object({ contact: string().min(11, 'Contact must be at least 11 characters long'), password: string().min(8, 'Password must be at least 8 characters long') })])
+               .optional(),
      }),
 });
 

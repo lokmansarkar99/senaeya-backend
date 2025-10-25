@@ -22,6 +22,8 @@ export type IUser = {
      };
      helperUserId?: Types.ObjectId | null;
      fingerPrintId?: string;
+     deviceToken?: string;
+     fcmToken?: string;
 };
 
 export type UserModel = {

@@ -1,3 +1,3 @@
-export enum WorkType {
+export enum SparePartType {
      SPARE_PART = 'SPARE PART'
 }

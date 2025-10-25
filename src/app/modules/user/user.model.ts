@@ -97,6 +97,12 @@ const userSchema = new Schema<IUser, UserModel>(
           fingerPrintId: {
                type: String,
           },
+          deviceToken: {
+               type: String,
+          },
+          fcmToken: {
+               type: String,
+          },
      },
      { timestamps: true },
 );

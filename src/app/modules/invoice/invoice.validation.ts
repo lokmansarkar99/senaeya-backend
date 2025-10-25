@@ -12,14 +12,17 @@ const createInvoiceZodSchema = z.object({
                          z.object({
                               work: z.string({ required_error: 'Work is required' }),
                               quantity: z.number({ required_error: 'Quantity is required' }),
+                              cost: z.number({ required_error: 'Cost is required' }),
                          }),
                     )
                     .optional(),
                sparePartsList: z
                     .array(
                          z.object({
-                              item: z.string({ required_error: 'Item is required' }),
+                              itemName: z.string({ required_error: 'Item is required' }),
                               quantity: z.number({ required_error: 'Quantity is required' }),
+                              cost: z.number({ required_error: 'Cost is required' }),
+                              code: z.string({ required_error: 'Code is required' }),
                          }),
                     )
                     .optional(),
@@ -62,14 +65,16 @@ const updateInvoiceZodSchema = z.object({
                     z.object({
                          work: z.string({ required_error: 'Work is required' }),
                          quantity: z.number({ required_error: 'Quantity is required' }),
+                         cost: z.number({ required_error: 'Cost is required' }),
                     }),
                )
                .optional(),
           sparePartsList: z
                .array(
                     z.object({
-                         item: z.string({ required_error: 'Item is required' }),
+                         itemName: z.string({ required_error: 'Item is required' }),
                          quantity: z.number({ required_error: 'Quantity is required' }),
+                         cost: z.number({ required_error: 'Cost is required' }),
                     }),
                )
                .optional(),

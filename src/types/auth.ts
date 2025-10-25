@@ -7,6 +7,9 @@ export type ILoginData = {
      contact?: string;
      password?: string;
      fingerPrintId?: string;
+     fcmToken?: string;
+     deviceId?: string;
+     deviceType?: 'android' | 'ios';
 };
 
 export type IAuthResetPassword = {

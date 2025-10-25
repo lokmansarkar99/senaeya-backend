@@ -9,14 +9,16 @@ import { WorksCategories } from '../worksCategories/worksCategories.model';
 import { SpareParts } from './spareParts.model';
 import { getXLXStoJSON } from '../work/work.utils';
 
-const createSpareParts = async (payload: ISpareParts & { titleObj?: ISpareParts['title']; workCategoryName: string }): Promise<ISpareParts> => {
-     if (payload.title) {
+const createSpareParts = async (payload: Partial<ISpareParts & { titleObj?: ISpareParts['title']; workCategoryName: string }>): Promise<ISpareParts> => {
+     if (payload.itemName) {
           delete payload.titleObj;
-          const [titleObj]: [ISpareParts['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
+          const [titleObj]: [ISpareParts['title']] = await Promise.all([buildTranslatedField(payload.itemName as any)]);
           payload.title = titleObj;
      } else if (payload.titleObj) {
           payload.title = payload.titleObj;
+          payload.itemName = payload.titleObj.en;
      }
+     payload.code = payload.code!.toLowerCase();
      const result = await SpareParts.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
@@ -149,6 +151,16 @@ const getSparePartsById = async (id: string): Promise<ISpareParts | null> => {
      return result;
 };
 
+const createManySpareParts = async (payload: any): Promise<ISpareParts[]> => {
+     const result = await Promise.all(payload.data!.map((item: any) => createSpareParts(item)));
+     return result;
+};
+
+const getSparePartsByCode = async (code: string): Promise<ISpareParts | null> => {
+     const result = await SpareParts.findOne({ code: code.toLowerCase() });
+     return result;
+};
+
 export const sparePartsService = {
      createSpareParts,
      createManySparePartsByXLXS,
@@ -158,4 +170,6 @@ export const sparePartsService = {
      deleteSpareParts,
      hardDeleteSpareParts,
      getSparePartsById,
+     createManySpareParts,
+     getSparePartsByCode
 };

@@ -28,11 +28,20 @@ router.post(
      sparePartsController.createManySparePartsByXLXS,
 );
 
+// createmanyspareparts
+router.post(
+     '/create-many',
+     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER),
+     validateUserAuthority(),
+     sparePartsController.createManySpareParts,
+);
+
 router.get('/', sparePartsController.getAllSpareParts);
 
 router.get('/unpaginated', sparePartsController.getAllUnpaginatedSpareParts);
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), sparePartsController.hardDeleteSpareParts);
+router.get('/get-by-code/:code',  sparePartsController.getSparePartsByCode);
 
 router.patch(
      '/:id',

@@ -17,14 +17,40 @@ import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { USER_ROLES } from '../../../enums/user';
 import { workShopService } from '../workShop/workShop.service';
+import DeviceToken from '../DeviceToken/DeviceToken.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
-     const { contact, password } = payload;
+     const { contact, password, fcmToken, deviceId, deviceType = 'android' } = payload;
+     if (fcmToken && !deviceId) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'deviceId is required when providing fcmToken');
+     }
 
      const isExistUser = await User.findOne({ contact }).select('+password');
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+     }
+
+     if (fcmToken && deviceId) {
+          const existingToken = await DeviceToken.findOne({
+               userId: isExistUser._id,
+               deviceId: deviceId,
+          });
+
+          if (existingToken) {
+               existingToken.fcmToken = fcmToken;
+               existingToken.deviceType = deviceType;
+               await existingToken.save();
+               console.log(`Updated FCM token for user ${isExistUser._id}, device ${deviceId}`);
+          } else {
+               await DeviceToken.create({
+                    userId: isExistUser._id,
+                    fcmToken,
+                    deviceId,
+                    deviceType,
+               });
+               console.log(`Created new FCM token for user ${isExistUser._id}, device ${deviceId}`);
+          }
      }
 
      // Handle OAuth users (they don't have passwords)

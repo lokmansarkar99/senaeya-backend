@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { WorkType } from './spareParts.enum';
+import { SparePartType } from './spareParts.enum';
 
 const createSparePartsZodSchema = z.object({
      body: z.object({
-          providerWorkShopId: z.string(),
-          type: z.nativeEnum(WorkType).default(WorkType.SPARE_PART).optional(),
-          title: z.string().optional(),
+          providerWorkShopId: z.string().optional(),
+          type: z.nativeEnum(SparePartType).default(SparePartType.SPARE_PART).optional(),
+          itemName: z.string().optional(),
           titleObj: z
                .object({
                     ar: z.string().optional(),
@@ -16,16 +16,15 @@ const createSparePartsZodSchema = z.object({
                     en: z.string().optional(),
                })
                .optional(),
-          code: z.string().optional(),
-          cost: z.number().optional(),
+          code: z.string(),
      }),
 });
 
 const updateSparePartsZodSchema = z.object({
      body: z.object({
           providerWorkShopId: z.string().optional(),
-          type: z.nativeEnum(WorkType).default(WorkType.SPARE_PART).optional(),
-          title: z.string().optional(),
+          type: z.nativeEnum(SparePartType).default(SparePartType.SPARE_PART).optional(),
+          item: z.string().optional(),
           titleObj: z
                .object({
                     ar: z.string().optional(),
@@ -37,9 +36,10 @@ const updateSparePartsZodSchema = z.object({
                })
                .optional(),
           code: z.string().optional(),
-          cost: z.number().optional(),
      }),
 });
+
+
 
 export const sparePartsValidation = {
      createSparePartsZodSchema,

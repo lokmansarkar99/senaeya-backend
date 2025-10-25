@@ -95,13 +95,38 @@ const getSparePartsById = catchAsync(async (req: Request, res: Response) => {
      });
 });  
 
+const createManySpareParts = catchAsync(async (req: Request, res: Response) => {
+     const result = await sparePartsService.createManySpareParts(req.body);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Work created successfully',
+          data: result,
+     });
+});
+
+const getSparePartsByCode = catchAsync(async (req: Request, res: Response) => {
+     const { code } = req.params;
+     const result = await sparePartsService.getSparePartsByCode(code);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Work retrieved successfully',
+          data: result || undefined,
+     });
+});
+
 export const sparePartsController = {
      createSpareParts,
      createManySparePartsByXLXS,
+     createManySpareParts,
      getAllSpareParts,
      getAllUnpaginatedSpareParts,
      updateSpareParts,
      deleteSpareParts,
      hardDeleteSpareParts,
-     getSparePartsById
+     getSparePartsById,
+     getSparePartsByCode
 };
