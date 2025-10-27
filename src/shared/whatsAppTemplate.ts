@@ -1,5 +1,6 @@
 import { CLIENT_STATUS } from '../app/modules/client/client.enum';
 import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
+import { IworkShop } from '../app/modules/workShop/workShop.interface';
 import { buildTranslatedField } from '../utils/buildTranslatedField';
 
 const createAccount = (values: { name?: string; otp: number; contact: string }) => {
@@ -533,18 +534,35 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
      `;
 };
 
-const createReport = (report: any) => {
-     const saved = report?.numberOfUnpaidNonPostpaidInvoices ?? 0;
-     const postpaid = report?.numberOfUnpaidPostpaidInvoices ?? 0;
-     const completed = report?.numberOfPaidInvoices ?? 0;
+const createReport = (
+     report: {
+          numberOfPaidInvoices: number;
+          numberOfUnpaidPostpaidInvoices: number;
+          numberOfUnpaidNonPostpaidInvoices: number;
+          totalAllIncomeRecorded: number;
+          totalIncomeCollected: number;
+          totalUnpaidPostpaidFinalCost: number;
+          totalExpenses: number;
+          collectedFinancialBalance: number | undefined;
+          recordedFinancialBalance: number | undefined;
+          numberOfCars: number;
+          range: { start: Date; end: Date };
+          scopedByProviderWorkShopId: boolean;
+          workshop: IworkShop;
+     },
+     lang: 'ar' | 'en',
+) => {
+     const savedInvoicesCount = report?.numberOfUnpaidNonPostpaidInvoices ?? 0;
+     const postpaidInvoicesCount = report?.numberOfUnpaidPostpaidInvoices ?? 0;
+     const completedInvoicesCount = report?.numberOfPaidInvoices ?? 0;
 
-     const collected = Number(report?.totalIncomeCollected ?? 0);
-     const recorded = Number(report?.totalAllIncomeRecorded ?? 0);
-     const postpaidSaved = Math.max(0, recorded - collected);
+     const collectedIncome = Number(report?.totalIncomeCollected ?? 0);
+     const recordedIncome = Number(report?.totalAllIncomeRecorded ?? 0);
+     const postpaidSaved = Math.max(0, recordedIncome - collectedIncome);
      const expenses = Number(report?.totalExpenses ?? 0);
 
-     const balCollected = Number(report?.collectedFinancialBalance ?? collected - expenses);
-     const balRecorded = Number(report?.recordedFinancialBalance ?? recorded - expenses);
+     const balCollected = Number(report?.collectedFinancialBalance ?? collectedIncome - expenses);
+     const balRecorded = Number(report?.recordedFinancialBalance ?? recordedIncome - expenses);
 
      const cars = report?.numberOfCars ?? 0;
 
@@ -552,7 +570,8 @@ const createReport = (report: any) => {
      const e = report?.range?.end ? new Date(report.range.end) : null;
      const fmtDate = (x: Date) => `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`;
      const dur = s && e ? Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000) + 1) : undefined;
-     const dateRange = s && e ? `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}` : '';
+     const dateRange =
+          s && e ? (lang === 'ar' ? `من ${fmtDate(s)} إلى ${fmtDate(e)}${dur ? ` مدة: ${dur} أيام` : ''}` : `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}`) : '';
 
      const fmt = (n: number) =>
           n.toLocaleString(undefined, {
@@ -560,64 +579,554 @@ const createReport = (report: any) => {
                maximumFractionDigits: 2,
           });
 
-     return `<!doctype html><html lang="ar" dir="rtl"><head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Financial Report - Senaeya App</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-  body{font-family:'Cairo',Arial,Helvetica,sans-serif;background:#f4f5f7;color:#000;margin:0}
-  .c{max-width:1100px;margin:0 auto;background:#fff}
-  .h{background:#1771b7;color:#fff;padding:20px 28px;text-align:center}
-  .h h1{margin:0;font-size:24px}.h p{margin:6px 0 0;font-size:14px}
-  .v{background:#cb3c40;color:#fff;padding:8px 28px;display:flex;justify-content:space-between;font:600 13px Arial}
-  .cnt{padding:24px 28px}
-  .t{color:#1771b7;font:700 22px Arial;text-align:right;margin:0 0 18px}
-  .dr{background:#d1d1d1;padding:12px 18px;text-align:center;font:700 16px Arial;border-radius:4px;margin:0 0 18px}
-  .g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 18px}
-  .card{background:#f4f5f7;padding:18px;text-align:center;border-radius:4px}
-  .lb{font:600 14px Arial;margin:0 0 8px}
-  .r .lb{color:#cb3c40}.o .lb{color:#ff9900}.gr .lb{color:#11c84e}
-  .val{font:700 34px Arial}
-  .r .val{color:#cb3c40}.o .val{color:#ff9900}.gr .val{color:#11c84e}
-  .bar{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-radius:4px;color:#fff;margin:0 0 12px}
-  .b{background:#1771b7}.rr{background:#cb3c40}.gy{background:#959595}
-  .amt{display:flex;align-items:center;gap:10px;font:700 26px Arial}.cur{font-size:22px}
-  .lbl{font:600 16px Arial}
-  .bg{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:22px 0}
-  .bx{padding:18px;border-radius:4px;text-align:center}
-  .bu{background:#f0f7fc}.re{background:#fcf0f0}
-  .bt{font:700 18px Arial;margin:0 0 10px}.bu .bt{color:#1771b7}.re .bt{color:#cb3c40}
-  .fml{font:600 12px Arial}
-  .bam{display:flex;justify-content:center;gap:10px;font:700 28px Arial;margin-top:10px}
-  .car{background:#d1d1d1;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;border-radius:4px;margin:0 0 18px}
-  .cl{font:700 18px Arial}.cv{font:700 24px Arial}
-  .ft{background:#1771b7;color:#fff;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;font:400 13px Arial}
-  .ph{background:#cb3c40;padding:6px 12px;border-radius:4px;font:700 13px Arial}
-  @media(max-width:760px){.g{grid-template-columns:1fr}.bg{grid-template-columns:1fr}.bar,.car,.ft{flex-direction:column;gap:8px;text-align:center}.h{padding:16px 20px}.v{padding:8px 20px}.cnt{padding:20px}.t{font-size:18px}}
-  </style></head>
-  <body><div class="c">
-    <div class="h"><h1>مركز محمد لصيانة السيارات</h1><p>مؤسسة محمد علي التجارية</p></div>
-    <div class="v"><span>VAT - 3xxxxxxxxxxxxxx3</span><span>CR - 1010347328</span></div>
-    <div class="cnt">
-      <h2 class="t">Report issued by Senaeya App</h2>
-      <div class="dr">${dateRange}</div>
-      <div class="g">
-        <div class="card r"><div class="lb">Number of<br>saved invoices</div><div class="val">${saved}</div></div>
-        <div class="card o"><div class="lb">Number of<br>Postpaid Invoices</div><div class="val">${postpaid}</div></div>
-        <div class="card gr"><div class="lb">Number of<br>completed invoices</div><div class="val">${completed}</div></div>
-      </div>
-      <div class="bar b"><div class="amt"><span class="cur">﷼</span><span>${fmt(collected)}</span></div><div class="lbl">Total income collected</div></div>
-      <div class="bar rr"><div class="amt"><span class="cur">﷼</span><span>${fmt(postpaidSaved)}</span></div><div class="lbl">Total postpaid and saved income</div></div>
-      <div class="bar gy"><div class="amt"><span class="cur">﷼</span><span>${fmt(expenses)}</span></div><div class="lbl">Total expenses paid</div></div>
-      <div class="bg">
-        <div class="bx bu"><div class="bt">Collected financial balance</div><div class="fml">All income collected</div><div class="fml">-</div><div class="fml">All expenses paid</div><div class="bam"><span class="cur">﷼</span><span>${fmt(balCollected)}</span></div></div>
-        <div class="bx re"><div class="bt">Recorded financial balance</div><div class="fml">All income recorded</div><div class="fml">-</div><div class="fml">All expenses paid</div><div class="bam"><span class="cur">﷼</span><span>${fmt(balRecorded)}</span></div></div>
-      </div>
-      <div class="car"><div class="cl">Cars</div><div class="cv">${cars}</div><div class="cl">Number of cars serviced</div></div>
-    </div>
-    <div class="ft"><div>You can issue multiple reports via Senaeya App.<br>Daily - Weekly - Monthly - Annual Report - and more</div><div><span class="ph">966-5xxxxxxxx</span> <span>Riyadh - old Industrial - ali st.</span></div></div>
-  </div></body></html>`;
+     return `<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>pdf-report.svg</title>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" width="595" height="842">
+      <defs>
+        <clipPath id="a"><path d="M0 0h595v842H0z"></path></clipPath>
+      </defs>
+      <g clip-path="url(#a)">
+        <path fill="#fff" d="M0 0h595v842H0z"></path>
+        <text
+          fill="#1771b7"
+          data-name="Report issued by Senaeya App"
+          font-family="Calibri-Bold, Calibri"
+          font-size="22"
+          font-weight="700"
+          transform="translate(160 131)"
+        >
+          <tspan x="0" y="0">${lang === 'ar' ? 'تم إصدار التقرير بواسطة تطبيق Senaeya' : 'Report issued by Senaeya App'}</tspan>
+        </text>
+        <rect
+          width="151"
+          height="91"
+          fill="#f4f5f7"
+          rx="20"
+          transform="translate(394 220)"
+        ></rect>
+        <rect
+          width="237"
+          height="120"
+          fill="#f4f5f7"
+          data-name="card1bg"
+          rx="20"
+          transform="translate(308 547)"
+        ></rect>
+        <rect
+          width="237"
+          height="120"
+          fill="#f4f5f7"
+          data-name="card1bg"
+          rx="20"
+          transform="translate(50 547)"
+        ></rect>
+        <rect
+          width="151"
+          height="91"
+          fill="#f4f5f7"
+          data-name="card1bg"
+          rx="20"
+          transform="translate(222 220)"
+        ></rect>
+        <rect
+          width="151"
+          height="91"
+          fill="#f4f5f7"
+          data-name="card1bg"
+          rx="20"
+          transform="translate(50 220)"
+        ></rect>
+        <text
+          fill="#11c84e"
+          data-name="Number of completed invoices"
+          font-family="Calibri-Bold, Calibri"
+          font-size="16"
+          font-weight="700"
+          transform="translate(470 241)"
+        >
+          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
+          <tspan x="-63.84" y="20">${lang === 'ar' ? 'السندات المدفوعة' : 'completed invoices'}</tspan>
+        </text>
+        <text
+          fill="#f90"
+          data-name="Number of Postpaid invoices"
+          font-family="Calibri-Bold, Calibri"
+          font-size="16"
+          font-weight="700"
+          transform="translate(298 241)"
+        >
+          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
+          <tspan x="-57.301" y="20">${lang === 'ar' ? 'السندات المدفوعة' : 'Postpaid invoices'}</tspan>
+        </text>
+        <text
+          fill="#cb3c40"
+          data-name="Number of saved invoices"
+          font-family="Calibri-Bold, Calibri"
+          font-size="16"
+          font-weight="700"
+          transform="translate(126 241)"
+        >
+          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
+          <tspan x="-47.555" y="20">${lang === 'ar' ? 'السندات المحفوظة' : 'saved invoices'}</tspan>
+        </text>
+        <text
+          fill="#11c84e"
+          data-name=${completedInvoicesCount}
+          font-family="Calibri-Bold, Calibri"
+          font-size="30"
+          font-weight="700"
+          transform="translate(470 297)"
+        >
+          <tspan x="-15.205" y="0">${completedInvoicesCount}</tspan>
+        </text>
+        <text
+          fill="#f90"
+          data-name=${postpaidInvoicesCount}
+          font-family="Calibri-Bold, Calibri"
+          font-size="30"
+          font-weight="700"
+          transform="translate(298 297)"
+        >
+          <tspan x="-7.603" y="0">${postpaidInvoicesCount}</tspan>
+        </text>
+        <text
+          fill="#cb3c40"
+          data-name=${savedInvoicesCount}
+          font-family="Calibri-Bold, Calibri"
+          font-size="30"
+          font-weight="700"
+          transform="translate(126 297)"
+        >
+          <tspan x="-7.603" y="0">${savedInvoicesCount}</tspan>
+        </text>
+        <rect
+          width="495"
+          height="48"
+          fill="#1771b7"
+          data-name="Rectangle 5386"
+          rx="3"
+          transform="translate(50 333)"
+        ></rect>
+        <rect
+          width="495"
+          height="48"
+          fill="#cb3c40"
+          data-name="Rectangle 5387"
+          rx="3"
+          transform="translate(50 396)"
+        ></rect>
+        <rect
+          width="495"
+          height="48"
+          fill="#959595"
+          data-name="Rectangle 5388"
+          rx="3"
+          transform="translate(50 459)"
+        ></rect>
+        <rect
+          width="495"
+          height="35"
+          fill="#959595"
+          data-name="Rectangle 5392"
+          opacity=".5"
+          rx="3"
+          transform="translate(50 163)"
+        ></rect>
+        <rect
+          width="495"
+          height="35"
+          fill="#959595"
+          data-name="Rectangle 5389"
+          opacity=".5"
+          rx="3"
+          transform="translate(50 707)"
+        ></rect>
+        <text
+          data-name=${dateRange}
+          font-family="Calibri-Bold, Calibri"
+          font-size="20"
+          font-weight="700"
+          transform="translate(297.5 186)"
+          text-anchor="middle"
+        >
+          <tspan xml:space="preserve" x="0" y="0">
+            ${dateRange}
+          </tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name="Total income collected"
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(410 366)"
+        >
+          <tspan x="-115.796" y="0">${lang === 'ar' ? 'إجمالي الدخل الذي تم جمعه' : 'Total income collected'}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name="Total postpaid and saved income"
+          font-family="Calibri-Bold, Calibri"
+          font-size="22"
+          font-weight="700"
+          transform="translate(381 428)"
+        >
+          <tspan x="-149.021" y="0">${lang === 'ar' ? 'إجمالي الدخل المدفوع والمدخر' : 'Total postpaid and saved income'}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name="Total expenses paid"
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(429 490)"
+        >
+          <tspan x="-101.404" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'Total expenses paid'}</tspan>
+        </text>
+        <text
+          data-name="Number of cars serviced"
+          font-family="Calibri-Bold, Calibri"
+          font-size="22"
+          font-weight="700"
+          transform="translate(420 732)"
+        >
+          <tspan x="-110.317" y="0">${lang === 'ar' ? 'عدد السيارات المدفوعة' : 'Number of cars serviced'}</tspan>
+        </text>
+        <text
+          font-family="Calibri-Bold, Calibri"
+          font-size="22"
+          font-weight="700"
+          transform="translate(96 732)"
+        >
+          <tspan x="-19.417" y="0">${lang === 'ar' ? 'سيارات' : 'Cars'}</tspan>
+        </text>
+        <g fill="#fff">
+          <path
+            d="M80.947 368.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+            data-name="Path 28007"
+          ></path>
+          <path
+            d="M89.434 363.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+            data-name="Path 28008"
+          ></path>
+        </g>
+        <g fill="#fff" data-name="Saudi_Riyal_Symbol">
+          <path
+            d="M80.947 431.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+            data-name="Path 28007"
+          ></path>
+          <path
+            d="M89.434 426.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+            data-name="Path 28008"
+          ></path>
+        </g>
+        <g fill="#cb3c40" data-name="Saudi_Riyal_Symbol">
+          <path
+            d="M383.83 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
+            data-name="Path 28007"
+          ></path>
+          <path
+            d="M391.139 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
+            data-name="Path 28008"
+          ></path>
+        </g>
+        <g fill="#1771b7" data-name="Saudi_Riyal_Symbol">
+          <path
+            d="M126.473 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
+            data-name="Path 28007"
+          ></path>
+          <path
+            d="M133.782 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
+            data-name="Path 28008"
+          ></path>
+        </g>
+        <g fill="#fff" data-name="Saudi_Riyal_Symbol">
+          <path
+            d="M80.947 494.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+            data-name="Path 28007"
+          ></path>
+          <path
+            d="M89.434 489.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+            data-name="Path 28008"
+          ></path>
+        </g>
+        <text
+          fill="#fff"
+          data-name=${fmt(collectedIncome)}
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(146 366)"
+        >
+          <tspan x="-41.351" y="0">${fmt(collectedIncome)}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${fmt(postpaidSaved)}
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(146 429)"
+        >
+          <tspan x="-41.351" y="0">${fmt(postpaidSaved)}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${fmt(expenses)}
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(146 492)"
+        >
+          <tspan x="-35.016" y="0">${fmt(expenses)}</tspan>
+        </text>
+        <text
+          data-name=${cars}
+          font-family="Calibri-Bold, Calibri"
+          font-size="22"
+          font-weight="700"
+          transform="translate(146 733)"
+        >
+          <tspan x="-11.15" y="0">${cars}</tspan>
+        </text>
+        <text
+          fill="#cb3c40"
+          data-name="Recorded financial balance"
+          font-family="Calibri-Bold, Calibri"
+          font-size="20"
+          font-weight="700"
+          transform="translate(427 577)"
+        >
+          <tspan x="-111.274" y="0">${lang === 'ar' ? 'الرصيد المحفوظ' : 'Recorded financial balance'}</tspan>
+        </text>
+        <text
+          fill="#cb3c40"
+          data-name=${fmt(balRecorded)}
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(441 652)"
+        >
+          <tspan x="-41.351" y="0">${fmt(balRecorded)}</tspan>
+        </text>
+        <text
+          fill="#1771b7"
+          data-name=${fmt(balCollected)}
+          font-family="Calibri-Bold, Calibri"
+          font-size="25"
+          font-weight="700"
+          transform="translate(183.643 652)"
+        >
+          <tspan x="-41.351" y="0">${fmt(balCollected)}</tspan>
+        </text>
+        <text
+          fill="#1771b7"
+          data-name="Collected financial balance"
+          font-family="Calibri-Bold, Calibri"
+          font-size="20"
+          font-weight="700"
+          transform="translate(168 577)"
+        >
+          <tspan x="-110.591" y="0">${lang === 'ar' ? 'الرصيد المدفوع' : 'Collected financial balance'}</tspan>
+        </text>
+        <text
+          data-name="All income recorded"
+          font-family="Calibri-Bold, Calibri"
+          font-size="11"
+          font-weight="700"
+          transform="translate(429 596)"
+        >
+          <tspan x="-45.751" y="0">${lang === 'ar' ? 'إجمالي الإيرادات المدفوعة' : 'All income recorded'}</tspan>
+        </text>
+        <text
+          data-name="All income collected"
+          font-family="Calibri-Bold, Calibri"
+          font-size="11"
+          font-weight="700"
+          transform="translate(169 596)"
+        >
+          <tspan x="-45.861" y="0">${lang === 'ar' ? 'إجمالي الإيرادات المدفوعة' : 'All income collected'}</tspan>
+        </text>
+        <text
+          data-name="All expenses paid"
+          font-family="Calibri-Bold, Calibri"
+          font-size="11"
+          font-weight="700"
+          transform="translate(430 617)"
+        >
+          <tspan x="-39.529" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'All expenses paid'}</tspan>
+        </text>
+        <text
+          data-name="All expenses paid"
+          font-family="Calibri-Bold, Calibri"
+          font-size="11"
+          font-weight="700"
+          transform="translate(169 617)"
+        >
+          <tspan x="-39.529" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'All expenses paid'}</tspan>
+        </text>
+        <text
+          data-name="-"
+          font-family="Calibri-Bold, Calibri"
+          font-size="20"
+          font-weight="700"
+          transform="translate(430 609)"
+        >
+          <tspan x="-3.062" y="0">-</tspan>
+        </text>
+        <text
+          data-name="-"
+          font-family="Calibri-Bold, Calibri"
+          font-size="20"
+          font-weight="700"
+          transform="translate(166 609)"
+        >
+          <tspan x="-3.062" y="0">-</tspan>
+        </text>
+        <path
+          fill="#1771b7"
+          d="M0 0h595v77H0z"
+          data-name="Rectangle 5390"
+        ></path>
+        <path
+          fill="#cb3c40"
+          d="M0 76h595v15H0z"
+          data-name="Rectangle 5391"
+        ></path>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.workshopNameArabic}
+          font-family="Arial-BoldMT, Arial"
+          font-size="20"
+          font-weight="700"
+          transform="translate(205 41)"
+        >
+          <tspan x="0" y="0">${report.workshop.workshopNameArabic}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.workshopNameEnglish}
+          font-family="ArialMT, Arial"
+          font-size="15"
+          transform="translate(233 69)"
+        >
+          <tspan x="0" y="0">${report.workshop.workshopNameEnglish}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.crn}
+          font-family="ArialMT, Arial"
+          font-size="10"
+          transform="translate(447 87)"
+        >
+          <tspan x="0" y="0">CR - ${report.workshop.crn}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.taxVatNumber}
+          font-family="ArialMT, Arial"
+          font-size="10"
+          transform="translate(50 87)"
+        >
+          <tspan x="0" y="0">VAT - ${report.workshop.taxVatNumber}</tspan>
+        </text>
+        <path
+          fill="#cb3c40"
+          d="M207 815h389v22H207z"
+          data-name="Rectangle 5394"
+        ></path>
+        <path
+          fill="#1771b7"
+          d="M0 796h207v41H0z"
+          data-name="Rectangle 5393"
+        ></path>
+        <path
+          fill="#1771b7"
+          d="m207 796 33.5 41h-67Z"
+          data-name="Polygon 2"
+        ></path>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.address}
+          font-family="Calibri-Bold, Calibri"
+          font-size="12"
+          font-weight="700"
+          transform="translate(488 830)"
+        >
+          <tspan x="-72.36" y="0">${report.workshop.address}</tspan>
+        </text>
+        <text
+          fill="#fff"
+          data-name=${report.workshop.contact}
+          font-family="Calibri-Bold, Calibri"
+          font-size="12"
+          font-weight="700"
+          letter-spacing=".07em"
+          transform="translate(279 830)"
+        >
+          <tspan x="-41.096" y="0">${report.workshop.contact}</tspan>
+        </text>
+        <g data-name="Group 55921">
+          <path
+            fill="#fff"
+            d="m352.708 826.662 1.637-1.637a.47.47 0 0 0 .082-.555l-1.053-1.962a.47.47 0 0 1 .01-.462l1.7-2.863a.47.47 0 0 1 .592-.191c.557.245 1.577.69 2.028.867a.6.6 0 0 1 .249.17c1.654 1.908-.361 5.7-3.267 8.609s-6.702 4.92-8.61 3.262a.6.6 0 0 1-.17-.244 78 78 0 0 0-.867-2.028.47.47 0 0 1 .191-.592l2.863-1.7a.47.47 0 0 1 .462-.01l1.962 1.055a.47.47 0 0 0 .555-.082Z"
+            data-name="Path 28011"
+          ></path>
+          <path
+            fill="#fff"
+            d="M352.451 818.953v1.356a6.1 6.1 0 0 0-6.1 6.1H345a7.46 7.46 0 0 1 7.451-7.456"
+            data-name="Path 28012"
+          ></path>
+          <path
+            fill="#fff"
+            d="M352.451 821.587v1.355a3.466 3.466 0 0 0-3.462 3.467h-1.355a4.82 4.82 0 0 1 4.817-4.822"
+            data-name="Path 28013"
+          ></path>
+          <circle
+            cx="6.608"
+            cy="6.608"
+            r="6.608"
+            fill="#2ab540"
+            data-name="Ellipse 3"
+            transform="translate(328.858 819.285)"
+          ></circle>
+          <path
+            fill="#fff"
+            d="M331.227 825.854a4.25 4.25 0 0 0 .568 2.127l-.6 2.2 2.256-.592a4.25 4.25 0 0 0 2.034.518 4.256 4.256 0 1 0-4.258-4.253m1.344 2.016-.084-.134a3.537 3.537 0 1 1 3 1.657 3.54 3.54 0 0 1-1.8-.493l-.129-.077-1.339.351Zm2.912 2.242"
+            data-name="Path 28009"
+          ></path>
+          <path
+            fill="#fff"
+            d="M334.42 824.079c-.08-.177-.163-.181-.239-.184s-.133 0-.2 0a.4.4 0 0 0-.284.133 1.2 1.2 0 0 0-.372.887 2.07 2.07 0 0 0 .434 1.1 4.37 4.37 0 0 0 1.816 1.605c.9.354 1.081.284 1.276.266a1.07 1.07 0 0 0 .718-.505.9.9 0 0 0 .062-.506c-.027-.044-.1-.071-.2-.124s-.629-.31-.727-.346-.168-.053-.239.053-.275.346-.337.417-.124.08-.23.027a2.9 2.9 0 0 1-.855-.528 3.2 3.2 0 0 1-.592-.736c-.062-.106-.007-.164.047-.217s.106-.124.16-.186a.7.7 0 0 0 .106-.177.2.2 0 0 0-.009-.186c-.027-.053-.233-.579-.328-.789"
+            data-name="Path 28010"
+          ></path>
+        </g>
+        <path fill="none" d="M412.082 793.031h24.6v24.6h-24.6Z"></path>
+        <text
+          fill="#fff"
+          data-name="You can issue multiple reports via Senaeya App Daily - Weekly - Monthly - Annual Report - and more"
+          font-family="Calibri"
+          font-size="11"
+          transform="translate(110 815)"
+        >
+          <tspan x="-104.411" y="0">
+            ${lang === 'ar' ? ' يمكنك إصدار تقارير متعددة عبر تطبيق سينايا' : 'You can issue multiple reports via Senaeya App'}
+          </tspan>
+          <tspan font-size="10">
+            <tspan x="-106.143" y="15">
+              ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - و المزيد' : 'Daily - Weekly - Monthly - Annual Report - and more'}
+            </tspan>
+          </tspan>
+        </text>
+      </g>
+    </svg>
+  </body>
+</html>
+`;
 };
 
 const defaulterList = ({ status }: { status: string }) => {

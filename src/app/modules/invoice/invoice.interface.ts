@@ -47,7 +47,7 @@ export interface IInvoice {
      finalCost: number; // based on the totalCostExcludingTax + taxAmount - discount
      totalCostOfWorkShopExcludingTax: number;
      totalCostOfSparePartsExcludingTax: number;
-     car: Types.ObjectId;
+     car: Types.ObjectId | null;
      invoiceAwsLink?: string;
      createdAt: Date;
      updatedAt: Date;

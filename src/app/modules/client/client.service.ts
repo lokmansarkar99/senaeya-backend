@@ -133,26 +133,9 @@ const createClient = async (payload: any) => {
                          }
                          throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
                     }
-               } else {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist.');
                }
                let isExistCar = await Car.findOne({ vin: payload.vin });
                if (!isExistCar) {
-                    // [isExistCar] = await Car.create(
-                    //      [
-                    //           {
-                    //                client: isExistClient._id,
-                    //                brand: payload.brand,
-                    //                model: payload.model,
-                    //                year: payload.year,
-                    //                vin: payload.vin,
-                    //                carType: payload.carType,
-                    //                plateNumberForInternational: payload.plateNumberForInternational || null,
-                    //                plateNumberForSaudi: payload.plateNumberForSaudi || null,
-                    //           },
-                    //      ],
-                    //      { session },
-                    // );
                     isExistCar = await carService.createCarWithSession(
                          {
                               client: isExistClient._id,
@@ -247,7 +230,7 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
-     const client = await Client.findOne({ contact, providerWorkShopId });
+     const client = await Client.findOne({ contact, providerWorkShopId }).populate('clientId','documentNumber workshopNameEnglish workshopNameArabic');
      if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }

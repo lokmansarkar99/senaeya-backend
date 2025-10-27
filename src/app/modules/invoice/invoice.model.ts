@@ -35,7 +35,7 @@ const InvoiceSchema = new Schema<IInvoice>(
      {
           providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
           client: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
-          car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+          car: { type: Schema.Types.ObjectId, ref: 'Car', required: false, default: null },
           discount: { type: Number, required: false },
           discountType: { type: String, enum: DiscountType, required: false },
           worksList: { type: [InvoiceWorkSchema], required: true, default: [] },

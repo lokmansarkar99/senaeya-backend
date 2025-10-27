@@ -148,6 +148,8 @@ import fs from 'fs';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { translateTextToTargetLang } from '../../../utils/translateTextToTargetLang';
+import { WorkShop } from '../workShop/workShop.model';
+import { IworkShop } from '../workShop/workShop.interface';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any) => {
      let { startDate, endDate, income, outlay, noOfCars, lang } = query;
@@ -192,6 +194,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 
           // Cars count (distinct cars from invoices)
           carsCountAgg,
+          workshop,
      ] = await Promise.all([
           // number of paid invoices count
           Invoice.aggregate([{ $match: { ...invoiceMatchBase, paymentStatus: PaymentStatus.PAID } }, { $count: 'count' }]),
@@ -219,6 +222,9 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 
           // number of unique cars on invoices within range
           Invoice.aggregate([{ $match: { ...invoiceMatchBase, car: { $ne: null } } }, { $group: { _id: '$car' } }, { $count: 'count' }]),
+
+          // workshop name
+          WorkShop.findById(providerWorkShopId),
      ]);
 
      const numberOfPaidInvoices = paidInvoicesAgg[0]?.count || 0;
@@ -235,7 +241,21 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 
      const numberOfCars = carsCountAgg[0]?.count || 0;
 
-     let report = {
+     let report: {
+          numberOfPaidInvoices: number;
+          numberOfUnpaidPostpaidInvoices: number;
+          numberOfUnpaidNonPostpaidInvoices: number;
+          totalAllIncomeRecorded: number;
+          totalIncomeCollected: number;
+          totalUnpaidPostpaidFinalCost: number;
+          totalExpenses: number;
+          collectedFinancialBalance: number | undefined;
+          recordedFinancialBalance: number | undefined;
+          numberOfCars: number;
+          range: { start: Date; end: Date };
+          scopedByProviderWorkShopId: boolean;
+          workshop: IworkShop;
+     } = {
           numberOfPaidInvoices,
           numberOfUnpaidPostpaidInvoices,
           numberOfUnpaidNonPostpaidInvoices,
@@ -248,26 +268,10 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           numberOfCars: noOfCars ? numberOfCars : undefined,
           range: { start, end },
           scopedByProviderWorkShopId: !!providerWorkShopId,
+          workshop: workshop!,
      };
 
-     if (lang === 'ar') {
-          report = {
-               numberOfPaidInvoices: await translateTextToTargetLang(numberOfPaidInvoices.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl'),
-               numberOfUnpaidPostpaidInvoices: await translateTextToTargetLang(numberOfUnpaidPostpaidInvoices.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl'),
-               numberOfUnpaidNonPostpaidInvoices: await translateTextToTargetLang(numberOfUnpaidNonPostpaidInvoices.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl'),
-               totalAllIncomeRecorded: income ? await translateTextToTargetLang(totalAllIncomeRecorded.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl') : undefined,
-               totalIncomeCollected: income ? await translateTextToTargetLang(totalIncomeCollected.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl') : undefined,
-               totalUnpaidPostpaidFinalCost: income ? await translateTextToTargetLang(totalUnpaidPostpaidFinalCost.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl') : undefined,
-               totalExpenses: outlay ? await translateTextToTargetLang(totalExpenses.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl') : undefined,
-               collectedFinancialBalance: income ? collectedFinancialBalance : undefined,
-               recordedFinancialBalance: income ? recordedFinancialBalance : undefined,
-               numberOfCars: noOfCars ? await translateTextToTargetLang(numberOfCars.toString(), lang as 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl') : undefined,
-               range: { start, end },
-               scopedByProviderWorkShopId: !!providerWorkShopId,
-          };
-     }
-
-     const createReportTemplate = whatsAppTemplate.createReport(report);
+     const createReportTemplate = whatsAppTemplate.createReport(report, lang);
      const reportInpdfPath = await generatePDF(createReportTemplate);
      const fileBuffer = fs.readFileSync(reportInpdfPath);
      const fileName = `Report file pdf_${startDate}_to_${endDate}`;
