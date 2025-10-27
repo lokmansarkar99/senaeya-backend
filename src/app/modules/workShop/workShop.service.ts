@@ -32,7 +32,7 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
 };
 
 const getAllWorkShops = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworkShop[] }> => {
-     const queryBuilder = new QueryBuilder(WorkShop.find(), query);
+     const queryBuilder = new QueryBuilder(WorkShop.find().populate('subscriptionId','status'), query);
      const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
@@ -44,6 +44,7 @@ const getAllUnpaginatedWorkShops = async (): Promise<IworkShop[]> => {
 };
 
 const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any): Promise<IworkShop | null> => {
+     console.log("🚀 ~ updateWorkShop ~ payload:", payload)
      if (user.role === USER_ROLES.WORKSHOP_OWNER) {
           const forbiddenFieldsForShopOwner = ['workshopNameEnglish', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber'];
 

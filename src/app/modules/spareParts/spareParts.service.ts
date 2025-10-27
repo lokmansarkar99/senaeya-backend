@@ -8,6 +8,7 @@ import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 import { WorksCategories } from '../worksCategories/worksCategories.model';
 import { SpareParts } from './spareParts.model';
 import { getXLXStoJSON } from '../work/work.utils';
+import { SparePartType } from './spareParts.enum';
 
 const createSpareParts = async (payload: Partial<ISpareParts & { titleObj?: ISpareParts['title']; workCategoryName: string }>): Promise<ISpareParts> => {
      if (payload.itemName) {
@@ -44,8 +45,8 @@ const createManySparePartsByXLXS = async (payload: ISpareParts & { document: str
                          tl: element.tl,
                          ur: element.ur,
                     },
-                    type: element.type,
-                    cost: element.cost,
+                    itemName: element.en,
+                    type: SparePartType.SPARE_PART,
                     code: element.code,
                };
           }),

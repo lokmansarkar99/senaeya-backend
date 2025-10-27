@@ -2,12 +2,20 @@ import express from 'express';
 import { USER_ROLES } from '../../../enums/user';
 import { NotificationController } from './notification.controller';
 import auth from '../../middleware/auth';
+import { notificationValidation } from './notification.validation';
+import validateRequest from '../../middleware/validateRequest';
 const router = express.Router();
 
 router.get('/', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.getNotificationFromDB);
 router.get('/admin', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), NotificationController.adminNotificationFromDB);
 router.patch('/', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.readNotification);
-router.patch('/admin', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER), NotificationController.adminReadNotification);
-router.patch('/send-notifications', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER), NotificationController.sendAdminPushNotification);
+router.patch('/admin', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.adminReadNotification);
+router.patch('/send-notifications', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.sendAdminPushNotification);
+router.patch(
+     '/send-push-notifications',
+     auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+     validateRequest(notificationValidation.pushNotificationToUserValidation),
+     NotificationController.pushNotificationToUser,
+);
 
 export const NotificationRoutes = router;

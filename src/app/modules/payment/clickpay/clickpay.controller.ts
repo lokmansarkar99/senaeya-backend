@@ -9,6 +9,7 @@ import { Subscription } from '../../subscription/subscription.model';
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../../errors/AppError';
 import { SubscriptionService } from '../../subscription/subscription.service';
+import { WorkShop } from '../../workShop/workShop.model';
 
 const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      const isExistPackage = await Package.findById(req.params.packageId);
@@ -39,7 +40,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${(req.body.providerWorkShopId as string)}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
 

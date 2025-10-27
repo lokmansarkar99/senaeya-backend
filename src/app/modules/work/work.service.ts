@@ -8,6 +8,7 @@ import mongoose, { ClientSession } from 'mongoose';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 import { WorksCategories } from '../worksCategories/worksCategories.model';
 import { Work } from './work.model';
+import { WorkType } from './work.enum';
 
 const createWork = async (payload: Iwork & { titleObj?: Iwork['title']; workCategoryName: string }): Promise<Iwork> => {
      const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: payload.workCategoryName });
@@ -52,8 +53,7 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
                          tl: element.tl,
                          ur: element.ur,
                     },
-                    type: element.type,
-                    cost: element.cost,
+                    type: WorkType.SERVICE,
                     workCategoryName: element.workCategoryName,
                     code: element.code,
                };

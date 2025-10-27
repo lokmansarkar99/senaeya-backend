@@ -247,7 +247,7 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
-     const client = await Client.findOne({ contact, providerWorkShopId }).select('_id');
+     const client = await Client.findOne({ contact, providerWorkShopId });
      if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
@@ -271,7 +271,8 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
                     select: '_id image title',
                },
           });
-     return [carOfClient];
+     // return [carOfClient,client];
+     return carOfClient ? [carOfClient] : [client];
 };
 
 const toggleClientStatus = async (id: string): Promise<IClient | null> => {

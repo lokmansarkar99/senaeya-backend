@@ -38,12 +38,14 @@ const getPackageFromDB = async (queryParms: Record<string, unknown>) => {
      };
 
      const queryBuilder = new QueryBuilder(Package.find(query), queryParms);
-     const packages = await queryBuilder.filter().sort().paginate().fields().sort().modelQuery.exec();
+     const packages = await queryBuilder.filter().sort()
+     // .paginate()
+     .fields().sort().modelQuery.exec();
      console.log(packages);
-     const meta = await queryBuilder.countTotal();
+     // const meta = await queryBuilder.countTotal();
      return {
           packages,
-          meta,
+          // meta,
      };
 };
 const getPackageByUserFromDB = async (queryParms: Record<string, unknown>) => {

@@ -111,7 +111,10 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 // get user profile
 const getUserProfileFromDB = async (user: JwtPayload): Promise<Partial<IUser>> => {
      const { id } = user;
-     const isExistUser = await User.isExistUserById(id);
+     const isExistUser = await User.findById(id).populate({
+          path: 'helperUserId',
+          select: 'name contact',
+     });
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }

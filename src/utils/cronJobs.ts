@@ -7,6 +7,7 @@ import { PaymentStatus } from '../app/modules/payment/payment.enum';
 import { whatsAppTemplate } from '../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../helpers/whatsAppHelper';
 import { sendNotifications } from '../helpers/notificationsHelper';
+import { WorkShop } from '../app/modules/workShop/workShop.model';
 // ====== CRON JOB SCHEDULERS ======
 const scheduleTrialWarningCheck = () => {
      // Run every 5 days at 9:00 AM '0 9 */5 * *'
@@ -69,14 +70,14 @@ const scheduleTrialExpiryCheck = () => {
                const now = new Date();
 
                // Find users whose trial has expired
-               const expiredUsers = await Subscription.find({
+               const expiredSubscriptions = await Subscription.find({
                     // isFreeTrial: true,
                     // trialExpireAt: { $lt: now },
                     currentPeriodEnd: { $lt: now },
                });
 
-               if (expiredUsers.length > 0) {
-                    console.log(`🚫 Found ${expiredUsers.length} expired trial users`);
+               if (expiredSubscriptions.length > 0) {
+                    console.log(`🚫 Found ${expiredSubscriptions.length} expired trial users`);
 
                     // Update expired users
                     const updateResult = await Subscription.updateMany(
@@ -90,6 +91,18 @@ const scheduleTrialExpiryCheck = () => {
                                    status: 'expired',
                               },
                               $inc: { tokenVersion: 1 },
+                         },
+                    );
+
+                    // nullify the subscriptionId of the expired users
+                    await WorkShop.updateMany(
+                         {
+                              subscriptionId: { $in: expiredSubscriptions.map((subscription) => subscription._id) },
+                         },
+                         {
+                              $set: {
+                                   subscriptionId: null,
+                              },
                          },
                     );
 
