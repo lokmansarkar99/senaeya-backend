@@ -10,11 +10,22 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../../errors/AppError';
 import { SubscriptionService } from '../../subscription/subscription.service';
 import { WorkShop } from '../../workShop/workShop.model';
+import { Coupon } from '../../coupon/coupon.model';
+import { CouponService } from '../../coupon/coupon.service';
 
 const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      const isExistPackage = await Package.findById(req.params.packageId);
      if (!isExistPackage) {
           throw new Error('Package not found');
+     }
+     let isExistCoupon;
+     let toBePaidAmount = isExistPackage.price;
+     if (req.query.couponCode) {
+          isExistCoupon = await CouponService.getTryCouponByCode(req.params.packageId, req.query.couponCode as string);
+          if (!isExistCoupon) {
+               throw new Error('Coupon not found for this package');
+          }
+          toBePaidAmount = (isExistCoupon as any).data.discountedPrice;
      }
      // checke already subscribed and not expired
      const isExistSubscription = await Subscription.findOne({
@@ -27,20 +38,17 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You are already subscribed');
      }
 
-     // const createdSubcription = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.body.providerWorkShopId as string, req.params.packageId as string);
-     // if (!createdSubcription) {
-     //      throw new AppError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
-     // }
+     
 
      const paymentRequest = {
-          cart_amount: isExistPackage.price,
+          cart_amount: toBePaidAmount,
           cart_currency: CLICKPAY_CURRENCY,
           cart_description: isExistPackage.description || 'Order Payment',
           cart_id: isExistPackage._id.toString(),
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${(req.body.providerWorkShopId as string)}`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
 

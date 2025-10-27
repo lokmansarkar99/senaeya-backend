@@ -22,6 +22,7 @@ import { carModelRoutes } from '../app/modules/carModel/carModel.route';
 import { checkPhoneNumberRoutes } from '../app/modules/checkPhoneNumber/checkPhoneNumber.route';
 import { sparePartsRoutes } from '../app/modules/spareParts/spareParts.route';
 import { NotificationRoutes } from '../app/modules/notification/notification.routes';
+import { CouponRoutes } from '../app/modules/coupon/coupon.route';
 const router = express.Router();
 const routes = [
      {
@@ -115,6 +116,10 @@ const routes = [
      {
           path: '/notification',
           route: NotificationRoutes,
+     },
+     {
+          path: '/coupon',
+          route: CouponRoutes,
      },
 ];
 

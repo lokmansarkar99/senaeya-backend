@@ -49,13 +49,6 @@ const createClient = async (payload: any) => {
           throw new AppError(StatusCodes.NOT_FOUND, 'Provider Workshop not found.');
      }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          // if (payload.providerWorkShopId == payload.workShopIdAsClient) {
-          //      if (payload.document) {
-          //           unlinkFile(payload.document);
-          //      }
-          //      throw new AppError(StatusCodes.BAD_REQUEST, 'Provider Workshop and Workshop ID should be different.');
-          // }
-          // const isExistWorkShop = await WorkShop.findById(payload.workShopIdAsClient);
           const isExistWorkShop = await workShopService.getWorkShopByContact(payload.contact);
           if (!isExistWorkShop) {
                if (payload.document) {
@@ -134,29 +127,31 @@ const createClient = async (payload: any) => {
                          throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
                     }
                }
-               let isExistCar = await Car.findOne({ vin: payload.vin });
-               if (!isExistCar) {
-                    isExistCar = await carService.createCarWithSession(
-                         {
-                              client: isExistClient._id,
-                              brand: payload.brand,
-                              model: payload.model,
-                              year: payload.year,
-                              vin: payload.vin,
-                              carType: payload.carType,
-                              plateNumberForInternational: payload.plateNumberForInternational || null,
-                              plateNumberForSaudi: payload.plateNumberForSaudi || null,
-                              slugForSaudiCarPlateNumber: null,
-                              providerWorkShopId: payload.providerWorkShopId,
-                         },
-                         session,
-                    );
+               if (payload.vin) {
+                    let isExistCar = await Car.findOne({ vin: payload.vin });
                     if (!isExistCar) {
-                         throw new AppError(StatusCodes.NOT_FOUND, 'Car creation failed.');
+                         isExistCar = await carService.createCarWithSession(
+                              {
+                                   client: isExistClient._id,
+                                   brand: payload.brand,
+                                   model: payload.model,
+                                   year: payload.year,
+                                   vin: payload.vin,
+                                   carType: payload.carType,
+                                   plateNumberForInternational: payload.plateNumberForInternational || null,
+                                   plateNumberForSaudi: payload.plateNumberForSaudi || null,
+                                   slugForSaudiCarPlateNumber: null,
+                                   providerWorkShopId: payload.providerWorkShopId,
+                              },
+                              session,
+                         );
+                         if (!isExistCar) {
+                              throw new AppError(StatusCodes.NOT_FOUND, 'Car creation failed.');
+                         }
                     }
+                    // link the client vs user and client vs car relation
+                    isExistClient.cars.push(isExistCar._id);
                }
-               // link the client vs user and client vs car relation
-               isExistClient.cars.push(isExistCar._id);
                await isExistClient.save({ session });
                await session.commitTransaction();
                session.endSession();
@@ -230,7 +225,7 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
-     const client = await Client.findOne({ contact, providerWorkShopId }).populate('clientId','documentNumber workshopNameEnglish workshopNameArabic');
+     const client = await Client.findOne({ contact, providerWorkShopId }).populate('clientId', 'documentNumber workshopNameEnglish workshopNameArabic');
      if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }

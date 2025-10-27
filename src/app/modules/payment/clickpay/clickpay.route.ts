@@ -9,6 +9,7 @@ import { SubscriptionService } from '../../subscription/subscription.service';
 import AppError from '../../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { WorkShop } from '../../workShop/workShop.model';
+import { Coupon } from '../../coupon/coupon.model';
 
 const router = express.Router();
 
@@ -25,6 +26,8 @@ router.get('/success', async (req, res) => {
 
      // update providerWorkShopId's subscription filed to null
      await WorkShop.updateOne({ _id: req.query.providerWorkShopId }, { $set: { subscriptionId: subscription._id } });
+     // update the coupon used count
+     await Coupon.updateOne({ code: req.query.couponCode }, { $inc: { usedCount: 1 } });
      res.send('<h1>Payment successful</h1>');
 });
 

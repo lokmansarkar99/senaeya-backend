@@ -8,49 +8,47 @@ import { sendNotifications } from '../../helpers/notificationsHelper';
 
 const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
-     try {
-          const user = req.user as IUser & { id: string };
-          if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
-               const { providerWorkShopId } = req.body;
-               const workShop = await WorkShop.findById(providerWorkShopId).select('ownerId helperUserId subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
-               if (!workShop) {
-                    throw new Error('Workshop not found');
-               }
-               // prevent trail limit expired or suscription expired
-               if (req.body.sparePartsList || req.body.worksList) {
-                    if (!workShop.subscribedPackage) {
-                         console.log("🚀 ~ validateUserAuthority ~ workShop.generatedInvoiceCount:", workShop.generatedInvoiceCount)
-                         console.log("🚀 ~ validateUserAuthority ~ MAX_FREE_INVOICE_COUNT:", MAX_FREE_INVOICE_COUNT)
-                         if (workShop.generatedInvoiceCount >= MAX_FREE_INVOICE_COUNT) {
-                              throw new Error('Plz do subscribe');
-                         }
-                    } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {
-                         const currentDate = new Date();
-                         const currentPeriodEnd = new Date((workShop as any).subscriptionId.currentPeriodEnd);
+          try {
+               const user = req.user as IUser & { id: string };
+               if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
+                    const { providerWorkShopId } = req.body;
+                    const workShop = await WorkShop.findById(providerWorkShopId).select('ownerId helperUserId subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
+                    if (!workShop) {
+                         throw new Error('Workshop not found');
+                    }
+                    // prevent trail limit expired or suscription expired
+                    if (req.body.sparePartsList || req.body.worksList) {
+                         if (!workShop.subscribedPackage) {
+                              console.log('🚀 ~ validateUserAuthority ~ workShop.generatedInvoiceCount:', workShop.generatedInvoiceCount);
+                              console.log('🚀 ~ validateUserAuthority ~ MAX_FREE_INVOICE_COUNT:', MAX_FREE_INVOICE_COUNT);
+                              if (workShop.generatedInvoiceCount >= MAX_FREE_INVOICE_COUNT) {
+                                   throw new Error('Plz do subscribe');
+                              }
+                         } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {
+                              const currentDate = new Date();
+                              const currentPeriodEnd = new Date((workShop as any).subscriptionId.currentPeriodEnd);
 
-                         if (currentDate >= currentPeriodEnd) {
-                              await sendNotifications({
-                                   title: `${(workShop as any)?.workshopNameEnglish}`,
-                                   receiver: (workShop as any).ownerId._id,
-                                   message: `Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.`,
-                                   type: 'ALERT',
-                              });
-                              throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
+                              if (currentDate >= currentPeriodEnd) {
+                                   await sendNotifications({
+                                        title: `${(workShop as any)?.workshopNameEnglish}`,
+                                        receiver: (workShop as any).ownerId._id,
+                                        message: `Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.`,
+                                        type: 'ALERT',
+                                   });
+                                   throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
                                    انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
+                              }
                          }
                     }
-               }
-               if (workShop.ownerId.toString() !== user!.id) {
-                    if (workShop.helperUserId!.toString() !== user!.id) {
+                    if (workShop.ownerId.toString() !== user!.id && workShop.helperUserId!.toString() !== user!.id) {
                          throw new Error('You are not authorized to perform this action');
                     }
                }
+               next();
+          } catch (error) {
+               next(error);
           }
-          next();
-     } catch (error) {
-          next(error);
-     }
-};
+     };
 };
 
 export default validateUserAuthority;

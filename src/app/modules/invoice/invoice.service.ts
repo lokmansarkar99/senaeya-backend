@@ -15,190 +15,71 @@ import { SpareParts } from '../spareParts/spareParts.model';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 import mongoose from 'mongoose';
 
-// const createInvoice = async (payload: Partial<IInvoice>) => {
-//      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
-//           payload.postPaymentDate = null;
-//      } else {
-//           // convert payload.postPaymentDate string to Date
-//           if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string') {
-//                payload.postPaymentDate = new Date(payload.postPaymentDate);
-//                // check its not in the past
-//                if (payload.postPaymentDate < new Date()) {
-//                     throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past');
-//                }
-//           }
-//      }
-//      try {
-//           const invoice = new Invoice(payload);
-//           // Validate the order data
-//           await invoice.validate();
-
-//           if (payload.sparePartsList) {
-//                // Process all spare parts in parallel and wait for all to complete
-//                await Promise.all(
-//                     payload.sparePartsList.map(async (sparePart) => {
-//                          try {
-//                               // Check if spare part with this code already exists
-//                               const existingSparePart = await SpareParts.findOne({
-//                                    code: sparePart.code.toLowerCase(),
-//                                    providerWorkShopId: payload.providerWorkShopId,
-//                               });
-
-//                               if (!existingSparePart) {
-//                                    const title = await buildTranslatedField(sparePart.itemName);
-//                                    const sparePartData = {
-//                                         providerWorkShopId: payload.providerWorkShopId,
-//                                         item: sparePart.itemName,
-//                                         code: sparePart.code.toLowerCase(),
-//                                         title,
-//                                    };
-
-//                                    // const newSparePart = new SpareParts(sparePartData);
-//                                    // console.log("🚀 ~ createInvoice ~ newSparePart:", newSparePart)
-//                                    // await newSparePart.save();
-
-//                                    const newSparePart = await SpareParts.create(sparePartData);
-
-//                                    if (!newSparePart) {
-//                                         throw new AppError(StatusCodes.NOT_FOUND, 'Spare part not found*.**.');
-//                                    }
-//                               }
-//                          } catch (error) {
-//                               console.error('Error saving spare part:', error);
-//                               // Continue with other spare parts even if one fails
-//                          }
-//                     }),
-//                );
-//           }
-//           // throw new Error("test");
-
-//           const result = await invoice.save();
-
-//           if (!result) {
-//                throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
-//           }
-//           // get the workshop
-//           const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
-//           if (!workshop!.subscribedPackage) {
-//                workshop!.generatedInvoiceCount += 1;
-//                await workshop!.save();
-//           }
-//           const populatedResult = await Invoice.findById(result._id)
-//                .populate({
-//                     path: 'providerWorkShopId',
-//                     select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
-//                })
-//                .populate({
-//                     path: 'client',
-//                     select: 'clientId clientType',
-//                     populate: {
-//                          path: 'clientId',
-//                          select: 'name contact',
-//                     },
-//                })
-//                .populate({
-//                     path: 'worksList sparePartsList',
-//                     select: 'work quantity finalCost',
-//                     populate: {
-//                          path: 'work',
-//                          select: 'title cost',
-//                     },
-//                })
-//                .populate({
-//                     path: 'sparePartsList',
-//                     select: 'item quantity finalCost',
-//                     populate: {
-//                          path: 'item',
-//                          select: 'title cost',
-//                     },
-//                })
-//                .populate({
-//                     path: 'car',
-//                     select: 'model brand year plateNumberForInternational plateNumberForSaudi',
-//                     populate: {
-//                          path: 'brand plateNumberForSaudi.symbol model',
-//                          // model: 'CarBrand',
-//                          // select: 'title image',
-//                     },
-//                });
-//           return populatedResult;
-//      } catch (error) {
-//           console.log('🚀 ~ createInvoice ~ error:', error);
-//           throw error;
-//      }
-// };
-
-
 const createInvoice = async (payload: Partial<IInvoice>) => {
-     // Handle postpaid date logic
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
           payload.postPaymentDate = null;
      } else {
+          // convert payload.postPaymentDate string to Date
           if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string') {
                payload.postPaymentDate = new Date(payload.postPaymentDate);
+               // check its not in the past
                if (payload.postPaymentDate < new Date()) {
                     throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past');
                }
           }
      }
-
-     const session = await mongoose.startSession();
-     let createdInvoiceId: string | mongoose.Types.ObjectId | null = null;
-
      try {
-          await session.withTransaction(async () => {
-               // Create and validate invoice
-               const invoice = new Invoice(payload);
-               await invoice.validate();
+          if (payload.sparePartsList) {
+               // Process all spare parts in parallel and wait for all to complete
+               await Promise.all(
+                    payload.sparePartsList.map(async (sparePart) => {
+                         try {
+                              // Check if spare part with this code already exists
+                              const existingSparePart = await SpareParts.findOne({
+                                   code: sparePart.code.toLowerCase(),
+                                   itemName: sparePart.itemName,
+                              });
 
-               // Save spare parts if they don’t exist
-               if (payload.sparePartsList?.length) {
-                    await Promise.all(
-                         payload.sparePartsList.map(async (sp) => {
-                              const code = sp.code ? String(sp.code).toLowerCase() : '';
-
-                              const existing = await SpareParts.findOne({
-                                   code,
-                                   itemName: sp.itemName,
-                                   providerWorkShopId: payload.providerWorkShopId,
-                              }).session(session);
-
-                              if (!existing) {
-                                   const title = await buildTranslatedField(sp.itemName);
-                                   const doc = {
+                              if (!existingSparePart) {
+                                   const title = await buildTranslatedField(sparePart.itemName);
+                                   const sparePartData = {
                                         providerWorkShopId: payload.providerWorkShopId,
-                                        itemName: sp.itemName,
-                                        code,
+                                        item: sparePart.itemName,
+                                        code: sparePart.code.toLowerCase(),
                                         title,
                                    };
-                                   await SpareParts.create([doc], { session });
+
+                                   const newSparePart = await SpareParts.create(sparePartData);
+
+                                   if (!newSparePart) {
+                                        throw new AppError(StatusCodes.NOT_FOUND, 'Spare part not found*.**.');
+                                   }
                               }
-                         }),
-                    );
-               }
-
-               // Save invoice
-               const saved = await invoice.save({ session });
-               if (!saved) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found');
-               }
-               createdInvoiceId = saved._id;
-
-               // Update workshop
-               const workshop = await WorkShop.findById(saved.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId').session(session);
-
-               if (workshop && !workshop.subscribedPackage) {
-                    workshop.generatedInvoiceCount += 1;
-                    await workshop.save({ session });
-               }
-          });
-
-          // Populate result after successful transaction
-          if (!createdInvoiceId) {
-               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Invoice creation failed');
+                         } catch (error) {
+                              console.error('Error saving spare part:', error);
+                              // Continue with other spare parts even if one fails
+                         }
+                    }),
+               );
           }
+          const invoice = new Invoice(payload);
+          // Validate the order data
+          await invoice.validate();
 
-          const populatedResult = await Invoice.findById(createdInvoiceId)
+          // throw new Error("test");
+
+          const result = await invoice.save();
+
+          if (!result) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
+          }
+          // get the workshop
+          const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
+          if (!workshop!.subscribedPackage) {
+               workshop!.generatedInvoiceCount += 1;
+               await workshop!.save();
+          }
+          const populatedResult = await Invoice.findById(result._id)
                .populate({
                     path: 'providerWorkShopId',
                     select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
@@ -232,15 +113,14 @@ const createInvoice = async (payload: Partial<IInvoice>) => {
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                     populate: {
                          path: 'brand plateNumberForSaudi.symbol model',
+                         // model: 'CarBrand',
+                         // select: 'title image',
                     },
                });
-
           return populatedResult;
      } catch (error) {
-          console.error('Error creating invoice:', error);
+          console.log('🚀 ~ createInvoice ~ error:', error);
           throw error;
-     } finally {
-          await session.endSession();
      }
 };
 

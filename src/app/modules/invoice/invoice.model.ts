@@ -96,9 +96,11 @@ InvoiceSchema.pre('validate', async function (next) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
      }
 
-     const isExistCar = await Car.findOne({ _id: payload.car, providerWorkShopId: payload.providerWorkShopId });
-     if (!isExistCar) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
+     if (payload.car) {
+          const isExistCar = await Car.findOne({ _id: payload.car, providerWorkShopId: payload.providerWorkShopId });
+          if (!isExistCar) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
+          }
      }
 
      if (payload.worksList) {
