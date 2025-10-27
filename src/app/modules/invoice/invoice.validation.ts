@@ -28,8 +28,9 @@ const createInvoiceZodSchema = z.object({
                     .optional(),
                discount: z.number().optional(),
                discountType: z.nativeEnum(DiscountType, { required_error: 'Discount Type is required' }).optional(),
-               paymentMethod: z.nativeEnum(PaymentMethod, { required_error: 'Payment Method is required' }).optional(),
+               paymentMethod: z.nativeEnum(PaymentMethod, { required_error: 'Payment Method is required' }),
                postPaymentDate: z.string().optional(),
+               isReleased: z.boolean().optional(),
           })
           .superRefine((body, ctx) => {
                if (body.paymentMethod === PaymentMethod.POSTPAID) {
