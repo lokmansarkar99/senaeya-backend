@@ -18,12 +18,13 @@ const SparePartsSchema = new Schema<ISpareParts>(
           itemName: { type: String, required: true },
           providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: false, default: null },
           type: { type: String, enum: Object.values(SparePartType), required: true, default: SparePartType.SPARE_PART },
-          code: { type: String, required: true, unique: true, lowerCase: true },
+          code: { type: String, required: true, lowerCase: true },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },
      { timestamps: true },
 );
+SparePartsSchema.index({ code: 1 }, { unique: true });
 
 SparePartsSchema.pre('find', function (next) {
      this.find({ isDeleted: false });
