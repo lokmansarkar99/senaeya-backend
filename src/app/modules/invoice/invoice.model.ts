@@ -103,7 +103,7 @@ InvoiceSchema.pre('validate', async function (next) {
 
      if (payload.worksList) {
           const worksIds = payload.worksList.map((work) => new Types.ObjectId(work.work));
-          isExistWorks = await Work.find({ _id: { $in: worksIds }, cost: { $gt: 0 } });
+          isExistWorks = await Work.find({ _id: { $in: worksIds } });
           if (!isExistWorks || isExistWorks.length !== payload.worksList.length) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.*');
           }
