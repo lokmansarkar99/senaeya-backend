@@ -10,8 +10,8 @@ export type ISubscription = {
      coupon: string;
      contact: string;
      status: 'expired' | 'active' | 'cancel';
-     currentPeriodStart: string;
-     currentPeriodEnd: string;
+     currentPeriodStart: Date;
+     currentPeriodEnd: Date;
      createdAt: Date;
      updatedAt: Date;
 };

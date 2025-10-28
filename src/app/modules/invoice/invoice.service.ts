@@ -155,7 +155,7 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
           query,
      );
      console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['description']).modelQuery;
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['description','car']).modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };

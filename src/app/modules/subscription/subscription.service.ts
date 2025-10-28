@@ -190,12 +190,10 @@ const upgradeSubscriptionToDB = async (subscriptionId: string, payload: any) => 
      if (!workshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'User or Stripe Customer ID not found');
      }
-     // update subscription
-     const updateDoc = await Subscription.findOneAndUpdate({ _id: subscriptionId }, payload, {
-          new: true,
-     });
 
-     return updateDoc;
+     const updatedSubscription = await Subscription.findByIdAndUpdate(subscriptionId, { $set: payload }, { new: true, runValidators: true });
+
+     return updatedSubscription;
 };
 const cancelSubscriptionToDB = async (workshop: string) => {
      const activeSubscription = await Subscription.findOne({
