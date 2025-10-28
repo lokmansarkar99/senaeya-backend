@@ -73,7 +73,7 @@ const getTryCouponByCode = async (packageId: string, couponCode: string) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Coupon is inactive.');
      }
 
-     if (coupon.usageLimit) {
+     if (coupon.usageLimit && coupon.usageLimit > 0) {
           if (coupon.usedCount >= coupon.usageLimit) {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Coupon usage limit exceeded.');
           }

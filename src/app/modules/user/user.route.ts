@@ -89,4 +89,7 @@ router.route('/stats').get(
 //      UserController.unlinkOAuthAccount
 // );
 
+// delete own accoutn
+router.route('/delete-own-account').delete(auth(USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.ADMIN), UserController.deleteOwnAccount);
+
 export const UserRouter = router;

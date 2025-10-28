@@ -10,10 +10,10 @@ const router = Router();
 // Define routes
 router.post('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateRequest(createCouponValidation.createCouponValidationSchema), CouponController.createCoupon);
 
-router.get('/super-admin', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CouponController.getAllCoupon);
+router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.CLIENT), CouponController.getAllCoupon);
 
 router.post('/try/:couponCode', CouponController.getTryCouponByCode);
-router.patch('/:couponCode/update-coupon', validateRequest(createCouponValidation.updateCouponValidationSchema), auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CouponController.updateCoupon);
+router.patch('/update-coupon/:couponCode', validateRequest(createCouponValidation.updateCouponValidationSchema), auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CouponController.updateCoupon);
 
 router.delete('/:couponId', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), CouponController.deleteCoupon);
 

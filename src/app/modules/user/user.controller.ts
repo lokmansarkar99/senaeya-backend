@@ -316,6 +316,19 @@ const unlinkOAuthAccount = catchAsync(async (req, res) => {
      });
 });
 
+// delete own account
+const deleteOwnAccount = catchAsync(async (req, res) => {
+     const { id } = req.user as any;
+     const result = await UserService.deleteUser(id);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Profile deleted successfully',
+          data: result,
+     });
+});
+
 export const UserController = {
      createUser,
      getUserProfile,
@@ -335,4 +348,5 @@ export const UserController = {
      getUserStats,
      linkOAuthAccount,
      unlinkOAuthAccount,
+     deleteOwnAccount
 };

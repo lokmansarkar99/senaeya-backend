@@ -6,10 +6,7 @@ import { USER_ROLES } from '../../../../enums/user';
 import auth from '../../../middleware/auth';
 import validateUserAuthority from '../../../middleware/validateUserAuthority';
 import { SubscriptionService } from '../../subscription/subscription.service';
-import AppError from '../../../../errors/AppError';
-import { StatusCodes } from 'http-status-codes';
-import { WorkShop } from '../../workShop/workShop.model';
-import { Coupon } from '../../coupon/coupon.model';
+import { Subscription } from '../../subscription/subscription.model';
 
 const router = express.Router();
 
@@ -19,7 +16,22 @@ router.post('/callback', clickpayController.paymentCallback);
 
 // make a success route with html return
 router.get('/success', async (req, res) => {
-     await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.query.providerWorkShopId as string, req.query.packageId as string, req.query.amountPaid as string, req.query.couponCode as string, req.query.contact as string);
+     // checke already subscribed and not expired
+     const isExistSubscription = await Subscription.findOne({
+          workshop: req.query.providerWorkShopId,
+          package: req.query.packageId,
+          status: 'active',
+          currentPeriodEnd: { $gt: new Date().toISOString() },
+     });
+     if (!isExistSubscription) {
+          await SubscriptionService.createSubscriptionByPackageIdForWorkshop(
+               req.query.providerWorkShopId as string,
+               req.query.packageId as string,
+               req.query.amountPaid as string,
+               req.query.couponCode as string,
+               req.query.contact as string,
+          );
+     }
      res.send('<h1>Payment successful</h1>');
 });
 
