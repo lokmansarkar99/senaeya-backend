@@ -20,6 +20,9 @@ const WorkShopSchema = new Schema<IworkShop>(
           workshopNameEnglish: { type: String, required: true, trim: true },
           workshopNameArabic: { type: String, required: true, trim: true },
           contact: { type: String, required: true, unique: true },
+          region: { type: String },
+          city: { type: String },
+          industrialComplexAreaName: { type: String },
           unn: {
                type: String,
                required: true,
@@ -45,7 +48,7 @@ const WorkShopSchema = new Schema<IworkShop>(
           address: { type: String, required: true, trim: true },
           taxVatNumber: {
                type: String,
-               required: true,
+               required: false,
                // total digit: 15; startingWith: 3
                match: [/^3\d{14}$/i, 'taxVatNumber must be 15 digits starting with 3'],
                trim: true,
@@ -82,7 +85,7 @@ const WorkShopSchema = new Schema<IworkShop>(
           description: { type: String, required: false },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
-          generatedInvoiceCount: { type: Number, default: 0,max: MAX_FREE_INVOICE_COUNT },
+          generatedInvoiceCount: { type: Number, default: 0, max: MAX_FREE_INVOICE_COUNT },
           subscribedPackage: {
                type: Types.ObjectId,
                ref: 'Package',
@@ -93,10 +96,10 @@ const WorkShopSchema = new Schema<IworkShop>(
                ref: 'Subscription',
                default: null,
           },
-          isUsedTrial:{
+          isUsedTrial: {
                type: Boolean,
                default: true,
-          }
+          },
      },
      { timestamps: true },
 );

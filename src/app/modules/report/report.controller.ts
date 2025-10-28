@@ -15,6 +15,18 @@ const getAllReportsByCreatedDateRange = catchAsync(async (req: Request, res: Res
      });
 });
 
+const getDashboardReport = catchAsync(async (req: Request, res: Response) => {
+     const result = await reportService.getDashboardReport();
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Reports retrieved successfully',
+          data: result,
+     });
+});
+
 export const reportController = {
      getAllReportsByCreatedDateRange,
+     getDashboardReport
 };

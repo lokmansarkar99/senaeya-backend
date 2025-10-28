@@ -11,7 +11,7 @@ import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { Payment } from './payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
 import { S3Helper } from '../../../helpers/aws/s3helper';
-import fs from 'fs';;
+import fs from 'fs';
 import { TranslatedFieldEnum } from '../invoice/invoice.interface';
 import { sendNotifications} from '../../../helpers/notificationsHelper';
 
@@ -38,7 +38,7 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
      if (isExistPayment) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Payment already exists.');
      }
-     const invoice = await Invoice.findOne({ _id: payload.invoice, providerWorkShopId: payload.providerWorkShopId });
+     const invoice = await Invoice.findOne({ _id: payload.invoice, providerWorkShopId: payload.providerWorkShopId, paymentStatus: PaymentStatus.UNPAID });
 
      if (!invoice) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.');

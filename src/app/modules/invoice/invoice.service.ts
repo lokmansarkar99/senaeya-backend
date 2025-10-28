@@ -1,12 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../errors/AppError';
-import { IInvoice } from './invoice.interface';
+import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
 import { Invoice } from './invoice.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { paymentService } from '../payment/payment.service';
 import { ObjectId } from 'mongodb';
-import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
+import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 import { WorkShop } from '../workShop/workShop.model';
 import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
@@ -14,8 +14,11 @@ import { sparePartsService } from '../spareParts/spareParts.service';
 import { SpareParts } from '../spareParts/spareParts.model';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 import mongoose from 'mongoose';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import { S3Helper } from '../../../helpers/aws/s3helper';
+import fs from 'fs';
 
-const createInvoice = async (payload: Partial<IInvoice>) => {
+const createInvoice = async (payload: Partial<IInvoice & { isReleased: boolean }>) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
           payload.postPaymentDate = null;
      } else {
@@ -101,22 +104,32 @@ const createInvoice = async (payload: Partial<IInvoice>) => {
                     },
                })
                .populate({
-                    path: 'sparePartsList',
-                    select: 'item quantity finalCost',
-                    populate: {
-                         path: 'item',
-                         select: 'title cost',
-                    },
-               })
-               .populate({
                     path: 'car',
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                     populate: {
-                         path: 'brand plateNumberForSaudi.symbol model',
+                         path: 'brand plateNumberForSaudi.symbol',
                          // model: 'CarBrand',
                          // select: 'title image',
                     },
                });
+
+          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult!, TranslatedFieldEnum.en);
+          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+          const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult!._id.toString(), 'application/pdf');
+
+          populatedResult!.invoiceAwsLink = invoiceAwsLink;
+          await populatedResult!.save();
+
+          if (payload.isReleased) {
+               await sendNotifications({
+                    title: `${(populatedResult!.client as any).clientId.name}`,
+                    receiver: (populatedResult!.client as any).clientId._id,
+                    message: `Invoice No. ${populatedResult!._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+                    type: 'ALERT',
+               });
+               await releaseInvoiceToWhatsApp(populatedResult!);
+          }
           return populatedResult;
      } catch (error) {
           console.log('🚀 ~ createInvoice ~ error:', error);
@@ -234,25 +247,21 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      return result;
 };
 
-const releaseInvoice = async (invoiceId: string, payload: { providerWorkShopId: string; cardApprovalCode: string }) => {
-     const result = await Invoice.findById(invoiceId);
+const releaseInvoice = async (invoiceId: string) => {
+     const result = await Invoice.findById(invoiceId).populate({
+          path: 'client',
+          select: 'clientId clientType',
+          populate: {
+               path: 'clientId',
+               select: 'name contact _id',
+          },
+     });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.*.');
      }
-     if (result.paymentMethod === PaymentMethod.CARD && !payload.cardApprovalCode) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'cardApprovalCode is required for TRANSFER payment method');
-     }
-
-     const paymentResult = await paymentService.createPayment({
-          providerWorkShopId: new ObjectId(payload.providerWorkShopId),
-          invoice: new ObjectId(invoiceId),
-          isCashRecieved: result.paymentMethod === PaymentMethod.CASH ? true : null,
-          cardApprovalCode: result.paymentMethod === PaymentMethod.CARD ? payload.cardApprovalCode : null,
-          isRecievedTransfer: result.paymentMethod === PaymentMethod.TRANSFER ? true : null,
-          postPaymentDate: result.paymentMethod === PaymentMethod.POSTPAID ? result.postPaymentDate : null,
-     });
-     console.log('🚀 ~ releaseInvoice ~ paymentResult:', paymentResult);
-     return paymentResult;
+     await releaseInvoiceToWhatsApp(result);
+     
+     return result;
 };
 
 const resendInvoice = async (invoiceId: string) => {

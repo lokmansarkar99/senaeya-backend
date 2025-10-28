@@ -23,7 +23,10 @@ export interface IworkShop {
      crn: string; // commercial registration number | total digit: 10;
      mln: string; // municipality license number | unique | total digit: 11; startingWith: 4
      address: string;
-     taxVatNumber: string; // total digit: 15; startingWith: 3
+     region?: string;
+     city?: string;
+     industrialComplexAreaName?: string;
+     taxVatNumber?: string; // total digit: 15; startingWith: 3
      bankAccountNumber?: string; // total letters: 24; startingWith: "SA"
      isAvailableMobileWorkshop: boolean;
      workshopGEOlocation: IGeoLocation;

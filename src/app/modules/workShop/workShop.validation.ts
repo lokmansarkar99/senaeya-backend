@@ -23,7 +23,7 @@ const createWorkShopZodSchema = z.object({
      body: z.object({
           workshopNameEnglish: z.string({ required_error: 'workshopNameEnglish is required' }).trim(),
           workshopNameArabic: z.string({ required_error: 'workshopNameArabic is required' }).trim(),
-          contact: z.string({ required_error: 'contact is required' }).trim(),
+          contact: z.string({ required_error: 'contact is required' }).trim().optional(),
           unn: z
                .string({ required_error: 'unn is required' })
                .trim()
@@ -38,9 +38,10 @@ const createWorkShopZodSchema = z.object({
                .regex(/^4\d{10}$/i, 'mln must be 11 digits starting with 4'),
           address: z.string({ required_error: 'address is required' }).trim(),
           taxVatNumber: z
-               .string({ required_error: 'taxVatNumber is required' })
+               .string()
                .trim()
-               .regex(/^3\d{14}$/i, 'taxVatNumber must be 15 digits starting with 3'),
+               .regex(/^3\d{14}$/i, 'taxVatNumber must be 15 digits starting with 3')
+               .optional(),
           bankAccountNumber: z
                .string()
                .trim()
@@ -60,6 +61,9 @@ const updateWorkShopZodSchema = z.object({
           workshopNameEnglish: z.string().trim().optional(),
           workshopNameArabic: z.string().trim().optional(),
           contact: z.string().trim().optional(),
+          region: z.string().trim().optional(),
+          city: z.string().trim().optional(),
+          industrialComplexAreaName: z.string().trim().optional(),
           unn: z
                .string()
                .trim()
@@ -117,8 +121,18 @@ const updateWorkShopZodSchemaByWorkshopOwner = z.object({
      }),
 });
 
+const getWorkShopBycrnMlnUnnTaxZodSchema = z.object({
+     query: z.object({
+          crn: z.string({ required_error: 'crn is required' }).trim(),
+          mln: z.string({ required_error: 'mln is required' }).trim(),
+          unn: z.string({ required_error: 'unn is required' }).trim(),
+          taxVatNumber: z.string({ required_error: 'taxVatNumber is required' }).trim().optional(),
+     }),
+});
+
 export const workShopValidation = {
      createWorkShopZodSchema,
      updateWorkShopZodSchema,
      updateWorkShopZodSchemaByWorkshopOwner,
+     getWorkShopBycrnMlnUnnTaxZodSchema
 };

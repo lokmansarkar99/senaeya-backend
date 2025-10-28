@@ -6,6 +6,8 @@ export type IUser = {
      role: USER_ROLES;
      email?: string;
      contact: string;
+     nationality?: string;
+     preferredLanguage?: 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl';
      password?: string;
      image?: string;
      isDeleted: boolean;

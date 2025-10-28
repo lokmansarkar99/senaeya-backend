@@ -12,20 +12,21 @@ const router = express.Router();
 
 router.post(
      '/',
-     auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER),
+     auth(USER_ROLES.WORKSHOP_OWNER),
      fileUploadHandler(),
      parseFileData(FOLDER_NAMES.IMAGE),
      validateRequest(workShopValidation.createWorkShopZodSchema),
      workShopController.createWorkShop,
 );
 
-router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.getAllWorkShops);
+router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllWorkShops);
 router.get('/my', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllWorkShops);
 
-router.get('/unpaginated', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.getAllUnpaginatedWorkShops);
+router.get('/unpaginated', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllUnpaginatedWorkShops);
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.hardDeleteWorkShop);
 router.get('/contact/:contact', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.getWorkShopByContact);
+router.get('/crn-mln-unn-tax', auth(USER_ROLES.WORKSHOP_OWNER),validateRequest(workShopValidation.getWorkShopBycrnMlnUnnTaxZodSchema), workShopController.getWorkShopBycrnMlnUnnTax);
 
 router.patch(
      '/:id',

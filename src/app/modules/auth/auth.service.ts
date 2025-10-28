@@ -72,20 +72,20 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
      }
      const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact };
-     let data;
+     let workshops;
      if (isExistUser.role === USER_ROLES.WORKSHOP_MEMBER || isExistUser.role === USER_ROLES.WORKSHOP_OWNER) {
           const userWorkShops = await workShopService.getAllWorkShops({ ownerId: isExistUser._id, fields: '_id,workshopNameEnglish' });
           if (userWorkShops.result.length > 0) {
                const workShopsIds = userWorkShops.result.map((workShop) => workShop._id!.toString());
                jwtData.workShops = workShopsIds;
-               data = userWorkShops.result;
+               workshops = userWorkShops.result;
           }
      }
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
 
-     return { accessToken, refreshToken, data };
+     return { accessToken, refreshToken, workshops, role: isExistUser.role };
 };
 
 const loginUserWithFingerPrint = async (payload: ILoginData) => {
@@ -105,14 +105,14 @@ const loginUserWithFingerPrint = async (payload: ILoginData) => {
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
-     let data;
+     let workshops;
      if (isExistUser.role === USER_ROLES.WORKSHOP_MEMBER || isExistUser.role === USER_ROLES.WORKSHOP_OWNER) {
           const userWorkShops = await workShopService.getAllWorkShops({ ownerId: isExistUser._id, fields: '_id,workshopNameEnglish' });
           if (userWorkShops.result.length > 0) {
-               data = userWorkShops.result;
+               workshops = userWorkShops.result;
           }
      }
-     return { accessToken, refreshToken, data };
+     return { accessToken, refreshToken, workshops, role: isExistUser.role };
 };
 
 //forget password

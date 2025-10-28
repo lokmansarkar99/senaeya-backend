@@ -44,7 +44,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           taxPercentage: { type: Number, required: true },
           taxAmount: { type: Number, required: true },
           totalCostIncludingTax: { type: Number, required: true },
-          paymentMethod: { type: String, enum: PaymentMethod, required: false, default: null },
+          paymentMethod: { type: String, enum: PaymentMethod, required: true },
           paymentStatus: { type: String, enum: PaymentStatus, required: true, default: PaymentStatus.UNPAID },
           postPaymentDate: { type: Date, required: false, default: null },
           payment: { type: Schema.Types.ObjectId, ref: 'Payment', required: false, default: null },

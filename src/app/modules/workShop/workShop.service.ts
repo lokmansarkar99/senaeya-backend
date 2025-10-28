@@ -9,9 +9,22 @@ import { User } from '../user/user.model';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop> => {
+     //Three fields can be added from the administration, including: the name of the region, the name of the city, and the name of the industrial complex in which the workshop is located. This data is obtained from the workshop location specified in the application and entered manually.
+     if (user.role === USER_ROLES.WORKSHOP_OWNER) {
+          const forbiddenFieldsForShopOwner = ['region', 'city', 'industrialComplexAreaName'];
+
+          for (const field of forbiddenFieldsForShopOwner) {
+               if (Object.prototype.hasOwnProperty.call(payload, field)) {
+                    throw new AppError(StatusCodes.BAD_REQUEST, `WorkShop owner cannot create 'region', 'city', 'industrialComplexAreaName'. Plz connect to shop owner.`);
+               }
+          }
+     }
      const userIs = await User.findById(user.id);
      if (userIs?.helperUserId) {
           payload.helperUserId = userIs.helperUserId;
+     }
+     if (!payload.contact) {
+          payload.contact = user.contact;
      }
      payload.ownerId = user.id;
      const result = await WorkShop.create(payload);
@@ -32,8 +45,8 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
 };
 
 const getAllWorkShops = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworkShop[] }> => {
-     const queryBuilder = new QueryBuilder(WorkShop.find().populate('subscriptionId','status'), query);
-     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
+     const queryBuilder = new QueryBuilder(WorkShop.find().populate('subscriptionId', 'status'), query);
+     const result = await queryBuilder.filter().search(['contact', 'workshopNameEnglish', 'workshopNameArabic', 'unn', 'crn', 'mln', 'taxVatNumber']).sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
@@ -44,9 +57,9 @@ const getAllUnpaginatedWorkShops = async (): Promise<IworkShop[]> => {
 };
 
 const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any): Promise<IworkShop | null> => {
-     console.log("🚀 ~ updateWorkShop ~ payload:", payload)
+     console.log('🚀 ~ updateWorkShop ~ payload:', payload);
      if (user.role === USER_ROLES.WORKSHOP_OWNER) {
-          const forbiddenFieldsForShopOwner = ['workshopNameEnglish', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber'];
+          const forbiddenFieldsForShopOwner = ['workshopNameEnglish', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber', 'region', 'city', 'industrialComplexAreaName'];
 
           for (const field of forbiddenFieldsForShopOwner) {
                if (Object.prototype.hasOwnProperty.call(payload, field)) {
@@ -114,8 +127,25 @@ const getWorkShopById = async (id: string): Promise<IworkShop | null> => {
 };
 
 const getWorkShopByContact = async (contact: string): Promise<IworkShop | null> => {
-     const result = await WorkShop.findOne({ contact:contact.trim() });
+     const result = await WorkShop.findOne({ contact: contact.trim() });
      return result;
+};
+
+const getWorkShopBycrnMlnUnnTax = async (crn: string, mln: string, unn: string, taxVatNumber: string) => {
+     const isExistWorkshopByMln = await WorkShop.findOne({ mln });
+     const isExistWorkshopByUnn = await WorkShop.findOne({ unn });
+     let isExistWorkshopByTax = null;
+     if (taxVatNumber) {
+          isExistWorkshopByTax = await WorkShop.findOne({ taxVatNumber });
+     }
+     const isExistWorkshopByCrn = await WorkShop.findOne({ crn });
+
+     return {
+          isExistWorkshopByCrn: !!isExistWorkshopByCrn,
+          isExistWorkshopByTax: taxVatNumber ? !!isExistWorkshopByTax : undefined,
+          isExistWorkshopByUnn: !!isExistWorkshopByUnn,
+          isExistWorkshopByMln: !!isExistWorkshopByMln,
+     };
 };
 
 export const workShopService = {
@@ -127,4 +157,5 @@ export const workShopService = {
      hardDeleteWorkShop,
      getWorkShopById,
      getWorkShopByContact,
+     getWorkShopBycrnMlnUnnTax,
 };

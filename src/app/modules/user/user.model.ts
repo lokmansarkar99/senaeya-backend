@@ -28,6 +28,14 @@ const userSchema = new Schema<IUser, UserModel>(
                required: true,
                unique: true,
           },
+          nationality: {
+               type: String,
+               required: false,
+          },
+          preferredLanguage: {
+               type: String,
+               enum: ['en', 'bn', 'ar', 'ur', 'hi', 'tl'],
+          },
           password: {
                type: String,
                // required: function () {

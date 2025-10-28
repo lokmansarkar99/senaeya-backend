@@ -13,15 +13,9 @@ import generateOTP from '../../../utils/generateOTP';
 import { AuthService } from '../auth/auth.service';
 import mongoose, { Types } from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
-import { checkPhoneNumberService } from '../checkPhoneNumber/checkPhoneNumber.service';
 import session from 'express-session';
 // create user
 const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string } }) => {
-     // check is phone number verified
-     const isPhoneNumberVerified = await checkPhoneNumberService.getIsPhoneNumberVerified(payload.contact);
-     if (!isPhoneNumberVerified) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'Phone number is not verified');
-     }
      const user = await User.isExistUserByContact(payload.contact);
      if (user) {
           throw new AppError(StatusCodes.CONFLICT, 'Contact already exists');

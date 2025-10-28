@@ -20,6 +20,7 @@ const usersData = [
           email: 'user@gmail.com',
           role: USER_ROLES.WORKSHOP_OWNER,
           password: 'hello123',
+          contact: '+8801939032974',
           verified: true,
      },
 ];

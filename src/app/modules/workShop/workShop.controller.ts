@@ -96,6 +96,18 @@ const getWorkShopByContact = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getWorkShopBycrnMlnUnnTax = catchAsync(async (req: Request, res: Response) => {
+     const { crn, mln, unn, taxVatNumber='' } = req.query;
+     const result = await workShopService.getWorkShopBycrnMlnUnnTax(crn as string, mln as string, unn as string, taxVatNumber as string);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'WorkShop retrieved successfully',
+          data: result || undefined,
+     });
+});
+
 export const workShopController = {
      createWorkShop,
      getAllWorkShops,
@@ -104,5 +116,6 @@ export const workShopController = {
      deleteWorkShop,
      hardDeleteWorkShop,
      getWorkShopById,
-     getWorkShopByContact
+     getWorkShopByContact,
+     getWorkShopBycrnMlnUnnTax
 };
