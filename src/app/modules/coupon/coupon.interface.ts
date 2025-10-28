@@ -11,6 +11,7 @@ export interface ICoupon extends Document {
      isActive: boolean;
      isDeleted: boolean;
      createdBy: mongoose.Types.ObjectId;
+     status: string;
      name: string;
      description?: string;
      usageLimit?: number;

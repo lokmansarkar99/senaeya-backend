@@ -19,15 +19,7 @@ router.post('/callback', clickpayController.paymentCallback);
 
 // make a success route with html return
 router.get('/success', async (req, res) => {
-     const subscription = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.query.providerWorkShopId as string, req.query.packageId as string);
-     if (!subscription) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
-     }
-
-     // update providerWorkShopId's subscription filed to null
-     await WorkShop.updateOne({ _id: req.query.providerWorkShopId }, { $set: { subscriptionId: subscription._id } });
-     // update the coupon used count
-     await Coupon.updateOne({ code: req.query.couponCode }, { $inc: { usedCount: 1 } });
+     await SubscriptionService.createSubscriptionByPackageIdForWorkshop(req.query.providerWorkShopId as string, req.query.packageId as string, req.query.amountPaid as string, req.query.couponCode as string, req.query.contact as string);
      res.send('<h1>Payment successful</h1>');
 });
 

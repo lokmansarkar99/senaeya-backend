@@ -26,10 +26,19 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                required: false,
                default: '',
           },
-          // subscriptionId: {
-          //      type: String,
-          //      required: true,
-          // },
+          amountPaid: {
+               type: Number,
+               required: true,
+          },
+          coupon: {
+               type: String,
+               required: false,
+               default: '',
+          },
+          contact: {
+               type: String,
+               required: true,
+          },
           currentPeriodStart: {
                type: String,
                required: true,
@@ -38,10 +47,6 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                type: String,
                required: true,
           },
-          // remaining: {
-          //      type: Number,
-          //      required: true,
-          // },
           status: {
                type: String,
                enum: ['expired', 'active', 'cancel', 'deactivated'],

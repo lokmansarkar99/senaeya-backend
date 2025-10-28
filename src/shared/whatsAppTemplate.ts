@@ -1152,6 +1152,12 @@ const scheduleInvoiceWarningMessage = ({ workshopNameEnglish, workshopNameArabic
      `;
 };
 
+const subscriptionDeleted = () => {
+     return `Your subscription to Senaeya app has been deleted.
+    تم حذف اشتراككم في تطبيق الصناعية.
+    `;
+};
+
 export const whatsAppTemplate = {
      createAccount,
      forgetPassword,
@@ -1161,6 +1167,7 @@ export const whatsAppTemplate = {
      defaulterList,
      subscriptionExtended,
      scheduleInvoiceWarningMessage,
+     subscriptionDeleted
      // resetPassword,
      // resetPasswordByUrl,
      // contactFormTemplate,

@@ -5,7 +5,6 @@ const CarBrandCountriesSchema = new Schema<IcarBrandCountries>(
      {
           image: { type: String, required: true },
           title: { type: String, required: true, unique: true },
-          description: { type: String, required: true },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },

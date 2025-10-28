@@ -6,11 +6,14 @@ export type ISubscription = {
      workshop: Types.ObjectId;
      package: Types.ObjectId;
      trxId: string;
-     // remaining: number;
-     // subscriptionId: string;
+     amountPaid: number;
+     coupon: string;
+     contact: string;
      status: 'expired' | 'active' | 'cancel';
      currentPeriodStart: string;
      currentPeriodEnd: string;
+     createdAt: Date;
+     updatedAt: Date;
 };
 
 export type SubscriptionModel = Model<ISubscription, Record<string, unknown>>;

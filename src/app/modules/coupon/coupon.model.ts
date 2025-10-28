@@ -47,6 +47,11 @@ const couponSchema = new Schema<ICoupon>(
                type: Boolean,
                default: false,
           },
+          status: {
+               type: String,
+               enum: ['active', 'inactive', 'expired'],
+               default: 'active',
+          },
      },
      {
           timestamps: true,

@@ -22,10 +22,11 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      let toBePaidAmount = isExistPackage.price;
      if (req.query.couponCode) {
           isExistCoupon = await CouponService.getTryCouponByCode(req.params.packageId, req.query.couponCode as string);
+          console.log("🚀 ~ isExistCoupon:", isExistCoupon)
           if (!isExistCoupon) {
                throw new Error('Coupon not found for this package');
           }
-          toBePaidAmount = (isExistCoupon as any).data.discountedPrice;
+          toBePaidAmount = isExistCoupon.discountedPrice;
      }
      // checke already subscribed and not expired
      const isExistSubscription = await Subscription.findOne({
@@ -48,7 +49,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
 

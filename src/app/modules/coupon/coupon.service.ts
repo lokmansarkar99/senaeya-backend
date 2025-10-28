@@ -12,6 +12,10 @@ const createCoupon = async (couponData: Partial<ICoupon>, user: any) => {
      if (!isExistPackage) {
           throw new AppError(StatusCodes.BAD_REQUEST, `Package doesn't exit.`);
      }
+     const isExistCoupon = await Coupon.findOne({ code: couponData.code, package: couponData.package });
+     if (isExistCoupon) {
+          throw new AppError(StatusCodes.BAD_REQUEST, `Coupon already exists.`);
+     }
      const coupon = new Coupon({
           ...couponData,
           createdBy: user.id,

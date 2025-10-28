@@ -8,6 +8,7 @@ import { whatsAppTemplate } from '../shared/whatsAppTemplate';
 import { whatsAppHelper } from '../helpers/whatsAppHelper';
 import { sendNotifications } from '../helpers/notificationsHelper';
 import { WorkShop } from '../app/modules/workShop/workShop.model';
+import { Coupon } from '../app/modules/coupon/coupon.model';
 // ====== CRON JOB SCHEDULERS ======
 const scheduleTrialWarningCheck = () => {
      // Run every 5 days at 9:00 AM '0 9 */5 * *'
@@ -152,6 +153,33 @@ const scheduleInvoiceWarningCheck = () => {
      });
 };
 
+// 4. warn unpaid-due invoices' clients "You have an overdue invoice for (workshop name shown on invoice). Please pay the invoice within 3 days, so that your name is not placed on the defaulters list."
+const scheduleCouponExpire = () => {
+     // Run every 3 days at 9:00 AM '0 9 */3 * *'
+     cron.schedule('0 9 */3 * *', async () => {
+          try {
+               console.log('⏰ Checking for expired coupons...');
+
+               const now = new Date();
+
+               // updatemany
+               await Coupon.updateMany(
+                    {
+                         endDate: { $lt: now },
+                    },
+                    {
+                         $set: {
+                              status: 'expired',
+                         },
+                         $inc: { tokenVersion: 1 },
+                    },
+               );
+          } catch (error) {
+               console.error('❌ Error in coupon expire check:', error);
+          }
+     });
+};
+
 // ASCII Art Title
 figlet('Senaeya', (err, data) => {
      if (err) {
@@ -175,5 +203,6 @@ const setupTimeManagement = () => {
      scheduleTrialExpiryCheck(); // Every hour
      scheduleTrialWarningCheck(); // Daily at 9 AM
      scheduleInvoiceWarningCheck(); // Daily at 9 AM
+     scheduleCouponExpire(); // Daily at 9 AM
 };
 export default setupTimeManagement;

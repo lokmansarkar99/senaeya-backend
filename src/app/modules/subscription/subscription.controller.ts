@@ -39,7 +39,7 @@ const cancelSubscription = catchAsync(async (req, res) => {
 const createCheckoutSession = catchAsync(async (req, res) => {
      const { id }: any = req.user;
      const packageId = req.params.id;
-     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(id, packageId);
+     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(id, packageId, req.query.amountPaid as string, req.query.couponCode as string, req.query.contact as string);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
@@ -50,9 +50,8 @@ const createCheckoutSession = catchAsync(async (req, res) => {
 });
 // update subscriptions
 const updateSubscription = catchAsync(async (req, res) => {
-     const { id }: any = req.user;
-     const packageId = req.params.id;
-     const result = await SubscriptionService.upgradeSubscriptionToDB(id, packageId, req.body.providerWorkShopId);
+     const subscriptionId = req.params.id;
+     const result = await SubscriptionService.upgradeSubscriptionToDB(subscriptionId,req.body);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
@@ -70,6 +69,18 @@ const orderSuccess = catchAsync(async (req, res) => {
 const orderCancel = catchAsync(async (req, res) => {
      res.render('cancel');
 });
+
+const deleteSubscriptionPackageToDB = catchAsync(async (req, res) => {
+     const packageId = req.params.packageId;
+     const result = await SubscriptionService.deleteSubscriptionPackageToDB(packageId);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Delete subscription successfully',
+          data: result,
+     });
+});
 export const SubscriptionController = {
      subscriptions,
      subscriptionDetails,
@@ -78,4 +89,5 @@ export const SubscriptionController = {
      cancelSubscription,
      orderSuccess,
      orderCancel,
+     deleteSubscriptionPackageToDB,
 };
