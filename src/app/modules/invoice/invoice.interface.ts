@@ -35,7 +35,7 @@ export interface IInvoice {
      discountType?: DiscountType;
      worksList?: IInvoiceWork[]; // work.type === 'service'
      sparePartsList?: IInvoiceSpareParts[]; // work.type === 'spare parts'
-     paymentMethod: PaymentMethod | null;
+     paymentMethod: PaymentMethod | undefined;
      paymentStatus: PaymentStatus;
      postPaymentDate?: Date | null; // only if the paymentMethod is postpaid
      payment?: Types.ObjectId | null;

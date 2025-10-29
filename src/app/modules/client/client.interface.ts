@@ -3,10 +3,10 @@ import { CLIENT_TYPE, CLIENT_STATUS } from './client.enum';
 
 export interface IClient {
      providerWorkShopId: Types.ObjectId;
-     clientType?: CLIENT_TYPE;
+     clientType: CLIENT_TYPE;
      clientId?: string;
+     workNameAsClient?: string;
      contact: string;
-     document?: string; // ref: Document
      documentNumber: string | null; // ref: Document
      cars: Types.ObjectId[]; // servicetaken for as client ref: Car
      invoices: Types.ObjectId[]; // service taken for as client ref: Invoice

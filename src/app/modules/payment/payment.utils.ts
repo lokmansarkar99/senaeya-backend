@@ -45,7 +45,7 @@ export const generatePDF = async (htmlContent: string) => {
 
 export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
      whatsAppHelper.sendWhatsAppPDFMessage({
-          to: (updatedInvoice.client as any).clientId.contact,
+          to: (updatedInvoice.client as any).contact,
           priority: 10,
           referenceId: '',
           msgId: '',

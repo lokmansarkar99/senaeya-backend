@@ -8,10 +8,7 @@ export interface Ipayment {
      paymentMethod: PaymentMethod;
      paymentStatus: PaymentStatus;
      amount: number;
-     isCashRecieved?: boolean | null; // for cash payment
-     cardApprovalCode?: string | null; // for card payment
-     isRecievedTransfer?: boolean | null; // for transfer payment
-     postPaymentDate?: Date | null; // for postpaid payment
+     cardApprovalCode?: string | undefined;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

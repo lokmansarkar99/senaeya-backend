@@ -18,11 +18,191 @@ import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
 import { addToBullQueueToCheckInvoicePaymentStatus } from '../../../helpers/redis/queues';
+import { Payment } from '../payment/payment.model';
 
-const createInvoice = async (payload: Partial<IInvoice & { isReleased: boolean }>) => {
+// const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: boolean; isRecievedTransfer: boolean; cardApprovalCode: string }>) => {
+//      const isReleased = payload.isReleased === 'true';
+//      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
+//           payload.postPaymentDate = undefined;
+//           if (payload.paymentMethod == PaymentMethod.CASH) {
+//                payload.isCashRecieved == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+//           } else if (payload.paymentMethod == PaymentMethod.TRANSFER) {
+//                payload.isRecievedTransfer == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+//           } else if (payload.paymentMethod == PaymentMethod.CARD) {
+//                payload.cardApprovalCode ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+//           }
+//      } else {
+//           payload.paymentStatus = PaymentStatus.UNPAID;
+//           // convert payload.postPaymentDate string to Date
+//           if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string') {
+//                payload.postPaymentDate = new Date(payload.postPaymentDate);
+//                // check its not in the past
+//                if (payload.postPaymentDate < new Date()) {
+//                     throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past');
+//                }
+//           }
+//      }
+
+//      const session = await mongoose.startSession();
+//      session.startTransaction();
+//      try {
+//           console.log("payload.sparePartsList && payload.sparePartsList.length > 0", payload?.sparePartsList, payload?.sparePartsList?.length)
+//           // Pre-process spare parts: check existence and create missing ones in parallel
+//           if (payload?.sparePartsList && payload?.sparePartsList?.length > 0) {
+//                // Collect unique codes with itemNames for batch existence check if possible, but since itemName must match,
+//                // parallel individual checks are efficient and simple
+//                await Promise.all(
+//                     payload.sparePartsList.map(async (sparePart) => {
+//                          try {
+//                               // Check if spare part with this code and itemName already exists
+//                               const existingSparePart = await SpareParts.findOne(
+//                                    {
+//                                         code: sparePart.code.toLowerCase(),
+//                                         itemName: sparePart.itemName,
+//                                    },
+//                                    { session },
+//                               );
+
+//                               if (!existingSparePart) {
+//                                    const title = await buildTranslatedField(sparePart.itemName);
+//                                    const sparePartData = {
+//                                         providerWorkShopId: payload.providerWorkShopId,
+//                                         item: sparePart.itemName,
+//                                         code: sparePart.code.toLowerCase(),
+//                                         title,
+//                                    };
+
+//                                    const [newSparePart] = await SpareParts.create([sparePartData], { session });
+
+//                                    if (!newSparePart) {
+//                                         // Use a more appropriate error; this should rarely happen if create succeeds
+//                                         throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create spare part.');
+//                                    }
+//                                    console.log("🚀 ~ createInvoice ~ newSparePart created:",)
+//                               }
+//                          } catch (error) {
+//                               console.error('Error processing spare part:', error);
+//                               // Continue with other spare parts; transaction will proceed but may have partial data
+//                          }
+//                     }),
+//                );
+//           }
+
+//           // Create invoice within transaction
+//           const [resultInvoice] = await Invoice.create([payload], { session });
+
+//           if (!resultInvoice) {
+//                throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create invoice.');
+//           }
+
+//           // Handle payment if invoice is paid
+//           if (resultInvoice.paymentStatus === PaymentStatus.PAID) {
+//                const paymentPayload = {
+//                     providerWorkShopId: payload.providerWorkShopId,
+//                     invoice: resultInvoice._id,
+//                     paymentMethod: resultInvoice.paymentMethod,
+//                     paymentStatus: resultInvoice.paymentStatus,
+//                     cardApprovalCode: payload.paymentMethod === PaymentMethod.CARD ? payload.cardApprovalCode : undefined,
+//                     amount: resultInvoice.finalCost,
+//                };
+
+//                const [payment] = await Payment.create([paymentPayload], { session });
+//                if (!payment) {
+//                     throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create payment.');
+//                }
+
+//                // Update invoice with payment reference
+//                resultInvoice.payment = payment._id;
+//                await resultInvoice.save({ session });
+//           }
+
+//           // Update workshop invoice count if not subscribed (within transaction for atomicity)
+//           const workshop = await WorkShop.findById(resultInvoice.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId').session(session);
+
+//           if (workshop && !workshop.subscribedPackage) {
+//                workshop.generatedInvoiceCount += 1;
+//                await workshop.save({ session });
+//           }
+
+//           // Commit transaction
+//           await session.commitTransaction();
+//           await session.endSession();
+
+//           // Populate invoice data within transaction to ensure consistency with uncommitted changes
+//           const populatedResult = await Invoice.findById(resultInvoice._id)
+//                .populate({
+//                     path: 'providerWorkShopId',
+//                     select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
+//                })
+//                .populate({
+//                     path: 'client',
+//                     populate: {
+//                          path: 'clientId',
+//                          select: 'name contact',
+//                     },
+//                })
+//                .populate({
+//                     path: 'worksList sparePartsList',
+//                     select: 'work quantity finalCost',
+//                     populate: {
+//                          path: 'work',
+//                          select: 'title cost',
+//                     },
+//                })
+//                .populate({
+//                     path: 'car',
+//                     select: 'model brand year plateNumberForInternational plateNumberForSaudi',
+//                     populate: {
+//                          path: 'brand plateNumberForSaudi.symbol',
+//                     },
+//                });
+
+//           if (!populatedResult) {
+//                throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
+//           }
+
+//           // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
+//           const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult, TranslatedFieldEnum.en);
+//           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+//           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+//           const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
+
+//           // Update invoice with AWS link within transaction
+//           populatedResult.invoiceAwsLink = invoiceAwsLink;
+//           await populatedResult.save();
+//           // Post-commit operations: notifications and WhatsApp release (non-transactional)
+//           if (isReleased) {
+//                await sendNotifications({
+//                     title: `${(populatedResult.client as any).clientId.name}`,
+//                     receiver: (populatedResult.client as any).clientId._id,
+//                     message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+//                     type: 'ALERT',
+//                });
+//                await releaseInvoiceToWhatsApp(populatedResult);
+//           }
+
+//           return populatedResult;
+//      } catch (error) {
+//           await session.abortTransaction();
+//           await session.endSession();
+//           console.error('Error in createInvoice:', error);
+//           throw error;
+//      }
+// };
+
+const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: boolean; isRecievedTransfer: boolean; cardApprovalCode: string }>) => {
+     const isReleased = payload.isReleased === 'true';
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
-          payload.postPaymentDate = null;
+          payload.postPaymentDate = undefined;
+          if (payload.paymentMethod == PaymentMethod.CASH) {
+               payload.isCashRecieved == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+          } else if (payload.paymentMethod == PaymentMethod.TRANSFER) {
+               payload.isRecievedTransfer == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+          } else if (payload.paymentMethod == PaymentMethod.CARD) {
+               payload.cardApprovalCode ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+          }
      } else {
+          payload.paymentStatus = PaymentStatus.UNPAID;
           // convert payload.postPaymentDate string to Date
           if (payload.postPaymentDate && typeof payload.postPaymentDate === 'string') {
                payload.postPaymentDate = new Date(payload.postPaymentDate);
@@ -32,65 +212,102 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: boolean }
                }
           }
      }
+
+     const session = await mongoose.startSession();
+     session.startTransaction();
      try {
-          if (payload.sparePartsList) {
-               // Process all spare parts in parallel and wait for all to complete
+          console.log('payload.sparePartsList && payload.sparePartsList.length > 0', payload?.sparePartsList, payload?.sparePartsList?.length);
+          // Pre-process spare parts: check existence and create missing ones in parallel
+          if (payload?.sparePartsList && payload?.sparePartsList?.length > 0) {
+               // Collect unique codes with itemNames for batch existence check if possible, but since itemName must match,
+               // parallel individual checks are efficient and simple
                await Promise.all(
                     payload.sparePartsList.map(async (sparePart) => {
                          try {
-                              // Check if spare part with this code already exists
-                              const existingSparePart = await SpareParts.findOne({
-                                   code: sparePart.code.toLowerCase(),
-                                   itemName: sparePart.itemName,
-                              });
+                              // Check if spare part with this code and item already exists
+                              // Note: Using 'item' to match schema field; assuming 'itemName' in payload maps to 'item' in DB
+                              const existingSparePart = await SpareParts.findOne(
+                                   {
+                                        code: sparePart.code.toLowerCase(),
+                                        itemName: sparePart.itemName,
+                                   },
+                                   null, // Explicit null projection to avoid misinterpreting options as projection
+                                   { session },
+                              );
 
                               if (!existingSparePart) {
                                    const title = await buildTranslatedField(sparePart.itemName);
                                    const sparePartData = {
                                         providerWorkShopId: payload.providerWorkShopId,
-                                        item: sparePart.itemName,
+                                        itemName: sparePart.itemName,
                                         code: sparePart.code.toLowerCase(),
                                         title,
                                    };
 
-                                   const newSparePart = await SpareParts.create(sparePartData);
+                                   const [newSparePart] = await SpareParts.create([sparePartData], { session });
 
                                    if (!newSparePart) {
-                                        throw new AppError(StatusCodes.NOT_FOUND, 'Spare part not found*.**.');
+                                        // Use a more appropriate error; this should rarely happen if create succeeds
+                                        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create spare part.');
                                    }
+                                   console.log('🚀 ~ createInvoice ~ newSparePart created:', newSparePart._id);
                               }
                          } catch (error) {
-                              console.error('Error saving spare part:', error);
-                              // Continue with other spare parts even if one fails
+                              console.error('Error processing spare part:', error);
+                              // Continue with other spare parts; transaction will proceed but may have partial data
                          }
                     }),
                );
           }
-          const invoice = new Invoice(payload);
-          // Validate the order data
-          await invoice.validate();
 
-          // throw new Error("test");
+          // Create invoice within transaction
+          const [resultInvoice] = await Invoice.create([payload], { session });
 
-          const result = await invoice.save();
-
-          if (!result) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.**..');
+          if (!resultInvoice) {
+               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create invoice.');
           }
-          // get the workshop
-          const workshop = await WorkShop.findById(result.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
-          if (!workshop!.subscribedPackage) {
-               workshop!.generatedInvoiceCount += 1;
-               await workshop!.save();
+
+          // Handle payment if invoice is paid
+          if (resultInvoice.paymentStatus === PaymentStatus.PAID) {
+               const paymentPayload = {
+                    providerWorkShopId: payload.providerWorkShopId,
+                    invoice: resultInvoice._id,
+                    paymentMethod: resultInvoice.paymentMethod,
+                    paymentStatus: resultInvoice.paymentStatus,
+                    cardApprovalCode: payload.paymentMethod === PaymentMethod.CARD ? payload.cardApprovalCode : undefined,
+                    amount: resultInvoice.finalCost,
+               };
+
+               const [payment] = await Payment.create([paymentPayload], { session });
+               if (!payment) {
+                    throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create payment.');
+               }
+
+               // Update invoice with payment reference
+               resultInvoice.payment = payment._id;
+               await resultInvoice.save({ session });
           }
-          const populatedResult = await Invoice.findById(result._id)
+
+          // Update workshop invoice count if not subscribed (within transaction for atomicity)
+          const workshop = await WorkShop.findById(resultInvoice.providerWorkShopId).select('subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId').session(session);
+
+          if (workshop && !workshop.subscribedPackage) {
+               workshop.generatedInvoiceCount += 1;
+               await workshop.save({ session });
+          }
+
+          // Commit transaction
+          await session.commitTransaction();
+          await session.endSession();
+
+          // Populate invoice data after commit (no session needed)
+          const populatedResult = await Invoice.findById(resultInvoice._id)
                .populate({
                     path: 'providerWorkShopId',
                     select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
                })
                .populate({
                     path: 'client',
-                    select: 'clientId clientType',
                     populate: {
                          path: 'clientId',
                          select: 'name contact',
@@ -109,31 +326,39 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: boolean }
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                     populate: {
                          path: 'brand plateNumberForSaudi.symbol',
-                         // model: 'CarBrand',
-                         // select: 'title image',
                     },
                });
 
-          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult!, TranslatedFieldEnum.en);
+          if (!populatedResult) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
+          }
+
+          // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
+          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult, TranslatedFieldEnum.en);
           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult!._id.toString(), 'application/pdf');
+          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
 
-          populatedResult!.invoiceAwsLink = invoiceAwsLink;
-          await populatedResult!.save();
+          // Update invoice with AWS link (after commit, no session)
+          populatedResult.invoiceAwsLink = invoiceAwsLink;
+          await populatedResult.save();
 
-          if (payload.isReleased) {
+          // Post-commit operations: notifications and WhatsApp release (non-transactional)
+          if (isReleased) {
                await sendNotifications({
-                    title: `${(populatedResult!.client as any).clientId.name}`,
-                    receiver: (populatedResult!.client as any).clientId._id,
-                    message: `Invoice No. ${populatedResult!._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+                    title: `${(populatedResult.client as any).clientId.name}`,
+                    receiver: (populatedResult.client as any).clientId._id,
+                    message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
                     type: 'ALERT',
                });
-               await releaseInvoiceToWhatsApp(populatedResult!);
+               await releaseInvoiceToWhatsApp(populatedResult);
           }
+
           return populatedResult;
      } catch (error) {
-          console.log('🚀 ~ createInvoice ~ error:', error);
+          await session.abortTransaction();
+          await session.endSession();
+          console.error('Error in createInvoice:', error);
           throw error;
      }
 };
@@ -213,7 +438,6 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      const result = await Invoice.findById(id)
           .populate({
                path: 'client',
-               select: 'clientId clientType',
                populate: {
                     path: 'clientId',
                     select: 'name contact _id',
@@ -252,7 +476,6 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
 const releaseInvoice = async (invoiceId: string) => {
      const result = await Invoice.findById(invoiceId).populate({
           path: 'client',
-          select: 'clientId clientType',
           populate: {
                path: 'clientId',
                select: 'name contact _id',

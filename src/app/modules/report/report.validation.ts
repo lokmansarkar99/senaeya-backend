@@ -12,7 +12,7 @@ const getAllReportsByCreatedDateRangeZodSchema = z.object({
                outlay: z.union([z.string(), z.boolean()]).optional(),
                noOfCars: z.union([z.string(), z.boolean()]).optional(),
                lang: z.enum(['ar', 'en']).optional(),
-               isReleased: z.union([z.string(), z.boolean()]).optional(),
+               isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
           }),
 });
 

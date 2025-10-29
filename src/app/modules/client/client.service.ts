@@ -40,45 +40,23 @@ import { workShopService } from '../workShop/workShop.service';
  */
 
 const createClient = async (payload: any) => {
-     console.log('🚀 ~ createClient ~ payload:', payload);
-     const isExistProviderWorkShop = await WorkShop.findById(payload.providerWorkShopId);
-     if (!isExistProviderWorkShop) {
-          if (payload.document) {
-               unlinkFile(payload.document);
-          }
-          throw new AppError(StatusCodes.NOT_FOUND, 'Provider Workshop not found.');
-     }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          const isExistWorkShop = await workShopService.getWorkShopByContact(payload.contact);
-          if (!isExistWorkShop) {
-               if (payload.document) {
-                    unlinkFile(payload.document);
-               }
-               throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found..');
-          }
-          let isExistClient = await Client.findOne({ clientId: isExistWorkShop._id, clientType: CLIENT_TYPE.WORKSHOP });
+          let isExistClient = await Client.findOne({ workNameAsClient: payload.workNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
                isExistClient = await Client.create({
                     clientType: payload.clientType,
-                    clientId: isExistWorkShop._id,
-                    document: payload.document || null,
+                    workNameAsClient: payload.workNameAsClient,
                     documentNumber: payload.documentNumber,
                     providerWorkShopId: payload.providerWorkShopId,
                     contact: payload.contact,
                });
                if (!isExistClient) {
-                    if (payload.document) {
-                         unlinkFile(payload.document);
-                    }
                     throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
                }
                return isExistClient;
           }
 
-          if (payload.document) {
-               unlinkFile(payload.document);
-          }
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist.....');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
      } else if (payload.clientType === CLIENT_TYPE.USER) {
           // use mongoose transaction
           const session = await mongoose.startSession();
@@ -98,9 +76,6 @@ const createClient = async (payload: any) => {
                          { session },
                     );
                     if (!isExistUser) {
-                         if (payload.document) {
-                              unlinkFile(payload.document);
-                         }
                          throw new AppError(StatusCodes.NOT_FOUND, 'User creation failed.');
                     }
                }
@@ -112,7 +87,6 @@ const createClient = async (payload: any) => {
                               {
                                    clientType: payload.clientType,
                                    clientId: isExistUser._id,
-                                   document: payload.document || null,
                                    documentNumber: payload.documentNumber,
                                    providerWorkShopId: payload.providerWorkShopId,
                                    contact: payload.contact,
@@ -121,9 +95,6 @@ const createClient = async (payload: any) => {
                          { session },
                     );
                     if (!isExistClient) {
-                         if (payload.document) {
-                              unlinkFile(payload.document);
-                         }
                          throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
                     }
                }
@@ -162,9 +133,6 @@ const createClient = async (payload: any) => {
                await session.abortTransaction();
                session.endSession();
 
-               if (payload.document) {
-                    unlinkFile(payload.document);
-               }
                throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Client not created..');
           }
      }
@@ -185,14 +153,7 @@ const getAllUnpaginatedClients = async (): Promise<IClient[]> => {
 const updateClient = async (id: string, payload: Partial<IClient>): Promise<IClient | null> => {
      const isExist = await Client.findOne({ _id: id });
      if (!isExist) {
-          if (payload.document) {
-               unlinkFile(payload.document);
-          }
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
-     }
-
-     if (isExist.document) {
-          unlinkFile(isExist.document);
      }
      return await Client.findByIdAndUpdate(id, payload, { new: true });
 };
@@ -212,9 +173,6 @@ const hardDeleteClient = async (id: string): Promise<IClient | null> => {
      const result = await Client.findOneAndDelete({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
-     }
-     if (result.document) {
-          unlinkFile(result.document);
      }
      return result;
 };

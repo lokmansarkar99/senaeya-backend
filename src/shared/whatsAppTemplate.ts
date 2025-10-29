@@ -21,7 +21,6 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 };
 
 const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum) => {
-     console.log('🚀 ~ createInvoice ~ updatedInvoice:', updatedInvoice);
      let titleTag = 'Invoice Report - فاتورة ضريبية مبسطة';
      let invoiceTitle = 'Simplified Tax Invoice';
      let simplifiedLable = 'ورة ضريبية مبسطة';

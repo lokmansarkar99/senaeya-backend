@@ -6,7 +6,7 @@ const createClientZodSchema = z.object({
           .object({
                providerWorkShopId: z.string({ required_error: 'WorkShopId is required' }),
                clientType: z.nativeEnum(CLIENT_TYPE),
-               workShopIdAsClient: z.string().optional(),
+               workNameAsClient: z.string().optional(),
                brand: z.string().optional(),
                model: z.string().optional(),
                year: z.string().optional(),
@@ -39,11 +39,11 @@ const createClientZodSchema = z.object({
                          }
                     });
                } else if (body.clientType === CLIENT_TYPE.WORKSHOP) {
-                    // workShopIdAsClient is required for WorkShop
-                    if (!body.workShopIdAsClient) {
+                    // workNameAsClient is required for WorkShop
+                    if (!body.workNameAsClient) {
                          ctx.addIssue({
-                              path: ['workShopIdAsClient'],
-                              message: `workShopIdAsClient is required for WorkShop clientType`,
+                              path: ['workNameAsClient'],
+                              message: `workNameAsClient is required for WorkShop clientType`,
                               code: z.ZodIssueCode.custom,
                          });
                     }
@@ -56,7 +56,7 @@ const updateClientZodSchema = z.object({
           providerWorkShopId: z.string({ required_error: 'WorkShopId is required' }),
           clientType: z.nativeEnum(CLIENT_TYPE).optional(),
           // for worksop type ⬇️⬇️
-          workShopIdAsClient: z.string().optional(),
+          workNameAsClient: z.string().optional(),
           // for worksop type ⬆️⬆️
           // for user type ⬇️⬇️
           brand: z.string({ required_error: 'Brand is required' }).optional(),
