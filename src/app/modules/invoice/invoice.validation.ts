@@ -36,13 +36,6 @@ const createInvoiceZodSchema = z.object({
                isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
           })
           .superRefine((body, ctx) => {
-               if (!body.isCashRecieved && !body.isRecievedTransfer && !body.cardApprovalCode) {
-                    ctx.addIssue({
-                         path: ['isCashRecieved', 'isRecievedTransfer', 'cardApprovalCode'],
-                         message: 'At least one of isCashRecieved, isRecievedTransfer, or cardApprovalCode is required',
-                         code: z.ZodIssueCode.custom,
-                    });
-               }
                if (body.paymentMethod === PaymentMethod.POSTPAID) {
                     // These fields are required for POSTPAID paymentMethod
                     const requiredFields: (keyof typeof body)[] = ['postPaymentDate'];
@@ -56,11 +49,13 @@ const createInvoiceZodSchema = z.object({
                          }
                     });
                } else {
-                    // These fields are required for CASH paymentMethod
-                    const deleteFields: (keyof typeof body)[] = ['postPaymentDate'];
-                    deleteFields.forEach((field) => {
-                         delete body[field];
-                    });
+                    if (!body.isCashRecieved && !body.isRecievedTransfer && !body.cardApprovalCode) {
+                         ctx.addIssue({
+                              path: ['isCashRecieved', 'isRecievedTransfer', 'cardApprovalCode'],
+                              message: 'At least one of isCashRecieved, isRecievedTransfer, or cardApprovalCode is required',
+                              code: z.ZodIssueCode.custom,
+                         });
+                    }
                }
           }),
 });

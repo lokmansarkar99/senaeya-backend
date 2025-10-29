@@ -27,9 +27,6 @@ const createPayment = async (
      if (!invoice) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.');
      }
-     if (invoice.paymentMethod === PaymentMethod.POSTPAID) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'Postpaid invoice cannot have payment.');
-     }
 
      if (payload.paymentMethod == PaymentMethod.CASH && !payload.isCashRecieved) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Cash must be recieved.');
@@ -56,7 +53,7 @@ const createPayment = async (
           if (!payment) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Payment not found.');
           }
-          const updatedInvoice = await Invoice.findByIdAndUpdate(invoice._id, { payment: payment._id }, { new: true, session });
+          const updatedInvoice = await Invoice.findByIdAndUpdate(invoice._id, { payment: payment._id, paymentStatus: PaymentStatus.PAID,paymentMethod: payload.paymentMethod }, { new: true, session });
           if (!updatedInvoice) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found**.');
           }
