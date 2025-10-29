@@ -17,6 +17,7 @@ import mongoose from 'mongoose';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
+import { addToBullQueueToCheckInvoicePaymentStatus } from '../../../helpers/redis/queues';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: boolean }>) => {
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
@@ -155,7 +156,7 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
           query,
      );
      console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['description','car']).modelQuery;
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['description', 'car']).modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
@@ -182,6 +183,7 @@ const updateInvoice = async (id: string, payload: Partial<IInvoice & { extraTime
           if (!payload.postPaymentDate && payload.extraTimeForUnpaidPostpaidInvoice) {
                payload.postPaymentDate = isExist.postPaymentDate;
                payload.postPaymentDate.setDate(payload.postPaymentDate.getDate() + payload.extraTimeForUnpaidPostpaidInvoice);
+               await addToBullQueueToCheckInvoicePaymentStatus(id, isExist.client.toString(), Number(payload.extraTimeForUnpaidPostpaidInvoice));
           }
      }
 
@@ -260,7 +262,7 @@ const releaseInvoice = async (invoiceId: string) => {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*.*.');
      }
      await releaseInvoiceToWhatsApp(result);
-     
+
      return result;
 };
 

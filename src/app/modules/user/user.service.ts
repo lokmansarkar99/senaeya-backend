@@ -63,7 +63,7 @@ const createUserToDB = async (payload: IUser & { helperUserId: { contact: string
           await session.abortTransaction();
           session.endSession();
 
-          throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'User not created.');
+          throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, `User not created. ${error}`);
      }
 };
 
@@ -121,12 +121,11 @@ const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser & { he
      const { id } = user;
      const isExistUser = await User.isExistUserById(id);
      if (!isExistUser) {
+          //unlink file here
+          if (payload.image) {
+               unlinkFile(isExistUser.image);
+          }
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
-     }
-
-     //unlink file here
-     if (payload.image) {
-          unlinkFile(isExistUser.image);
      }
 
      let helperUser = null;
@@ -141,6 +140,13 @@ const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser & { he
      const updateDoc = await User.findOneAndUpdate({ _id: id }, payload, {
           new: true,
      });
+     if (!updateDoc) {
+          //unlink file here
+          if (payload.image) {
+               unlinkFile(isExistUser.image);
+          }
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to update user');
+     }
 
      return updateDoc;
 };
@@ -339,6 +345,16 @@ const unlinkOAuthAccount = async (userId: string, provider: 'google' | 'facebook
      return await User.findByIdAndUpdate(userId, updateData, { new: true });
 };
 
+// update user by admin
+const updateUserById = async (userId: string, payload: Partial<IUser>) => {
+     const user = await User.findById(userId);
+     if (!user) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+     }
+
+     return await User.findByIdAndUpdate(userId, { ...payload }, { new: true });
+};
+
 export const UserService = {
      createUserToDB,
      getUserProfileFromDB,
@@ -359,4 +375,5 @@ export const UserService = {
      getUserStats,
      linkOAuthAccount,
      unlinkOAuthAccount,
+     updateUserById,
 };

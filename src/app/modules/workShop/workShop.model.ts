@@ -19,7 +19,7 @@ const WorkShopSchema = new Schema<IworkShop>(
      {
           workshopNameEnglish: { type: String, required: true, trim: true },
           workshopNameArabic: { type: String, required: true, trim: true },
-          contact: { type: String, required: true, unique: true },
+          contact: { type: String, required: true },
           region: { type: String },
           city: { type: String },
           industrialComplexAreaName: { type: String },

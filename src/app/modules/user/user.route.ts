@@ -13,7 +13,7 @@ router
      .route('/profile')
      .get(auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.SUPER_ADMIN), UserController.getUserProfile)
      .patch(
-          auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER),
+          auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER),
           fileUploadHandler(),
           parseFileData(FOLDER_NAMES.IMAGE),
           validateRequest(UserValidation.updateUserZodSchema),
@@ -32,6 +32,11 @@ router.route('/admin').post(
 router.route('/find/id/:id').get(
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
      UserController.findUserById
+);
+// update user by admin
+router.route('/admin/update/:id').patch(
+     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+     UserController.updateUserById
 );
 
 router.route('/find/email/:email').get(

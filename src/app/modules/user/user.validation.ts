@@ -37,6 +37,8 @@ const updateUserZodSchema = z.object({
           email: z.string().optional(),
           password: z.string().optional(),
           image: z.string().optional(),
+          nationality: z.string().optional(),
+          preferredLanguage: z.string().optional(),
           fingerPrintId: z.string().optional(),
           deviceToken: z.string().optional(),
           fcmToken: z.string().optional(),

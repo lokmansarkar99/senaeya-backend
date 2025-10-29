@@ -22,12 +22,12 @@ ClientSchema.pre('find', function (next) {
 });
 
 ClientSchema.pre('findOne', function (next) {
-     this.findOne({ isDeleted: false, status: CLIENT_STATUS.ACTIVE });
+     this.findOne({ isDeleted: false });
      next();
 });
 
 ClientSchema.pre('aggregate', function (next) {
-     this.pipeline().unshift({ $match: { isDeleted: { $ne: true }, status: CLIENT_STATUS.ACTIVE } });
+     this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
      next();
 });       
 

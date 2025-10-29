@@ -2,10 +2,12 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../errors/AppError';
 import { IcheckPhoneNumber } from './checkPhoneNumber.interface';
 import { CheckPhoneNumber } from './checkPhoneNumber.model';
-import QueryBuilder from '../../builder/QueryBuilder';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import generateOTP from '../../../utils/generateOTP';
+import { CLIENT_STATUS } from '../client/client.enum';
+import { Client } from '../client/client.model';
+import { clientService } from '../client/client.service';
 
 const createCheckPhoneNumber = async (payload: IcheckPhoneNumber) => {
      const isExistPhoneNumber = await CheckPhoneNumber.findOne({ phoneNumber: payload.phoneNumber.trim() });
@@ -29,14 +31,14 @@ const createCheckPhoneNumber = async (payload: IcheckPhoneNumber) => {
      });
 
      const result = await CheckPhoneNumber.create({ phoneNumber: payload.phoneNumber.trim(), otp });
+     const isAlreadyBlocked = await Client.findOne({ contact: payload.phoneNumber.trim() }).select('status');
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'CheckPhoneNumber not found.');
      }
-     return { message: 'otp sent successfully.' };
+     return { message: 'otp sent successfully.', isAlreadyBlocked: isAlreadyBlocked?.status === CLIENT_STATUS.BLOCK };
 };
 
 const getCheckPhoneNumberByPhoneNumber = async (phoneNumber: string, otp: number) => {
-     console.log("🚀 ~ getCheckPhoneNumberByPhoneNumber ~ phoneNumber: string, otp: number:", phoneNumber, otp)
      const isExistPhoneNumber = await CheckPhoneNumber.findOne({ phoneNumber: phoneNumber.trim(), otp: Number(otp) });
      if (!isExistPhoneNumber) {
           throw new AppError(StatusCodes.NOT_FOUND, 'CheckPhoneNumber not found...*.');

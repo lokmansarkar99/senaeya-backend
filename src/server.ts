@@ -10,6 +10,9 @@ import { socketHelper } from './helpers/socketHelper';
 import { setupProcessHandlers } from './DB/processHandlers';
 import { setupSecurity } from './DB/security';
 import { setupCluster } from './DB/cluster';
+import { redisClient } from './helpers/redis/redis';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { startScheduleWorker, startScheduleWorker } from './helpers/redis/queues';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -26,7 +29,6 @@ export async function startServer() {
           httpServer = createServer(app);
           const httpPort = Number(config.port);
           const ipAddress = config.ip_address as string;
-  
 
           // Set timeouts
           httpServer.timeout = 120000;
@@ -40,15 +42,25 @@ export async function startServer() {
 
           // Set up Socket.io server on same port as HTTP server
           socketServer = new SocketServer(httpServer, {
+               pingTimeout: 60000,
                cors: {
                     origin: config.allowed_origins || '*',
                },
           });
 
+          const pubClient = redisClient;
+          const subClient = pubClient.duplicate();
+
+          logger.info(colors.green('🍁 Redis connected successfully'));
+
+          socketServer.adapter(createAdapter(pubClient, subClient));
           socketHelper.socket(socketServer);
           //@ts-ignore
           global.io = socketServer;
           logger.info(colors.yellow(`♻️  Socket is listening on same port ${httpPort}`));
+
+          // 🔥 Start BullMQ Worker (listens for schedule jobs)
+          startScheduleWorker();
      } catch (error) {
           logger.error(colors.red('Failed to start server'), error);
           process.exit(1);

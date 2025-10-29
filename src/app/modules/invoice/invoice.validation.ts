@@ -85,6 +85,28 @@ const updateInvoiceZodSchema = z.object({
           paymentStatus: z.nativeEnum(PaymentStatus, { required_error: 'Payment Status is required' }).optional(),
           postPaymentDate: z.string().optional(),
           extraTimeForUnpaidPostpaidInvoice: z.number().default(5).optional(),
+     })
+     .superRefine((body, ctx) => {
+          if (body.paymentMethod === PaymentMethod.POSTPAID) {
+               // These fields are required for POSTPAID paymentMethod
+               const requiredFields: (keyof typeof body)[] = ['postPaymentDate'];
+               requiredFields.forEach((field) => {
+                    if (!body[field]) {
+                         ctx.addIssue({
+                              path: [field],
+                              message: `${field} is required for "POSTPAID" paymentMethod`,
+                              code: z.ZodIssueCode.custom,
+                         });
+                    }
+               });
+          } else {
+               // These fields are required for CASH paymentMethod
+               const deleteFields: (keyof typeof body)[] = ['postPaymentDate'];
+               deleteFields.forEach((field) => {
+                    delete body[field];
+               });
+
+          }
      }),
 });
 
