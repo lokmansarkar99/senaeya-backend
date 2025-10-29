@@ -46,49 +46,6 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
      const session = await mongoose.startSession();
      session.startTransaction();
      try {
-          // // Pre-process spare parts: check existence and create missing ones in parallel
-          // if (payload?.sparePartsList && payload?.sparePartsList?.length > 0) {
-          //      // Collect unique codes with itemNames for batch existence check if possible, but since itemName must match,
-          //      // parallel individual checks are efficient and simple
-          //      await Promise.all(
-          //           payload.sparePartsList.map(async (sparePart) => {
-          //                try {
-          //                     // Check if spare part with this code and item already exists
-          //                     // Note: Using 'item' to match schema field; assuming 'itemName' in payload maps to 'item' in DB
-          //                     const existingSparePart = await SpareParts.findOne(
-          //                          {
-          //                               code: sparePart.code.toLowerCase(),
-          //                               itemName: sparePart.itemName,
-          //                          },
-          //                          null, // Explicit null projection to avoid misinterpreting options as projection
-          //                          { session },
-          //                     );
-
-          //                     if (!existingSparePart) {
-          //                          const title = await buildTranslatedField(sparePart.itemName);
-          //                          const sparePartData = {
-          //                               providerWorkShopId: payload.providerWorkShopId,
-          //                               itemName: sparePart.itemName,
-          //                               code: sparePart.code.toLowerCase(),
-          //                               title,
-          //                          };
-
-          //                          const [newSparePart] = await SpareParts.create([sparePartData], { session });
-
-          //                          if (!newSparePart) {
-          //                               // Use a more appropriate error; this should rarely happen if create succeeds
-          //                               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create spare part.');
-          //                          }
-          //                          console.log('🚀 ~ createInvoice ~ newSparePart created:', newSparePart._id);
-          //                     }
-          //                } catch (error) {
-          //                     console.error('Error processing spare part:', error);
-          //                     // Continue with other spare parts; transaction will proceed but may have partial data
-          //                }
-          //           }),
-          //      );
-          // }
-
           // In the createInvoice method, replace the spare parts processing code with:
           if (payload?.sparePartsList && payload?.sparePartsList?.length > 0) {
                // Add each spare part to the queue for background processing
