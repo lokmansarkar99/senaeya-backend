@@ -7,7 +7,7 @@ const ClientSchema = new Schema<IClient>({
      clientType: { type: String, enum: CLIENT_TYPE, required: true },
      clientId: { type: String, refPath: 'clientType', required: false, unique: true },
      contact: { type: String, required: true, index: true },
-     workNameAsClient: { type: String, required: false, index: true },
+     workShopNameAsClient: { type: String, required: false, index: true },
      cars: { type: [Schema.Types.ObjectId], ref: 'Car', required: true, default: [] },
      invoices: { type: [Schema.Types.ObjectId], ref: 'Invoice', required: true, default: [] },
      documentNumber: { type: String, required: false },

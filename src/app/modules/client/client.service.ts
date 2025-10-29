@@ -41,11 +41,11 @@ import { workShopService } from '../workShop/workShop.service';
 
 const createClient = async (payload: any) => {
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          let isExistClient = await Client.findOne({ workNameAsClient: payload.workNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
+          let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
                isExistClient = await Client.create({
                     clientType: payload.clientType,
-                    workNameAsClient: payload.workNameAsClient,
+                    workShopNameAsClient: payload.workShopNameAsClient,
                     documentNumber: payload.documentNumber || null,
                     providerWorkShopId: payload.providerWorkShopId,
                     contact: payload.contact,
