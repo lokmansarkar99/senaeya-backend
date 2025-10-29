@@ -7,7 +7,7 @@ export interface IClient {
      clientId?: string;
      workNameAsClient?: string;
      contact: string;
-     documentNumber: string | null; // ref: Document
+     documentNumber?: string | null; // ref: Document
      cars: Types.ObjectId[]; // servicetaken for as client ref: Car
      invoices: Types.ObjectId[]; // service taken for as client ref: Invoice
      createdAt: Date;

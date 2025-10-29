@@ -14,6 +14,7 @@ const createClientZodSchema = z.object({
                name: z.string().optional(),
                contact: z.string().optional(),
                description: z.string().optional(),
+               documentNumber: z.string().optional(),
                carType: z.nativeEnum(CLIENT_CAR_TYPE).optional(),
                plateNumberForInternational: z.string().optional(),
                plateNumberForSaudi: z

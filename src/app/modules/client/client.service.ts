@@ -46,7 +46,7 @@ const createClient = async (payload: any) => {
                isExistClient = await Client.create({
                     clientType: payload.clientType,
                     workNameAsClient: payload.workNameAsClient,
-                    documentNumber: payload.documentNumber,
+                    documentNumber: payload.documentNumber || null,
                     providerWorkShopId: payload.providerWorkShopId,
                     contact: payload.contact,
                });
@@ -87,7 +87,7 @@ const createClient = async (payload: any) => {
                               {
                                    clientType: payload.clientType,
                                    clientId: isExistUser._id,
-                                   documentNumber: payload.documentNumber,
+                                   documentNumber: payload.documentNumber || null,
                                    providerWorkShopId: payload.providerWorkShopId,
                                    contact: payload.contact,
                               },

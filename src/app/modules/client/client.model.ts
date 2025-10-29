@@ -10,7 +10,7 @@ const ClientSchema = new Schema<IClient>({
      workNameAsClient: { type: String, required: false, index: true },
      cars: { type: [Schema.Types.ObjectId], ref: 'Car', required: true, default: [] },
      invoices: { type: [Schema.Types.ObjectId], ref: 'Invoice', required: true, default: [] },
-     documentNumber: { type: String, required: true },
+     documentNumber: { type: String, required: false },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },
      status: { type: String, enum: CLIENT_STATUS, default: CLIENT_STATUS.ACTIVE },
