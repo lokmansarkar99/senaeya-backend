@@ -6,6 +6,8 @@ import { Invoice } from '../../../app/modules/invoice/invoice.model';
 import { User } from '../../../app/modules/user/user.model';
 import { CLIENT_STATUS, CLIENT_TYPE } from '../../../app/modules/client/client.enum';
 import { Client } from '../../../app/modules/client/client.model';
+import { SpareParts } from '../../../app/modules/spareParts/spareParts.model';
+import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 
 // Create a reusable connection for BullMQ
 export const connection = {
@@ -65,19 +67,78 @@ const shutdown = async () => {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-export default {
-     emailQueue,
-     emailWorker,
-};
+// Spare Parts Queue
+export const sparePartsQueue = new Queue('sparePartsQueue', {
+     connection,
+     defaultJobOptions: {
+          attempts: 3,
+          backoff: {
+               type: 'exponential',
+               delay: 2000,
+          },
+          removeOnComplete: {
+               age: 24 * 3600, // Keep jobs for 24 hours after completion
+               count: 5000, // Keep up to 5000 jobs
+          },
+          removeOnFail: {
+               age: 7 * 24 * 3600, // Keep failed jobs for 7 days
+          },
+     },
+});
 
-// // Example of adding a job to the queue
-// await emailQueue.add('send-email', {
-//   to: 'user@example.com',
-//   subject: 'Hello',
-//   body: 'This is a test email'
-// }, {
-//   // Optional job options
-//   delay: 1000, // Delay in ms
+// Spare Parts Worker
+export const sparePartsWorker = new Worker(
+     'sparePartsQueue',
+     async (job) => {
+          const { sparePart } = job.data;
+          
+          try {
+               // Check if spare part with this code and item already exists
+               const existingSparePart = await SpareParts.findOne(
+                    {
+                         code: sparePart.code.toLowerCase(),
+                         itemName: sparePart.itemName,
+                    },
+                    null,
+               );
+
+               if (!existingSparePart) {
+                    const title = await buildTranslatedField(sparePart.itemName);
+                    const sparePartData = {
+                         providerWorkShopId: sparePart.providerWorkShopId,
+                         itemName: sparePart.itemName,
+                         code: sparePart.code.toLowerCase(),
+                         title,
+                    };
+
+                    const newSparePart = await SpareParts.create(sparePartData);
+
+                    if (!newSparePart) {
+                         throw new Error('Failed to create spare part');
+                    }
+                    
+                    console.log('Successfully processed spare part:', newSparePart._id);
+               }
+          } catch (error) {
+               console.error('Error processing spare part job:', error);
+               throw error; // This will trigger the retry mechanism
+          }
+     },
+     {
+          connection,
+          concurrency: 5, // Process up to 5 jobs in parallel
+          autorun: true,
+     },
+);
+
+// Handle worker events
+sparePartsWorker.on('completed', (job, result) => {
+     console.log(`Spare parts job ${job.id} completed`, result);
+});
+
+sparePartsWorker.on('failed', (job, error) => {
+     errorLogger.error(`Spare parts job ${job?.id} failed:`, error);
+});
 //   attempts: 3, // Override default attempts if needed
 // });
 
