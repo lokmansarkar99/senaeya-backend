@@ -30,7 +30,7 @@ const auth =
                          }
 
                          //  user cheak isUserExist or not
-                         const user = await User.isExistUserById(verifyUser.id);
+                         const user = await User.isExistUserByContact(verifyUser.contact);
                          if (!user) {
                               throw new AppError(StatusCodes.NOT_FOUND, 'This user is not found !!');
                          }
