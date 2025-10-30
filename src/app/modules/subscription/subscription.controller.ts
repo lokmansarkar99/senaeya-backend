@@ -81,6 +81,18 @@ const deleteSubscriptionPackageToDB = catchAsync(async (req, res) => {
           data: result,
      });
 });
+
+const getSubscriptionById = catchAsync(async (req, res) => {
+     const subscriptionId = req.params.id;
+     const result = await SubscriptionService.getSubscriptionByIdToDB(subscriptionId);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Get subscription successfully',
+          data: result,
+     });
+});
 export const SubscriptionController = {
      subscriptions,
      subscriptionDetails,
@@ -90,4 +102,5 @@ export const SubscriptionController = {
      orderSuccess,
      orderCancel,
      deleteSubscriptionPackageToDB,
+     getSubscriptionById
 };

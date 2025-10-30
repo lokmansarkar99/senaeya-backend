@@ -256,6 +256,14 @@ const deleteSubscriptionPackageToDB = async (packageId: string) => {
      });
      return subscription;
 };
+
+const getSubscriptionByIdToDB = async (subscriptionId: string) => {
+     const subscription = await Subscription.findById(subscriptionId);
+     if (!subscription) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
+     }
+     return subscription;
+};
 export const SubscriptionService = {
      subscriptionDetailsFromDB,
      subscriptionsFromDB,
@@ -265,4 +273,5 @@ export const SubscriptionService = {
      cancelSubscriptionToDB,
      successMessage,
      deleteSubscriptionPackageToDB,
+     getSubscriptionByIdToDB
 };
