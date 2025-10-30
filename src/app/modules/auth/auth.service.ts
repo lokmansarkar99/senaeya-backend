@@ -31,13 +31,29 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
 
+     let info = {};
+
      if (fcmToken && deviceId) {
           const existingToken = await DeviceToken.findOne({
                userId: isExistUser._id,
-               deviceId: deviceId,
           });
 
           if (existingToken) {
+               if (existingToken.deviceId !== deviceId && existingToken.deviceType !== deviceType) {
+                    info = {
+                         message: `Updated FCM token for user ${isExistUser._id}, device ${deviceId}`,
+                         oldDeviceId: existingToken.deviceId,
+                         presentDeviceId: deviceId,
+                    };
+
+                    existingToken.deviceId = deviceId;
+                    existingToken.deviceType = deviceType;
+                    // use socket to emit event
+                    //@ts-ignore
+                    const socketIo = global.io;
+                    socketIo.emit(`notification::${isExistUser._id}`, info);
+               }
+
                existingToken.fcmToken = fcmToken;
                existingToken.deviceType = deviceType;
                await existingToken.save();
@@ -71,7 +87,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
      if (!(await User.isMatchPassword(password, isExistUser.password || ''))) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
      }
-     const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact };
+     const jwtData: any = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, deviceId: deviceId || '' };
      let workshops;
      if (isExistUser.role === USER_ROLES.WORKSHOP_MEMBER || isExistUser.role === USER_ROLES.WORKSHOP_OWNER) {
           const userWorkShops = await workShopService.getAllWorkShops({ ownerId: isExistUser._id, fields: '_id,workshopNameEnglish' });
@@ -89,7 +105,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
 };
 
 const loginUserWithFingerPrint = async (payload: ILoginData) => {
-     const { fingerPrintId } = payload;
+     const { fingerPrintId, fcmToken, deviceId, deviceType = 'android' } = payload;
 
      const isExistUser = await User.findOne({ fingerPrintId });
      if (!isExistUser) {
@@ -101,7 +117,45 @@ const loginUserWithFingerPrint = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You do not have permission to access this content. It looks like your account has been blocked.');
      }
 
-     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact };
+     let info = {};
+
+     if (fcmToken && deviceId) {
+          const existingToken = await DeviceToken.findOne({
+               userId: isExistUser._id,
+          });
+
+          if (existingToken) {
+               if (existingToken.deviceId !== deviceId && existingToken.deviceType !== deviceType) {
+                    info = {
+                         message: `Updated FCM token for user ${isExistUser._id}, device ${deviceId}`,
+                         oldDeviceId: existingToken.deviceId,
+                         presentDeviceId: deviceId,
+                    };
+
+                    existingToken.deviceId = deviceId;
+                    existingToken.deviceType = deviceType;
+                    // use socket to emit event
+                    //@ts-ignore
+                    const socketIo = global.io;
+                    socketIo.emit(`notification::${isExistUser._id}`, info);
+               }
+
+               existingToken.fcmToken = fcmToken;
+               existingToken.deviceType = deviceType;
+               await existingToken.save();
+               console.log(`Updated FCM token for user ${isExistUser._id}, device ${deviceId}`);
+          } else {
+               await DeviceToken.create({
+                    userId: isExistUser._id,
+                    fcmToken,
+                    deviceId,
+                    deviceType,
+               });
+               console.log(`Created new FCM token for user ${isExistUser._id}, device ${deviceId}`);
+          }
+     }
+
+     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email || '', contact: isExistUser.contact, deviceId: deviceId || '' };
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
@@ -350,6 +404,7 @@ const refreshToken = async (token: string) => {
 
      return { accessToken };
 };
+
 export const AuthService = {
      verifyEmailToDB,
      loginUserFromDB,
