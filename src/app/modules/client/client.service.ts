@@ -153,7 +153,7 @@ const getAllUnpaginatedClients = async (): Promise<IClient[]> => {
 const updateClient = async (id: string, payload: Partial<IClient>): Promise<IClient | null> => {
      const isExist = await Client.findOne({ _id: id });
      if (!isExist) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.1');
      }
      return await Client.findByIdAndUpdate(id, payload, { new: true });
 };
@@ -161,7 +161,7 @@ const updateClient = async (id: string, payload: Partial<IClient>): Promise<ICli
 const deleteClient = async (id: string): Promise<IClient | null> => {
      const result = await Client.findOne({ _id: id });
      if (!result) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.2');
      }
      result.isDeleted = true;
      result.deletedAt = new Date();
@@ -172,7 +172,7 @@ const deleteClient = async (id: string): Promise<IClient | null> => {
 const hardDeleteClient = async (id: string): Promise<IClient | null> => {
      const result = await Client.findOneAndDelete({ _id: id });
      if (!result) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.3');
      }
      return result;
 };
@@ -185,7 +185,7 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
      const client = await Client.findOne({ contact, providerWorkShopId }).populate('clientId', 'documentNumber workshopNameEnglish workshopNameArabic');
      if (!client) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.4');
      }
 
      const carOfClient = await Car.findOne({ client: client._id })
@@ -214,7 +214,7 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
 const toggleClientStatus = async (id: string): Promise<IClient | null> => {
      const [result] = await Client.find({ _id: id });
      if (!result) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.5');
      }
      result.status = result.status === CLIENT_STATUS.ACTIVE ? CLIENT_STATUS.BLOCK : CLIENT_STATUS.ACTIVE;
      await result.save();
@@ -226,7 +226,7 @@ const toggleClientStatus = async (id: string): Promise<IClient | null> => {
 const sendMessageToRecieveCar = async (id: string, providerWorkShopId: string) => {
      const [result] = await Client.find({ _id: id });
      if (!result) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.6');
      }
      const workShop = await WorkShop.findById(providerWorkShopId).select('workshopNameEnglish workshopNameArabic');
      //send message

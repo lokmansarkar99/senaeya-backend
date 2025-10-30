@@ -91,13 +91,13 @@ InvoiceSchema.pre('validate', async function (next) {
      let isExistWorks: any[] = [];
      let isExistSpareParts: any[] = [];
 
-     const isExistClient = await Client.findOne({ _id: payload.client, providerWorkShopId: payload.providerWorkShopId });
+     const isExistClient = await Client.findOne({ _id: payload.client});
      if (!isExistClient) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.7');
      }
 
      if (payload.car) {
-          const isExistCar = await Car.findOne({ _id: payload.car, providerWorkShopId: payload.providerWorkShopId });
+          const isExistCar = await Car.findOne({ _id: payload.car });
           if (!isExistCar) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
           }

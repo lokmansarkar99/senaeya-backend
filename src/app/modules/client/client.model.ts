@@ -5,7 +5,7 @@ import { CLIENT_TYPE, CLIENT_STATUS } from './client.enum';
 const ClientSchema = new Schema<IClient>({
      providerWorkShopId:{ type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
      clientType: { type: String, enum: CLIENT_TYPE, required: true },
-     clientId: { type: String, refPath: 'clientType', required: false, unique: true },
+     clientId: { type: String, refPath: 'clientType', required: false},
      contact: { type: String, required: true, index: true },
      workShopNameAsClient: { type: String, required: false, index: true },
      cars: { type: [Schema.Types.ObjectId], ref: 'Car', required: true, default: [] },

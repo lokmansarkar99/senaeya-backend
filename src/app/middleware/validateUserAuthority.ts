@@ -44,7 +44,7 @@ const validateUserAuthority = () => {
                               }
                          }
                     }
-                    if (workShop.ownerId.toString() !== user!.id && workShop.helperUserId!.toString() !== user!.id) {
+                    if (workShop?.ownerId?.toString() !== user!.id && workShop?.helperUserId?.toString() !== user!.id) {
                          throw new Error('You are not authorized to perform this action');
                     }
                }
