@@ -39,7 +39,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
           });
 
           if (existingToken) {
-               if (existingToken.deviceId !== deviceId && existingToken.deviceType !== deviceType) {
+               if (existingToken.deviceId !== deviceId) {
                     info = {
                          message: `Updated FCM token for user ${isExistUser._id}, device ${deviceId}`,
                          oldDeviceId: existingToken.deviceId,
@@ -47,7 +47,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
                     };
 
                     existingToken.deviceId = deviceId;
-                    existingToken.deviceType = deviceType;
+                    deviceType && (existingToken.deviceType = deviceType);
                     // use socket to emit event
                     //@ts-ignore
                     const socketIo = global.io;
@@ -55,7 +55,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
                }
 
                existingToken.fcmToken = fcmToken;
-               existingToken.deviceType = deviceType;
+               deviceType && (existingToken.deviceType = deviceType);
                await existingToken.save();
                console.log(`Updated FCM token for user ${isExistUser._id}, device ${deviceId}`);
           } else {

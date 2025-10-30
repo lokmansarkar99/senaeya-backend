@@ -5,56 +5,69 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import { verifyToken } from '../../utils/verifyToken';
 import { User } from '../modules/user/user.model';
+import DeviceToken from '../modules/DeviceToken/DeviceToken.model';
 
 const auth =
      (...roles: string[]) =>
-          async (req: Request, res: Response, next: NextFunction) => {
-               try {
-                    const tokenWithBearer = req.headers.authorization;
-                    if (!tokenWithBearer) {
+     async (req: Request, res: Response, next: NextFunction) => {
+          try {
+               const tokenWithBearer = req.headers.authorization;
+               if (!tokenWithBearer) {
+                    throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized !!');
+               }
+               if (!tokenWithBearer.startsWith('Bearer')) {
+                    throw new AppError(StatusCodes.UNAUTHORIZED, 'Token send is not valid !!');
+               }
+
+               if (tokenWithBearer && tokenWithBearer.startsWith('Bearer')) {
+                    const token = tokenWithBearer.split(' ')[1];
+
+                    //verify token
+                    let verifyUser: any;
+                    try {
+                         verifyUser = verifyToken(token, config.jwt.jwt_secret as Secret);
+                    } catch (error) {
                          throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized !!');
                     }
-                    if (!tokenWithBearer.startsWith('Bearer')) {
-                         throw new AppError(StatusCodes.UNAUTHORIZED, 'Token send is not valid !!');
+
+                    if (verifyUser.deviceId) {
+                         const existingToken = await DeviceToken.findOne({
+                              userId: verifyUser.id,
+                         });
+                         if (!existingToken) {
+                              throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
+                         }
+                         if (existingToken.deviceId !== verifyUser.deviceId) {
+                              throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
+                         }
                     }
 
-                    if (tokenWithBearer && tokenWithBearer.startsWith('Bearer')) {
-                         const token = tokenWithBearer.split(' ')[1];
-
-                         //verify token
-                         let verifyUser: any;
-                         try {
-                              verifyUser = verifyToken(token, config.jwt.jwt_secret as Secret);
-                         } catch (error) {
-                              throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized !!');
-                         }
-
-                         //  user cheak isUserExist or not
-                         const user = await User.isExistUserByContact(verifyUser.contact);
-                         if (!user) {
-                              throw new AppError(StatusCodes.NOT_FOUND, 'This user is not found !!');
-                         }
-
-                         if (user?.status === 'blocked') {
-                              throw new AppError(StatusCodes.FORBIDDEN, 'This user is blocked !!');
-                         }
-
-                         if (user?.isDeleted) {
-                              throw new AppError(StatusCodes.FORBIDDEN, 'This user accaunt is deleted !!');
-                         }
-
-                         //guard user
-                         if (roles.length && !roles.includes(verifyUser?.role)) {
-                              throw new AppError(StatusCodes.FORBIDDEN, "You don't have permission to access this api !!");
-                         }
-
-                         //set user to header
-                         req.user = verifyUser;
-                         next();
+                    //  user cheak isUserExist or not
+                    const user = await User.isExistUserByContact(verifyUser.contact);
+                    if (!user) {
+                         throw new AppError(StatusCodes.NOT_FOUND, 'This user is not found !!');
                     }
-               } catch (error) {
-                    next(error);
+
+                    if (user?.status === 'blocked') {
+                         throw new AppError(StatusCodes.FORBIDDEN, 'This user is blocked !!');
+                    }
+
+                    if (user?.isDeleted) {
+                         throw new AppError(StatusCodes.FORBIDDEN, 'This user accaunt is deleted !!');
+                    }
+
+                    //guard user
+                    if (roles.length && !roles.includes(verifyUser?.role)) {
+                         throw new AppError(StatusCodes.FORBIDDEN, "You don't have permission to access this api !!");
+                    }
+
+                    //set user to header
+                    req.user = verifyUser;
+                    next();
                }
-          };
+          } catch (error) {
+               next(error);
+          }
+     };
 
 export default auth;
