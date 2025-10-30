@@ -133,9 +133,9 @@ InvoiceSchema.pre('validate', async function (next) {
      let totalCostExcludingTax = totalCostOfWorkShopExcludingTax + totalCostOfSparePartsExcludingTax;
 
      let vat = default_vat;
-     const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('vat');
-     if (workShopSettings) {
-          vat = workShopSettings.vat as number;
+     const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
+     if (appSettings) {
+          vat = appSettings.defaultVat as number;
      }
 
      // taxAmount
@@ -146,6 +146,10 @@ InvoiceSchema.pre('validate', async function (next) {
 
      // discount
      let finalDiscountInFlatAmount = default_discount;
+     const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
+     if (workShopSettings) {
+          finalDiscountInFlatAmount = workShopSettings.workShopDiscount as number;
+     }
      if (payload.discount && payload.discountType) {
           finalDiscountInFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (totalCostExcludingTax * payload.discount) / 100 : payload.discount;
      }

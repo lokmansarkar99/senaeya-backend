@@ -3,7 +3,7 @@ import { z } from 'zod';
 const createUpdateSettingsZodSchemaForWorkshop = z.object({
      body: z.object({
           providerWorkShopId: z.string(),
-          vat: z.number().optional(),
+          workShopDiscount: z.number().optional(),
      }),
 });
 
@@ -14,9 +14,11 @@ const createUpdateSettingsZodSchemaForApp = z.object({
                aboutUs: z.string().optional(),
                support: z.string().optional(),
                termsOfService: z.string().optional(),
+               allowedInvoicesCountForFreeUsers: z.number(),
+               defaultVat: z.number(),
           })
           .superRefine((body, ctx) => {
-               const allowedFieldsToModifyForApp: (keyof typeof body)[] = ['privacyPolicy', 'aboutUs', 'support', 'termsOfService'];
+               const allowedFieldsToModifyForApp: (keyof typeof body)[] = ['privacyPolicy', 'aboutUs', 'support', 'termsOfService', 'allowedInvoicesCountForFreeUsers', 'defaultVat'];
                const fieldsToModifyforApp = Object.keys(body);
                // check if any field is not allowed to modify
                const invalidFields = fieldsToModifyforApp.filter((field) => !allowedFieldsToModifyForApp.includes(field as keyof typeof body));

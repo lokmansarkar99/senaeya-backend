@@ -5,6 +5,7 @@ import { IUser } from '../modules/user/user.interface';
 import { USER_ROLES } from '../../enums/user';
 import { MAX_FREE_INVOICE_COUNT } from '../modules/workShop/workshop.enum';
 import { sendNotifications } from '../../helpers/notificationsHelper';
+import Settings from '../modules/settings/settings.model';
 
 const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
@@ -19,9 +20,12 @@ const validateUserAuthority = () => {
                     // prevent trail limit expired or suscription expired
                     if (req.body.sparePartsList || req.body.worksList) {
                          if (!workShop.subscribedPackage) {
-                              console.log('🚀 ~ validateUserAuthority ~ workShop.generatedInvoiceCount:', workShop.generatedInvoiceCount);
-                              console.log('🚀 ~ validateUserAuthority ~ MAX_FREE_INVOICE_COUNT:', MAX_FREE_INVOICE_COUNT);
-                              if (workShop.generatedInvoiceCount >= MAX_FREE_INVOICE_COUNT) {
+                              let maxFreeInvoiceCount = MAX_FREE_INVOICE_COUNT;
+                              const workShopSettings = await Settings.findOne({ providerWorkShopId }).select('allowedInvoicesCountForFreeUsers');
+                              if (workShopSettings) {
+                                   maxFreeInvoiceCount = workShopSettings.allowedInvoicesCountForFreeUsers;
+                              }
+                              if (workShop.generatedInvoiceCount >= maxFreeInvoiceCount) {
                                    throw new Error('Plz do subscribe');
                               }
                          } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {

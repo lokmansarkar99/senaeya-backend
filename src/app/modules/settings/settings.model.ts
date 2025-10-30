@@ -6,28 +6,30 @@ const settingsSchema = new Schema<ISettings>(
           providerWorkShopId: {
                type: Types.ObjectId,
                ref: 'WorkShop',
-               default: null, // null for app settings and not null for specific provider settings
+               default: undefined, // null for app settings and not null for specific provider settings
                unique: true,
           },
-          vat: {
+          workShopDiscount: {
                type: Number,
-               default: 0,
+               default: undefined,
           },
           privacyPolicy: {
                type: String,
-               default: '',
           },
           aboutUs: {
                type: String,
-               default: '',
           },
           support: {
                type: String,
-               default: '',
           },
           termsOfService: {
                type: String,
-               default: '',
+          },
+          allowedInvoicesCountForFreeUsers: {
+               type: Number,
+          },
+          defaultVat: {
+               type: Number,
           },
      },
      { timestamps: true },

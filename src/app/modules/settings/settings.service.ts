@@ -12,6 +12,12 @@ const upsertSettings = async (data: Partial<ISettings>): Promise<ISettings> => {
           });
           return updatedSettings!;
      } else {
+          if (!data.allowedInvoicesCountForFreeUsers) {
+               data.allowedInvoicesCountForFreeUsers = 0;
+          }
+          if (!data.defaultVat) {
+               data.defaultVat = 0;
+          }
           const newSettings = await Settings.create(data);
           if (!newSettings) {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to add settings');
@@ -73,6 +79,16 @@ const getAccountDelete = async () => {
 
 const addWorkshopSetting = async (data: Partial<ISettings>) => {
      const existingSettings = await Settings.findOne({ providerWorkShopId: data.providerWorkShopId });
+     const workShopSettingsDTO = {
+          providerWorkShopId: data.providerWorkShopId,
+          workShopDiscount: data.workShopDiscount,
+          allowedInvoicesCountForFreeUsers: data.allowedInvoicesCountForFreeUsers || undefined,
+          defaultVat: data.defaultVat || undefined,
+          privacyPolicy: data.privacyPolicy || undefined,
+          aboutUs: data.aboutUs || undefined,
+          support: data.support || undefined,
+          termsOfService: data.termsOfService || undefined,
+     };
      if (existingSettings) {
           const updatedSettings = await Settings.findOneAndUpdate({ providerWorkShopId: data.providerWorkShopId }, data, {
                new: true,
