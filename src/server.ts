@@ -12,7 +12,7 @@ import { setupSecurity } from './DB/security';
 import { setupCluster } from './DB/cluster';
 import { redisClient } from './helpers/redis/redis';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { startScheduleWorker, startScheduleWorker } from './helpers/redis/queues';
+import { startScheduleWorker } from './helpers/redis/queues';
 
 // Define the types for the servers
 let httpServer: HttpServer;
