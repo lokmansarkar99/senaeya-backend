@@ -10,7 +10,7 @@ router.get('/details', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.s
 router.get('/success', SubscriptionController.orderSuccess);
 router.get('/cancel', SubscriptionController.orderCancel);
 router.post('/create-checkout-session/:id', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.createCheckoutSession);
-router.post('/update/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.updateSubscription);
+router.patch('/update/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.updateSubscription);
 router.delete('/cancel/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.cancelSubscription);
 router.delete('/delete/package/:packageId', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.deleteSubscriptionPackageToDB);
 

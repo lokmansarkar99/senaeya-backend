@@ -31,8 +31,7 @@ const getPackage = catchAsync(async (req, res) => {
           statusCode: StatusCodes.OK,
           success: true,
           message: 'Package Retrieved Successfully',
-          data: result.packages,
-          meta: result.meta,
+          data: result
      });
 });
 const getPackageByUser = catchAsync(async (req, res) => {
