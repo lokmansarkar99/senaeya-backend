@@ -13,5 +13,6 @@ router
      .post(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateRequest(PackageValidation.createPackageZodSchema), PackageController.createPackage)
 router.get('/users', auth(USER_ROLES.WORKSHOP_OWNER), PackageController.getPackageByUser);
 router.route('/:id').patch(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PackageController.updatePackage).delete(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PackageController.deletePackage);
+router.get('/:id', PackageController.getPackageById);
 
 export const PackageRoutes = router;

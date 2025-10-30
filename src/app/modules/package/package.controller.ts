@@ -67,6 +67,17 @@ const deletePackage = catchAsync(async (req, res) => {
      });
 });
 
+const getPackageById = catchAsync(async (req, res) => {
+     const result = await PackageService.getPackageByIdFromDB(req.params.id);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Package Details Retrieved Successfully',
+          data: result,
+     });
+});
+
 export const PackageController = {
      createPackage,
      updatePackage,
@@ -74,4 +85,5 @@ export const PackageController = {
      packageDetails,
      deletePackage,
      getPackageByUser,
+     getPackageById,
 };

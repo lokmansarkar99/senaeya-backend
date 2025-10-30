@@ -102,6 +102,17 @@ const deletePackageToDB = async (id: string): Promise<IPackage | null> => {
      }
 };
 
+const getPackageByIdFromDB = async (id: string): Promise<IPackage | null> => {
+     if (!mongoose.Types.ObjectId.isValid(id)) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid ID');
+     }
+     const result = await Package.findById(id);
+     if (!result) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Package not found');
+     }
+     return result;
+};
+
 export const PackageService = {
      createPackageToDB,
      updatePackageToDB,
@@ -109,4 +120,5 @@ export const PackageService = {
      getPackageDetailsFromDB,
      deletePackageToDB,
      getPackageByUserFromDB,
+     getPackageByIdFromDB,
 };
