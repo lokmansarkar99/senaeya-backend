@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { Imessage } from './message.interface';
+import { MessageStatus } from './message.enum';
 
 const MessageSchema = new Schema<Imessage>({
      providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
@@ -9,6 +10,7 @@ const MessageSchema = new Schema<Imessage>({
      contact: { type: String,required: true },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },
+     status: { type: String, enum: Object.values(MessageStatus), default: MessageStatus.OPEN },
 }, { timestamps: true });
 
 MessageSchema.pre('find', function (next) {

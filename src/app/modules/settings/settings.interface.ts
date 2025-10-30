@@ -6,9 +6,17 @@ export interface ISettings extends Document {
      workShopDiscount?: number | undefined; // for specific provider settings it not for app settings
      // for app ⬇️⬇️⬇️
      privacyPolicy: string;
+     warrantyAndTerms: string;
      aboutUs: string;
      support: string;
      termsOfService: string;
      allowedInvoicesCountForFreeUsers: number;
      defaultVat: number;
+     socialMedia?:{
+          facebook: string;
+          twitter: string;
+          instagram: string;
+          linkedin: string;
+          whatsapp: string;
+     }
 }

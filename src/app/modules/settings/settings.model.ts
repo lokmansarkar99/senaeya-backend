@@ -16,6 +16,9 @@ const settingsSchema = new Schema<ISettings>(
           privacyPolicy: {
                type: String,
           },
+          warrantyAndTerms: {
+               type: String,
+          },
           aboutUs: {
                type: String,
           },
@@ -30,6 +33,9 @@ const settingsSchema = new Schema<ISettings>(
           },
           defaultVat: {
                type: Number,
+          },
+          socialMedia: {
+               type: Object,
           },
      },
      { timestamps: true },

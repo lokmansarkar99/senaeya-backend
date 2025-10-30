@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { MessageStatus } from "./message.enum";
 
 export interface Imessage {
      providerWorkShopId: Types.ObjectId;
@@ -10,6 +11,7 @@ export interface Imessage {
      updatedAt: Date;
      isDeleted: boolean;
      deletedAt?: Date;
+     status:MessageStatus
 }
 
 export type ImessageFilters = {

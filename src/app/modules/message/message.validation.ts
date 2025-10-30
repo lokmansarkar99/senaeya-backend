@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MessageStatus } from './message.enum';
 
 const createMessageZodSchema = z.object({
      body: z.object({
@@ -13,6 +14,7 @@ const createMessageZodSchema = z.object({
                .optional(),
           message: z.string({ required_error: 'message text is required' }),
           name: z.string().optional(),
+          contact: z.string({ required_error: 'contact is required' }),
      }),
 });
 
@@ -20,6 +22,7 @@ const updateMessageZodSchema = z.object({
      body: z.object({
           message: z.string().optional(),
           name: z.string().optional(),
+          status: z.nativeEnum(MessageStatus).optional(),
      }),
 });
 

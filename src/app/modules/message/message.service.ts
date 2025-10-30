@@ -3,6 +3,8 @@ import AppError from '../../../errors/AppError';
 import { Imessage } from './message.interface';
 import { Message } from './message.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { MessageStatus } from './message.enum';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 
 const createMessage = async (payload: Imessage, user: any): Promise<Imessage> => {
      payload.contact = user.contact;
@@ -31,7 +33,16 @@ const updateMessage = async (id: string, payload: Partial<Imessage>): Promise<Im
           throw new AppError(StatusCodes.NOT_FOUND, 'Message not found.');
      }
 
-     return await Message.findByIdAndUpdate(id, payload, { new: true });
+     const updatedMessage = await Message.findByIdAndUpdate(id, payload, { new: true });
+     if (!updatedMessage) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Message not found.');
+     }
+     if (payload.status === MessageStatus.CLOSED) {
+          // send message to whats app
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: updatedMessage.contact, body: `Your message was successfully completed.` });
+     }
+
+     return updatedMessage;
 };
 
 const deleteMessage = async (id: string): Promise<Imessage | null> => {
