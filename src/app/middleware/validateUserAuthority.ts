@@ -17,6 +17,9 @@ const validateUserAuthority = () => {
                     if (!workShop) {
                          throw new Error('Workshop not found');
                     }
+                    if (workShop?.ownerId?.toString() !== user!.id && workShop?.helperUserId?.toString() !== user!.id) {
+                         throw new Error('You are not authorized to perform this action');
+                    }
                     // prevent trail limit expired or suscription expired
                     if (req.body.sparePartsList || req.body.worksList) {
                          if (!workShop.subscribedPackage) {
@@ -43,9 +46,6 @@ const validateUserAuthority = () => {
                                    انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
                               }
                          }
-                    }
-                    if (workShop?.ownerId?.toString() !== user!.id && workShop?.helperUserId?.toString() !== user!.id) {
-                         throw new Error('You are not authorized to perform this action');
                     }
                }
                next();
