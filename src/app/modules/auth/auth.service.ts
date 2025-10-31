@@ -40,11 +40,12 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
           if (existingToken) {
                if (existingToken.deviceId !== deviceId) {
-                    info = {
-                         message: `Updated FCM token for user ${isExistUser._id}, device ${deviceId}`,
-                         oldDeviceId: existingToken.deviceId,
-                         presentDeviceId: deviceId,
-                    };
+                    const info = {
+                         title: `Device Changed`,
+                         receiver: isExistUser._id,
+                         message: `Updated FCM token for user ${isExistUser._id}, presentDevice ${deviceId} | oldDevice ${existingToken.deviceId}`,
+                         type: 'ALERT',
+                    }
 
                     existingToken.deviceId = deviceId;
                     deviceType && (existingToken.deviceType = deviceType);
@@ -101,7 +102,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
 
-     return { accessToken, refreshToken, workshops, role: isExistUser.role };
+     return { accessToken, refreshToken, workshops, role: isExistUser.role, userId: isExistUser._id };
 };
 
 const loginUserWithFingerPrint = async (payload: ILoginData) => {
@@ -166,7 +167,7 @@ const loginUserWithFingerPrint = async (payload: ILoginData) => {
                workshops = userWorkShops.result;
           }
      }
-     return { accessToken, refreshToken, workshops, role: isExistUser.role };
+     return { accessToken, refreshToken, workshops, role: isExistUser.role, userId: isExistUser._id };
 };
 
 //forget password

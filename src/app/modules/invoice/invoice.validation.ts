@@ -30,9 +30,9 @@ const createInvoiceZodSchema = z.object({
                discountType: z.nativeEnum(DiscountType, { required_error: 'Discount Type is required' }).optional(),
                paymentMethod: z.nativeEnum(PaymentMethod, { required_error: 'Payment Method is required' }),
                postPaymentDate: z.string().optional(),
-               isCashRecieved: z.boolean().optional(),
+               isCashRecieved: z.enum(['true', 'false']).optional(),
                cardApprovalCode: z.string().optional(),
-               isRecievedTransfer: z.boolean().optional(),
+               isRecievedTransfer: z.enum(['true', 'false']).optional(),
                isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
           })
           .superRefine((body, ctx) => {

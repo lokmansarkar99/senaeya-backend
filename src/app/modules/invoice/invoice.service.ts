@@ -19,15 +19,18 @@ import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
 import { addToBullQueueToCheckInvoicePaymentStatus, sparePartsQueue } from '../../../helpers/redis/queues';
 import { Payment } from '../payment/payment.model';
+import { generateFatooraQR } from '../../../helpers/qrcode/generateFatooraQr';
 
-const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: boolean; isRecievedTransfer: boolean; cardApprovalCode: string }>) => {
+const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; isRecievedTransfer: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true';
+     const isCashRecieved = payload.isCashRecieved === 'true';
+     const isRecievedTransfer = payload.isRecievedTransfer === 'true';
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
           payload.postPaymentDate = undefined;
           if (payload.paymentMethod == PaymentMethod.CASH) {
-               payload.isCashRecieved == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+               isCashRecieved ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           } else if (payload.paymentMethod == PaymentMethod.TRANSFER) {
-               payload.isRecievedTransfer == true ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+               isRecievedTransfer ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           } else if (payload.paymentMethod == PaymentMethod.CARD) {
                payload.cardApprovalCode ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           }
@@ -149,6 +152,18 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
           if (!populatedResult) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
+          }
+
+          // generate qr code if taxVatNumber is not empty
+          if ((populatedResult.providerWorkShopId as any).taxVatNumber) {
+               const qrPath = await generateFatooraQR({
+                    workshopNameArabic: (populatedResult.providerWorkShopId as any).workshopNameArabic,
+                    taxVatNumber: (populatedResult.providerWorkShopId as any).taxVatNumber,
+                    createdAt: populatedResult.createdAt.toISOString(),
+                    finalCost: populatedResult.finalCost.toString(),
+                    invoiceId: populatedResult._id.toString(),
+               });
+               populatedResult.invoiceQRLink = qrPath;
           }
 
           // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)

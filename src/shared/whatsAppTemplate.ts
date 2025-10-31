@@ -21,515 +21,533 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 };
 
 const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum) => {
-     let titleTag = 'Invoice Report - فاتورة ضريبية مبسطة';
-     let invoiceTitle = 'Simplified Tax Invoice';
-     let simplifiedLable = 'ورة ضريبية مبسطة';
-     let invoiceNo = 'Invoice No.';
-     let invoiceDate = 'Invoice Date';
-     let client = 'Client';
-
-     //  const [titleTagObj, invoiceTitleObj, simplifiedLableObj, invoiceNoObj, invoiceDateObj, clientObj]: any = await Promise.all([
-     //       buildTranslatedField(titleTag as any),
-     //       buildTranslatedField(invoiceTitle as any),
-     //       buildTranslatedField(simplifiedLable as any),
-     //       buildTranslatedField(invoiceNo as any),
-     //       buildTranslatedField(invoiceDate as any),
-     //       buildTranslatedField(client as any),
-     //  ]);
-
-     //  // modify the fields as per require translation
-     //  titleTag = titleTagObj[lang];
-     //  invoiceTitle = invoiceTitleObj[lang];
-     //  simplifiedLable = simplifiedLableObj[lang];
-     //  invoiceNo = invoiceNoObj[lang];
-     //  invoiceDate = invoiceDateObj[lang];
-     //  client = clientObj[lang];
-
      return `
-     <!DOCTYPE html>
-     <html lang="${lang}" dir="rtl">
-     <head>
-         <meta charset="UTF-8">
-         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <title>${titleTag}</title>
-         <style>
-             * {
-                 margin: 0;
-                 padding: 0;
-                 box-sizing: border-box;
-             }
- 
-             body {
-                 font-family: Arial, sans-serif;
-                 background-color: #f3f3f3;
-                 padding: 20px;
-             }
- 
-             .invoice-container {
-                 max-width: 800px;
-                 margin: 0 auto;
-                 background-color: #ffffff;
-                 padding: 30px;
-             }
- 
-             /* Header Section */
-             .header {
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: flex-start;
-                 margin-bottom: 20px;
-             }
- 
-             .header-left {
-                 display: flex;
-                 gap: 15px;
-                 align-items: flex-start;
-             }
- 
-             .logo {
-                 width: 80px;
-                 height: 80px;
-             }
- 
-             .qr-code {
-                 width: 80px;
-                 height: 80px;
-                 border: 1px solid #000;
-             }
- 
-             .header-right {
-                 text-align: right;
-             }
- 
-             .company-name {
-                 font-size: 20px;
-                 font-weight: bold;
-                 margin-bottom: 5px;
-             }
- 
-             .company-subtitle {
-                 font-size: 12px;
-                 margin-bottom: 3px;
-             }
- 
-             .company-details {
-                 font-size: 11px;
-                 line-height: 1.6;
-             }
- 
-             /* Invoice Info Section */
-             .invoice-info {
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: center;
-                 margin-bottom: 20px;
-                 padding-bottom: 15px;
-                 border-bottom: 1px solid #ddd;
-             }
- 
-             .invoice-left {
-                 text-align: left;
-             }
- 
-             .invoice-label {
-                 font-size: 11px;
-                 color: #666;
-             }
- 
-             .invoice-value {
-                 font-size: 12px;
-                 color: #cb3c40;
-                 font-weight: bold;
-             }
- 
-             .invoice-center {
-                 text-align: center;
-             }
- 
-             .simplified-label {
-                 font-size: 10px;
-                 color: #666;
-                 margin-bottom: 3px;
-             }
- 
-             .invoice-title {
-                 font-size: 16px;
-                 font-weight: bold;
-                 margin-bottom: 8px;
-             }
- 
-             .payment-type {
-                 font-size: 13px;
-                 color: #cb3c40;
-                 font-weight: bold;
-             }
- 
-             .invoice-right {
-                 text-align: right;
-             }
- 
-             .license-box {
-                 border: 2px solid #000;
-                 padding: 8px 12px;
-                 display: inline-block;
-                 text-align: center;
-             }
- 
-             .license-number {
-                 font-size: 18px;
-                 font-weight: bold;
-                 margin-bottom: 5px;
-             }
- 
-             .license-details {
-                 display: flex;
-                 gap: 10px;
-                 border-top: 1px solid #000;
-                 padding-top: 5px;
-             }
- 
-             .license-cell {
-                 text-align: center;
-                 font-size: 14px;
-                 font-weight: bold;
-             }
- 
-             .license-divider {
-                 width: 1px;
-                 background-color: #000;
-             }
- 
-             .license-arabic {
-                 writing-mode: vertical-rl;
-                 text-orientation: mixed;
-                 font-size: 12px;
-             }
- 
-             /* Vehicle Section */
-             .vehicle-section {
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: center;
-                 margin-bottom: 20px;
-                 padding: 15px 0;
-                 border-bottom: 1px solid #ddd;
-             }
- 
-             .vehicle-left {
-                 display: flex;
-                 align-items: center;
-                 gap: 20px;
-             }
- 
-             .toyota-logo {
-                 width: 50px;
-                 height: 50px;
-             }
- 
-             .vehicle-info {
-                 display: flex;
-                 gap: 30px;
-                 font-size: 18px;
-                 font-weight: bold;
-             }
- 
-             .vehicle-right {
-                 display: flex;
-                 gap: 30px;
-                 font-size: 11px;
-             }
- 
-             .vehicle-detail {
-                 text-align: right;
-             }
- 
-             .vehicle-detail-label {
-                 color: #666;
-             }
- 
-             .vehicle-detail-value {
-                 font-weight: bold;
-             }
- 
-             /* Tables */
-             .table-container {
-                 margin-bottom: 30px;
-             }
- 
-             table {
-                 width: 100%;
-                 border-collapse: collapse;
-             }
- 
-             thead {
-                 background-color: #1771b7;
-                 color: #ffffff;
-             }
- 
-             th {
-                 padding: 10px;
-                 text-align: center;
-                 font-size: 13px;
-                 font-weight: bold;
-                 border: 1px solid #1771b7;
-             }
- 
-             tbody tr {
-                 background-color: #eeeeee;
-                 height: 40px;
-             }
- 
-             tbody tr:nth-child(even) {
-                 background-color: #f8f8f8;
-             }
- 
-             td {
-                 padding: 10px;
-                 text-align: center;
-                 font-size: 12px;
-                 border: 1px solid #ddd;
-             }
- 
-             .summary-section {
-                 flex: 1;
-             }
- 
-             .summary-row {
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: center;
-                 margin-bottom: 8px;
-                 border: 1px solid #ddd;
-             }
- 
-             .summary-label {
-                 background-color: #cb3c40;
-                 color: #ffffff;
-                 padding: 8px 15px;
-                 font-size: 12px;
-                 flex: 1;
-                 text-align: center;
-             }
- 
-             .summary-value {
-                 background-color: #ffffff;
-                 padding: 8px 15px;
-                 font-size: 12px;
-                 flex: 1;
-                 text-align: center;
-                 font-weight: bold;
-             }
- 
-             .total-row .summary-label {
-                 background-color: #1771b7;
-             }
- 
-             /* Bottom Bar */
-             .bottom-bar {
-                 margin-top: 30px;
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: center;
-                 background-color: #1771b7;
-                 padding: 15px 20px;
-                 color: #ffffff;
-             }
- 
-             .thank-you {
-                 font-size: 12px;
-                 line-height: 1.5;
-             }
- 
-             .contact-bar {
-                 background-color: #cb3c40;
-                 padding: 10px 20px;
-                 display: flex;
-                 justify-content: space-between;
-                 align-items: center;
-                 color: #ffffff;
-                 font-size: 12px;
-             }
- 
-             .phone-number {
-                 background-color: #cb3c40;
-                 padding: 8px 16px;
-                 border-radius: 4px;
-                 font-weight: 700;
-             }
- 
-             .location {
-                 font-weight: 600;
-             }
-         </style>
-     </head>
-     <body>
-         <div class="invoice-container">
-             <div class="header">
-                 <div class="header-left">
-                     <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                         <circle cx="50" cy="35" r="15" fill="none" stroke="#f4c430" stroke-width="4"/>
-                         <circle cx="50" cy="35" r="8" fill="none" stroke="#f4c430" stroke-width="3"/>
-                     </svg>
-                     <div class="qr-code">
-                         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                             <rect width="100" height="100" fill="#fff"/>
-                             <rect x="5" y="5" width="25" height="25" fill="#000"/>
-                         </svg>
-                     </div>
-                 </div>
-                 <div class="header-right">
-                     <div class="company-name">مركز محمد لصيانة السيارات</div>
-                     <div class="company-subtitle">مؤسسة محمد علي التجارية</div>
-                     <div class="company-details">
-                         <div>سجل تجاري <span style="margin-left: 10px;">CR No.</span></div>
-                         <div>رقم الضريبي <span style="margin-left: 10px;">VAT No.</span></div>
-                     </div>
-                 </div>
-             </div>
- 
-             <div class="invoice-info">
-                 <div class="invoice-left">
-                     <div>
-                         <span class="invoice-label">${invoiceNo}</span>
-                         <div class="invoice-value">${updatedInvoice._id || ''}</div>
-                     </div>
-                     <div style="margin-top: 10px;">
-                         <span class="invoice-label">${invoiceDate}</span>
-                         <div class="invoice-value">${new Date(updatedInvoice.createdAt).toLocaleDateString() || ''}</div>
-                     </div>
-                 </div>
-                 <div class="invoice-center">
-                     <div class="simplified-label">${simplifiedLable}</div>
-                     <div class="invoice-title">${invoiceTitle}</div>
-                     <div class="payment-type">${updatedInvoice.paymentMethod || ''}</div>
-                 </div>
-                 <div class="invoice-right">
-                     <div class="license-box">
-                         <div class="license-number">KW-695048</div>
-                     </div>
-                 </div>
-             </div>
- 
-             <!-- Vehicle Section -->
-             <div class="vehicle-section">
-                 <div class="vehicle-left">
-                     <div class="vehicle-info">
-                         <span>Car Model</span>
-                         <span>2020</span>
-                     </div>
-                 </div>
-                 <div class="vehicle-right">
-                     <div class="vehicle-detail">
-                         <div class="vehicle-detail-label">${client}</div>
-                         <div class="vehicle-detail-value">${updatedInvoice.client || ''}</div>
-                     </div>
-                 </div>
-             </div>
- 
-             <!-- Works Table -->
-             <div class="table-container">
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>N</th>
-                             <th>Code</th>
-                             <th>Works</th>
-                             <th>Quantity</th>
-                             <th>Price</th>
-                             <th>Total</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         ${
-                              updatedInvoice.worksList
-                                   ? updatedInvoice.worksList
-                                          .map(
-                                               (work: any, index: any) => `
-                             <tr>
-                                 <td>${index + 1}</td>
-                                 <td>${work._id}</td>
-                                 <td>${work.work}</td>
-                                 <td>${work.quantity}</td>
-                                 <td>${work.finalCost}</td>
-                                 <td>${work.finalCost * work.quantity}</td>
-                             </tr>
-                         `,
-                                          )
-                                          .join('')
-                                   : ''
-                         }
-                     </tbody>
-                 </table>
-             </div>
- 
-             <!-- Spare Parts Table -->
-             <div class="table-container">
-                 <table>
-                     <thead>
-                         <tr>
-                             <th>N</th>
-                             <th>Code</th>
-                             <th>Spare Parts</th>
-                             <th>Quantity</th>
-                             <th>Price</th>
-                             <th>Total</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         ${
-                              updatedInvoice.sparePartsList
-                                   ? updatedInvoice.sparePartsList
-                                          .map(
-                                               (part: any, index: any) => `
-                             <tr>
-                                 <td>${index + 1}</td>
-                                 <td>${part._id}</td>
-                                 <td>${part.item}</td>
-                                 <td>${part.quantity}</td>
-                                 <td>${part.finalCost}</td>
-                                 <td>${part.finalCost * part.quantity}</td>
-                             </tr>
-                         `,
-                                          )
-                                          .join('')
-                                   : ''
-                         }
-                     </tbody>
-                 </table>
-             </div>
- 
-             <!-- Summary Section -->
-             <div class="summary-section">
-                 <div class="summary-row total">
-                     <div class="summary-label">Total Cost</div>
-                     <div class="summary-value">${updatedInvoice.totalCostIncludingTax || ''}</div>
-                 </div>
-                 <div class="summary-row">
-                     <div class="summary-label">Tax</div>
-                     <div class="summary-value">${updatedInvoice.taxAmount || ''}</div>
-                 </div>
-                 <div class="summary-row">
-                     <div class="summary-label">Discount</div>
-                     <div class="summary-value">${updatedInvoice.finalDiscountInFlatAmount || ''}</div>
-                 </div>
-                 <div class="summary-row">
-                     <div class="summary-label">Total After Discount</div>
-                     <div class="summary-value">${updatedInvoice.finalCost || ''}</div>
-                 </div>
-             </div>
- 
-             <!-- Footer Section -->
-             <div class="footer">
-                 <div class="footer-left">
-                     You can issue multiple reports via Senaeya App. Daily - Weekly - Monthly - Annual Report.
-                 </div>
-                 <div class="footer-right">
-                     <span class="phone-number">966-5xxxxxxxx</span>
-                 </div>
-             </div>
-         </div>
-     </body>
-     </html>
+     
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>pdf-invoice.svg</title>
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="595" height="842">
+        <defs>
+            <linearGradient id="d" x1=".5" x2=".5" y1="-.071" y2=".688" gradientUnits="objectBoundingBox">
+                <stop offset="0" stop-color="#ced0d1"></stop>
+                <stop offset=".157" stop-color="#f0f0f1"></stop>
+                <stop offset=".164" stop-color="#efeff0"></stop>
+                <stop offset=".259" stop-color="#e7e7e8"></stop>
+                <stop offset=".44" stop-color="#e5e5e6"></stop>
+                <stop offset=".56" stop-color="#cececf"></stop>
+                <stop offset=".811" stop-color="#939395"></stop>
+                <stop offset="1" stop-color="#626366"></stop>
+            </linearGradient>
+            <linearGradient id="a" x1=".925" x2=".125" y1="2.209" y2="2.973" gradientUnits="objectBoundingBox">
+                <stop offset="0" stop-color="#e5e5e6"></stop>
+                <stop offset=".44" stop-color="#e5e5e6"></stop>
+                <stop offset=".56" stop-color="#cececf"></stop>
+                <stop offset=".811" stop-color="#939395"></stop>
+                <stop offset="1" stop-color="#626366"></stop>
+            </linearGradient>
+            <linearGradient xlink:href="#a" id="e" x1=".972" x2="-.118" y1="-.234" y2=".22"></linearGradient>
+            <linearGradient xlink:href="#a" id="f" x1=".5" x2=".5" y1="1.601" y2="2.556"></linearGradient>
+            <linearGradient id="b" x1=".5" x2=".5" y1="1.041" y2=".041" gradientUnits="objectBoundingBox">
+                <stop offset="0" stop-color="#c3c5c7"></stop>
+                <stop offset=".049" stop-color="#d3d4d5"></stop>
+                <stop offset=".12" stop-color="#e5e5e6"></stop>
+                <stop offset=".124" stop-color="#e7e7e8"></stop>
+                <stop offset=".147" stop-color="#eeeeef"></stop>
+                <stop offset=".21" stop-color="#f0f0f1"></stop>
+                <stop offset=".545" stop-color="#f0f0f1"></stop>
+                <stop offset=".61" stop-color="#ccccce"></stop>
+                <stop offset=".691" stop-color="#a6a7a9"></stop>
+                <stop offset=".771" stop-color="#88898b"></stop>
+                <stop offset=".85" stop-color="#737477"></stop>
+                <stop offset=".928" stop-color="#66676a"></stop>
+                <stop offset="1" stop-color="#626366"></stop>
+            </linearGradient>
+            <linearGradient xlink:href="#b" id="g" x1=".499" x2=".499" y1="1.109" y2="-.025"></linearGradient>
+            <linearGradient xlink:href="#b" id="h" x1=".501" x2=".501" y1="2.29" y2=".071"></linearGradient>
+            <linearGradient id="i" x1=".5" x2=".5" y1="2.383" y2="1.239" gradientUnits="objectBoundingBox">
+                <stop offset=".006" stop-color="#e5e5e6"></stop>
+                <stop offset="1" stop-color="#6d6e6f"></stop>
+            </linearGradient>
+            <linearGradient xlink:href="#a" id="j" x1=".5" x2=".5" y1="3.14" y2="1.568"></linearGradient>
+            <linearGradient xlink:href="#a" id="k" x1=".503" x2=".503" y1="3.148" y2="1.57"></linearGradient>
+            <linearGradient xlink:href="#a" id="l" x1=".503" x2=".503" y1="1.193" y2="-.432"></linearGradient>
+            <linearGradient xlink:href="#a" id="m" x1=".5" x2=".5" y1="1.193" y2="-.432"></linearGradient>
+            <clipPath id="c">
+                <path d="M0 0h595v842H0z"></path>
+            </clipPath>
+        </defs>
+        <g clip-path="url(#c)">
+            <path fill="#fff" d="M0 0h595v842H0z"></path>
+            <g data-name="Group 55925">
+                <g data-name="Group 55923">
+                    <!-- Header Backgrounds -->
+                    <path fill="#1771b7" d="M13 248h569v34H13z" data-name="Rectangle 1"></path>
+                    <path fill="#1771b7" d="M13 492h569v34H13z" data-name="Rectangle 14"></path>
+                    <path fill="#cb3c40" d="M206 815h389v22H206z" data-name="Rectangle 2"></path>
+                    <path fill="#1771b7" d="M0 796h206v41H0z" data-name="Rectangle 3"></path>
+
+                    <!-- Header Lines -->
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M143.5 249v32" data-name="Line 2"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M143.5 493v32" data-name="Line 8"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M393.5 249v32" data-name="Line 4"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M393.5 493v32" data-name="Line 9"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M433.5 249v32" data-name="Line 5"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M433.5 493v32" data-name="Line 10"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M503.5 249v32" data-name="Line 6"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M503.5 493v32" data-name="Line 11"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M42.5 249v32" data-name="Line 3"></path>
+                    <path fill="none" stroke="#fff" stroke-width="2" d="M42.5 493v32" data-name="Line 7"></path>
+
+                    <!-- Company Info -->
+                    <text data-name="مركز محمد لصيانة السيارات" font-family="Arial-BoldMT, Arial" font-size="20" font-weight="700" transform="translate(379 38)">
+                        <tspan x="0" y="0"><%= workShopNameArabic %></tspan>
+                    </text>
+                    <text data-name="مؤسسة محمد علي التجارية" font-family="ArialMT, Arial" font-size="15" transform="translate(435 64)">
+                        <tspan x="0" y="0"><%= client.name || workshopNameAsClient %></tspan>
+                    </text>
+                    <text data-name="سجل تجاري" font-family="ArialMT, Arial" font-size="10" transform="translate(524 79)">
+                        <tspan x="0" y="0">سجل تجاري</tspan>
+                    </text>
+                    <text data-name="1010347328" font-family="Calibri" font-size="10" transform="translate(463 80)">
+                        <tspan x="0" y="0"><%= crn %></tspan>
+                    </text>
+                    <text data-name="300787972600003" font-family="Calibri" font-size="10" transform="translate(438 94)">
+                        <tspan x="0" y="0"><%= taxVatNumber %></tspan>
+                    </text>
+                    <text data-name="الرقم الضريبي" font-family="ArialMT, Arial" font-size="10" transform="translate(518 93)">
+                        <tspan x="0" y="0">الرقم الضريبي</tspan>
+                    </text>
+
+                    <!-- Vehicle Info Background -->
+                    <path fill="#eee" d="M13 177h432v31H13z" data-name="Rectangle 4"></path>
+                    <text font-family="Calibri" font-size="18" transform="translate(88 199)">
+                        <tspan x="0" y="0"><%= carBrandName %></tspan>
+                    </text>
+                    <text font-family="Calibri" font-size="18" transform="translate(235 199)">
+                        <tspan x="0" y="0"><%= carModelName %></tspan>
+                    </text>
+                    <text data-name="2020" font-family="Calibri" font-size="18" transform="translate(380 199)">
+                        <tspan x="0" y="0"><%= carYear %></tspan>
+                    </text>
+
+                    <!-- Customer Info Row -->
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 5">
+                        <path stroke="none" d="M13 212h569v30H13z"></path>
+                        <path fill="none" d="M13.5 212.5h568v29h-568z"></path>
+                    </g>
+                    <text font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(556 232)">
+                        <tspan x="-13.645" y="0">العميل</tspan>
+                    </text>
+                    <text data-name="Mohammad Ahmed" font-family="Calibri" font-size="12" transform="translate(489 231)">
+                        <tspan x="-48.844" y="0"><%= clientName %></tspan>
+                    </text>
+                    <text font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(317 232)">
+                        <tspan x="-14.656" y="0">الجوال</tspan>
+                    </text>
+                    <text data-name="966-5xxxxxxxx" font-family="Calibri" font-size="12" transform="translate(260 232)">
+                        <tspan x="-34.79" y="0"><%= contact %></tspan>
+                    </text>
+                    <text data-name="الرقم الضريبي" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(169 232)">
+                        <tspan x="-32.214" y="0">الرقم الضريبي</tspan>
+                    </text>
+                    <text data-name="VAT 3xxxxxxxxxxxxx3" font-family="Calibri" font-size="12" transform="translate(77 232)">
+                        <tspan xml:space="preserve" x="-95.627" y="0"><%= taxVatNumber %></tspan>
+                    </text>
+
+                    <!-- Invoice Details -->
+                    <text fill="#cb3c40" data-name="رقم الفاتورة" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(179 144)">
+                        <tspan x="-23.3" y="0">رقم الفاتورة</tspan>
+                    </text>
+                    <text data-name="1062" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(117 143)">
+                        <tspan x="-12.164" y="0"><%= invoiceNumber %></tspan>
+                    </text>
+                    <text data-name="PM 09:43 25-10-2025" font-family="Calibri" font-size="10" transform="translate(84 166)">
+                        <tspan xml:space="preserve" x="-81.059" y="0"><%= invoiceCreatedAt %></tspan>
+                    </text>
+                    <text fill="#cb3c40" data-name="وقت وتاريخ الفاتورة" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(182 167)">
+                        <tspan x="-40.131" y="0">وقت وتاريخ الفاتورة</tspan>
+                    </text>
+                    <text fill="#cb3c40" data-name="نقدي - Cash" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(301 157)">
+                        <tspan x="-29.502" y="0">نقدي</tspan>
+                        <tspan xml:space="preserve" y="0">- <%= paymentMethod %></tspan>
+                    </text>
+                    <text fill="#cb3c40" data-name="آجل - Postpaid" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(302 171)">
+                        <tspan x="-37.945" y="0">آجل</tspan>
+                        <tspan xml:space="preserve" y="0">- <%= isPostPaid %></tspan>
+                    </text>
+                    <text data-name="فاتورة ضريبية مبسطة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(299 127)">
+                        <tspan x="-54.448" y="0">فاتورة ضريبية مبسطة</tspan>
+                    </text>
+                    <text data-name="(Simplified tax invoice)" font-family="Calibri" font-size="10" transform="translate(302 139)">
+                        <tspan x="-45.833" y="0">(Simplified tax invoice)</tspan>
+                    </text>
+
+                    <!-- Triangle -->
+                    <path fill="#1771b7" d="m206 796 33.5 41h-67Z" data-name="Polygon 1"></path>
+
+                    <!-- Works Table Headers -->
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 6">
+                        <path stroke="none" d="M13 282h569v25H13z"></path>
+                        <path fill="none" d="M13.5 282.5h568v24h-568z"></path>
+                    </g>
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 15">
+                        <path stroke="none" d="M13 526h569v18H13z"></path>
+                        <path fill="none" d="M13.5 526.5h568v17h-568z"></path>
+                    </g>
+                    <path fill="#f3f3f3" d="M13 307h569v25H13z" data-name="Rectangle 7"></path>
+                    <path fill="#f3f3f3" d="M13 544h569v18H13z" data-name="Rectangle 16"></path>
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 8">
+                        <path stroke="none" d="M13 332h569v25H13z"></path>
+                        <path fill="none" d="M13.5 332.5h568v24h-568z"></path>
+                    </g>
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 17">
+                        <path stroke="none" d="M13 562h569v18H13z"></path>
+                        <path fill="none" d="M13.5 562.5h568v17h-568z"></path>
+                    </g>
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 24">
+                        <path stroke="none" d="M13 598h569v18H13z"></path>
+                        <path fill="none" d="M13.5 598.5h568v17h-568z"></path>
+                    </g>
+                    <path fill="#f3f3f3" d="M13 357h569v25H13z" data-name="Rectangle 9"></path>
+                    <path fill="#f3f3f3" d="M13 580h569v18H13z" data-name="Rectangle 18"></path>
+
+                    <!-- Totals Backgrounds -->
+                    <path fill="#f3f3f3" d="M344 672h238v28H344z" data-name="Rectangle 19"></path>
+                    <path fill="#cb3c40" d="M344 624h238v35H344z" data-name="Rectangle 25"></path>
+                    <path fill="#f3f3f3" d="M344 703h238v28H344z" data-name="Rectangle 22"></path>
+                    <path fill="#f3f3f3" d="M344 734h238v28H344z" data-name="Rectangle 20"></path>
+                    <path fill="#1771b7" d="M344 765h238v35H344z" data-name="Rectangle 21"></path>
+
+                    <!-- Spare Parts Table Headers -->
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 10">
+                        <path stroke="none" d="M13 382h569v25H13z"></path>
+                        <path fill="none" d="M13.5 382.5h568v24h-568z"></path>
+                    </g>
+                    <path fill="#f3f3f3" d="M13 407h569v25H13z" data-name="Rectangle 11"></path>
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 12">
+                        <path stroke="none" d="M13 432h569v25H13z"></path>
+                        <path fill="none" d="M13.5 432.5h568v24h-568z"></path>
+                    </g>
+                    <path fill="#f3f3f3" d="M13 457h569v25H13z" data-name="Rectangle 13"></path>
+
+                    <!-- Table Headers Text -->
+                    <text fill="#fff" font-family="ArialMT, Arial" font-size="14" letter-spacing=".07em" transform="translate(27 270)">
+                        <tspan x="-5.055" y="0">N</tspan>
+                    </text>
+                    <text fill="#fff" data-name="N" font-family="ArialMT, Arial" font-size="14" letter-spacing=".07em" transform="translate(28 514)">
+                        <tspan x="-5.055" y="0">N</tspan>
+                    </text>
+                    <text fill="#fff" data-name="الرمز Code" font-family="ArialMT, Arial" font-size="14" transform="translate(88 263)">
+                        <tspan x="-12.5" y="0">الرمز</tspan>
+                        <tspan x="-16.734" y="15">Code</tspan>
+                    </text>
+                    <text fill="#fff" data-name="الرمز Code" font-family="ArialMT, Arial" font-size="14" transform="translate(88 507)">
+                        <tspan x="-12.5" y="0">الرمز</tspan>
+                        <tspan x="-16.734" y="15">Code</tspan>
+                    </text>
+                    <text fill="#fff" data-name="Works الأعــمــال" font-family="ArialMT, Arial" font-size="14" text-align="center" transform="translate(281 271)">
+                        <tspan xml:space="preserve" x="-68.52" y="0">Works</tspan>
+                        <tspan y="0" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700">الأعــمــال</tspan>
+                    </text>
+                    <text fill="#fff" data-name="Spare Parts قطع غيار" font-family="ArialMT, Arial" font-size="14" transform="translate(271 515)">
+                        <tspan xml:space="preserve" x="-68.065" y="0">Spare Parts</tspan>
+                        <tspan y="0" font-family="Arial-BoldMT, Arial" font-weight="700">قطع غيار</tspan>
+                    </text>
+                    <text fill="#fff" data-name="عدد Qt." font-family="ArialMT, Arial" font-size="14" transform="translate(415 261)">
+                        <tspan x="-8.405" y="0">عدد</tspan>
+                        <tspan x="-9.334" y="15">Qt.</tspan>
+                    </text>
+                    <text fill="#fff" data-name="عدد Qt." font-family="ArialMT, Arial" font-size="14" transform="translate(415 505)">
+                        <tspan x="-8.405" y="0">عدد</tspan>
+                        <tspan x="-9.334" y="15">Qt.</tspan>
+                    </text>
+                    <text fill="#fff" data-name="السعر Price" font-family="ArialMT, Arial" font-size="14" transform="translate(469 263)">
+                        <tspan x="-12.793" y="0">السعر</tspan>
+                        <tspan x="-15.948" y="15">Price</tspan>
+                    </text>
+                    <text fill="#fff" data-name="السعر Price" font-family="ArialMT, Arial" font-size="14" transform="translate(469 507)">
+                        <tspan x="-12.793" y="0">السعر</tspan>
+                        <tspan x="-15.948" y="15">Price</tspan>
+                    </text>
+                    <text fill="#fff" data-name="الإجمالي Total" font-family="ArialMT, Arial" font-size="14" transform="translate(543 263)">
+                        <tspan x="-18.898" y="0">الإجمالي</tspan>
+                        <tspan x="-14.786" y="15">Total</tspan>
+                    </text>
+                    <text fill="#fff" data-name="الإجمالي Total" font-family="ArialMT, Arial" font-size="14" transform="translate(543 507)">
+                        <tspan x="-18.898" y="0">الإجمالي</tspan>
+                        <tspan x="-14.786" y="15">Total</tspan>
+                    </text>
+
+                    <!-- Totals Text -->
+                    <text data-name="المبلغ الخاضع للضريبة" font-family="ArialMT, Arial" font-size="14" transform="translate(527 691)">
+                        <tspan x="-51.43" y="0">المبلغ الخاضع للضريبة</tspan>
+                    </text>
+                    <text fill="#fff" data-name="إجمالي مبلغ قطع الغيار" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(526 641)">
+                        <tspan x="-52.298" y="0">إجمالي مبلغ قطع الغيار</tspan>
+                    </text>
+                    <text fill="#fff" data-name="(Total of spare parts)" font-family="Calibri" font-size="10" transform="translate(529 654)">
+                        <tspan x="-41.909" y="0">(Total of spare parts)</tspan>
+                    </text>
+                    <text fill="#fff" data-name="255" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 647)">
+                        <tspan x="-22.41" y="0"><%= totalSparePartsFinalCost %></tspan>
+                    </text>
+                    <text data-name="الخصم قبل الضريبة" font-family="ArialMT, Arial" font-size="14" transform="translate(534 722)">
+                        <tspan x="-44.198" y="0">الخصم قبل الضريبة</tspan>
+                    </text>
+                    <text fill="#fff" data-name="الإجمالي شامل الضريبة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(521 782)">
+                        <tspan x="-56.741" y="0">الإجمالي شامل الضريبة</tspan>
+                    </text>
+                    <text fill="#fff" data-name="621" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 788)">
+                        <tspan x="-22.41" y="0"><%= finalCost %></tspan>
+                    </text>
+                    <text fill="#fff" data-name="(Total including tax)" font-family="Calibri" font-size="10" transform="translate(524 796)">
+                        <tspan x="-39.624" y="0">(Total including tax)</tspan>
+                    </text>
+                    <text data-name="81" font-family="Calibri" font-size="12" transform="translate(391 753)">
+                        <tspan x="-13.679" y="0"><%= taxAmount %></tspan>
+                    </text>
+                    <text data-name="10" font-family="Calibri" font-size="12" transform="translate(391 722)">
+                        <tspan x="-13.679" y="0"><%= workshopDiscout %></tspan>
+                    </text>
+                    <text data-name="550" font-family="Calibri" font-size="12" transform="translate(394 691)">
+                        <tspan x="-16.72" y="0"><%= totalCostWithoutTax %></tspan>
+                    </text>
+                    <text data-name="(VAT 15%) الضريبة" font-family="ArialMT, Arial" font-size="12" transform="translate(529 753)">
+                        <tspan x="-48.573" y="0">(VAT 15%)</tspan>
+                        <tspan y="0" font-size="14"></tspan>
+                        <tspan y="0" font-size="14">الضريبة</tspan>
+                    </text>
+
+                    <!-- Warranty Section -->
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 23">
+                        <path stroke="none" d="M13 624h288v124H13z"></path>
+                        <path fill="none" d="M13.5 624.5h287v123h-287z"></path>
+                    </g>
+                    <text data-name="شروط الضمان والصيانة" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(157 639)">
+                        <tspan x="-54.954" y="0">شروط الضمان والصيانة</tspan>
+                    </text>
+                    <text data-name="المركز يضمن أعمال شغل اليد فقط إذا كانت القطع المستبدلة أصليه ومدة الضمان لا تتجاوز شهر من تاريخ الفاتورة المركز غير مسئول عن قطع الغيار القديمة بعد استبدالها وعدم قيام العميل بطلبها وأخذها بعد الصيانة مباشرة ويعد تصريح مباشر بالاستغناء عنها ولا يسأل عنها" font-family="ArialMT, Arial" font-size="10" transform="translate(295 661)">
+                        <tspan x="-254.478" y="0">المركز يضمن أعمال شغل اليد فقط إذا كانت القطع المستبدلة أصليه ومدة الضمان</tspan>
+                        <tspan x="-105.21" y="13">لا تتجاوز شهر من تاريخ الفاتورة</tspan>
+                        <tspan x="-276.348" y="26">المركز غير مسئول عن قطع الغيار القديمة بعد استبدالها وعدم قيام العميل بطلبها وأخذها</tspan>
+                        <tspan x="-267.383" y="39">بعد الصيانة مباشرة ويعد تصريح مباشر بالاستغناء عنها ولا يسأل عنها الورشة مطلقاً</tspan>
+                        <tspan x="-267.788" y="52">المركز غير مسئول عن تركيب قطع الغيار المستعملة وفي حالة وجود خلل بها يتطلب</tspan>
+                        <tspan x="-275.552" y="65">الفك والتركيب أكثر من مرة يتحمل العميل قيمة شغل اليد عن الفك والتركيب في كل مرة</tspan>
+                        <tspan x="-177.788" y="78">المركز غير مسئول عن رسوب السيارة بالفحص الدوري</tspan>
+                    </text>
+                    <text data-name="مدير الورشة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(171 771)">
+                        <tspan x="-30.736" y="0">مدير الورشة</tspan>
+                    </text>
+                    <text data-name="(Workshop Manager)" font-family="Calibri" font-size="8" transform="translate(171 781)">
+                        <tspan x="-34.471" y="0">(Workshop Manager)</tspan>
+                    </text>
+                    <text data-name="Asif Abdulwadud" font-family="Calibri" font-size="10" transform="translate(88 775)">
+                        <tspan x="-34.368" y="0"><%= workshopOwnerName %></tspan>
+                    </text>
+
+                    <!-- Bank Account -->
+                    <text data-name="الحساب البنكي" font-family="ArialMT, Arial" font-size="10" transform="translate(518 106)">
+                        <tspan x="0" y="0">الحساب البنكي</tspan>
+                    </text>
+                    <text font-family="Calibri" font-size="9" transform="translate(404 107)">
+                        <tspan x="0" y="0"><%= bankNumber %></tspan>
+                    </text>
+
+                    <!-- QR Code Placeholder -->
+                    <path fill="none" d="M411.082 793.031h24.6v24.6h-24.6Z"></path>
+
+                    <!-- Toyota Logo -->
+                    <g data-name="Toyota">
+                        <path fill="#272425" d="M36 193c0 5.508 7.214 10 16.091 10s16.091-4.492 16.091-10-7.214-10-16.091-10S36 187.492 36 193m.173 0c0-5.443 7.149-9.849 15.918-9.849S68.03 187.557 68.03 193s-7.149 9.849-15.94 9.849-15.917-4.428-15.917-9.849" data-name="Path 1003"></path>
+                        <path fill="#272425" d="M50.578 184.857c-3.693.216-6.458 1.21-6.89 2.441a1 1 0 0 0-.065.346 1.2 1.2 0 0 0 .173.583c.5.864 2.1 1.577 4.384 1.965l.065.022.022-.065c.389-2.376 1.253-4.255 2.376-5.14l.194-.151Zm-6.652 3.3a1.1 1.1 0 0 1-.151-.5.7.7 0 0 1 .065-.3c.41-1.145 3.067-2.1 6.523-2.333a8.82 8.82 0 0 0-2.246 5.011c-2.16-.389-3.736-1.08-4.19-1.879Zm6.091 2.186-.022.086h.083a30 30 0 0 0 3.974 0h.086l-.022-.086c-.346-1.987-1.145-3.218-2.073-3.218-.886 0-1.663 1.231-2.03 3.218Zm2.073-3.067c.821 0 1.533 1.166 1.879 3.024q-.94.065-1.879.065a27 27 0 0 1-1.879-.065c.324-1.879 1.059-3.024 1.88-3.024Zm1.469-2.289c1.123.886 1.965 2.765 2.354 5.14l.022.065.065-.022c2.289-.389 3.866-1.1 4.384-1.965a1.1 1.1 0 0 0 .108-.929c-.454-1.253-3.2-2.225-6.89-2.441l-.259-.022Zm.259.043c3.456.238 6.134 1.188 6.523 2.333a2 2 0 0 1 .065.3.9.9 0 0 1-.151.5c-.454.778-2.03 1.49-4.212 1.879a8.54 8.54 0 0 0-2.225-5.012m-12.591 3.326a6.34 6.34 0 0 0-2.549 4.795c0 4.1 5.054 7.6 11.771 8.1l.238.022-.173-.151c-1.533-1.3-2.484-4.384-2.484-8.013l.022-.713-.065-.022c-3.693-.67-6.242-2.181-6.631-3.974l-.043-.13Zm-2.4 4.795a6.06 6.06 0 0 1 2.4-4.579c.475 1.771 3 3.283 6.631 3.952 0 .108-.022.583-.022.583 0 3.542.907 6.566 2.354 7.97-6.479-.562-11.361-3.931-11.361-7.927Zm10.994-.454v.086c0 3.2.994 5.68 2.268 5.68 1.253 0 2.246-2.484 2.246-5.68v-.169h-.065c-.713.065-1.447.086-2.181.086s-1.469-.022-2.181-.086h-.086Zm.151.086c.691.043 1.4.086 2.117.086s1.425-.022 2.117-.086c0 3.11-.929 5.529-2.117 5.529-1.186.023-2.111-2.418-2.111-5.528Zm12.851-4.384c-.389 1.771-2.916 3.3-6.631 3.974l-.065.022.022.713c0 3.629-.95 6.717-2.484 8.013l-.173.151.238-.022c6.717-.5 11.771-3.974 11.771-8.1a6.34 6.34 0 0 0-2.549-4.795l-.108-.086Zm.13.173a6.1 6.1 0 0 1 2.4 4.579c0 3.974-4.881 7.365-11.4 7.9 1.447-1.4 2.354-4.428 2.354-7.97 0 0-.022-.475-.022-.583 3.672-.67 6.177-2.16 6.674-3.931Z" data-name="Path 1004"></path>
+                        <path fill="url(#d)" d="m33.754 45.622.065.194a2.1 2.1 0 0 1-.043 1.1 6.29 6.29 0 0 1 2.592 4.773c0 4.471-5.961 8.078-13.348 8.078-7.365 0-13.348-3.629-13.348-8.078a6.26 6.26 0 0 1 2.592-4.773 2.1 2.1 0 0 1-.043-1.1c.022-.065.043-.13.065-.216-2.247 1.577-3.586 3.672-3.586 5.918 0 4.946 6.393 8.963 14.3 8.963s14.3-4.017 14.3-8.963c0-2.246-1.343-4.318-3.546-5.896" data-name="Path 1005" transform="translate(29.093 141.46)"></path>
+                        <path fill="url(#a)" d="m64.21 46.609-.41.3c.346-2.57 1.3-4.212 2.4-4.212s2.073 1.641 2.4 4.212l-.41-.3c-.346-1.944-1.1-3.153-1.987-3.153-.891.022-1.647 1.209-1.993 3.153" data-name="Path 1006" transform="translate(-14.107 143.734)"></path>
+                        <path fill="url(#e)" d="m68.176 68.9-.346.626v.086c0 3.2-.972 5.616-2.181 5.616s-2.181-2.419-2.181-5.616V69.5l-.346-.583c-.022.216-.022.454-.022.691 0 3.629 1.123 6.35 2.549 6.35 1.4 0 2.549-2.743 2.549-6.35-.022-.259-.022-.475-.022-.713Z" data-name="Path 1007" transform="translate(-13.558 123.193)"></path>
+                        <path fill="url(#f)" d="M42.991 39c-.626.043-1.3.065-1.987.065s-1.361-.022-1.987-.065l-.41.3c.756.065 1.555.108 2.4.108a21 21 0 0 0 2.4-.108Zm7.3-3.132C49.794 34.231 45.647 33 41 33s-8.79 1.209-9.287 2.873c-.432 1.425 1.944 2.765 5.68 3.283l-.324-.41c-3.024-.5-4.816-1.6-4.406-2.786.5-1.425 4.168-2.441 8.337-2.441s7.84 1.015 8.337 2.441c.41 1.166-1.382 2.268-4.428 2.786l-.324.41c3.762-.497 6.138-1.836 5.706-3.283Z" data-name="Path 1008" transform="translate(11.087 151.339)"></path>
+                        <path fill="#424243" d="M62.868 188.377a6.9 6.9 0 0 1 1.533 1.663 5.7 5.7 0 0 0-1.1-2.592c-.151-.108-.3-.238-.475-.346l.065.194a1.84 1.84 0 0 1-.022 1.08Zm-21.555 0a2.1 2.1 0 0 1-.043-1.1c.022-.065.043-.13.065-.216-.173.108-.324.238-.5.367a5.8 5.8 0 0 0-1.1 2.592 8.7 8.7 0 0 1 1.577-1.641Z" data-name="Path 1009"></path>
+                        <path fill="url(#b)" d="M.8 37.114c0-5.486 7.171-9.914 16-9.914s16 4.449 16 9.914-7.171 9.914-16 9.914S.8 42.6.8 37.114m16 8.942c7.9 0 14.3-4.017 14.3-8.963s-6.393-8.963-14.3-8.963-14.3 4.017-14.3 8.963 6.415 8.963 14.3 8.963" data-name="Path 1010" transform="translate(35.286 155.886)"></path>
+                        <path fill="#fff" d="M37.706 192.979c0 4.989 6.458 9.05 14.384 9.05s14.384-4.06 14.384-9.05-6.457-9.05-14.384-9.05-14.384 4.06-14.384 9.05m.194 0c0-4.881 6.371-8.855 14.19-8.855s14.19 3.974 14.19 8.855-6.374 8.85-14.19 8.85-14.19-3.969-14.19-8.85" data-name="Path 1011"></path>
+                        <path fill="url(#g)" d="M57.5 41.747c0-4.773 1.685-8.747 3.758-8.747s3.758 3.974 3.758 8.747c0 4.816-1.685 8.747-3.758 8.747S57.5 46.585 57.5 41.747m3.758 6.048c1.4 0 2.549-2.743 2.549-6.35 0-3.758-1.123-6.35-2.549-6.35-1.4 0-2.549 2.592-2.549 6.35.022 3.628 1.145 6.35 2.549 6.35" data-name="Path 1012" transform="translate(-9.167 151.339)"></path>
+                        <path fill="url(#h)" d="M24.587 32.017C25 30.376 29.987 28 35.386 28c5.421 0 10.238 1.685 10.8 4.017.648 2.592-4.147 4.924-10.8 4.924s-11.447-2.332-10.799-4.924M35.408 29.1c-4.644 0-8.79 1.21-9.287 2.873-.562 1.857 3.564 3.542 9.287 3.542s9.849-1.685 9.287-3.542c-.495-1.662-4.643-2.873-9.287-2.873" data-name="Path 1013" transform="translate(16.683 155.259)"></path>
+                        <path fill="url(#i)" d="m32.926 53.455.346.6c.691.065 1.425.086 2.181.086s1.49-.022 2.181-.086l.346-.6c-.8.065-1.641.108-2.527.108a24 24 0 0 1-2.527-.108M46.317 49.2c-.065 1.857-2.916 3.5-7.149 4.1l.41.5c4.122-.734 6.847-2.548 6.739-4.6m-21.728 0c-.108 2.052 2.613 3.866 6.717 4.6l.41-.5c-4.19-.6-7.041-2.243-7.127-4.1" data-name="Path 1014" transform="translate(16.638 138.638)"></path>
+                        <path fill="url(#j)" d="m78.485 39.177.324-.41C78.248 35.333 76.693 33 74.9 33c1.685.022 3.11 2.635 3.585 6.177" data-name="Path 1015" transform="translate(-22.809 151.339)"></path>
+                        <path fill="url(#k)" d="M57.024 39.255c.475-3.542 1.922-6.155 3.585-6.155-1.814 0-3.348 2.311-3.909 5.767Z" data-name="Path 1016" transform="translate(-8.54 151.261)"></path>
+                        <path fill="url(#l)" d="M56.01 69.345c0-.389.022-.778.022-1.145l-.41.5c0 .216-.022.432-.022.648 0 5.1 1.836 8.747 4.147 8.747-2.047-.003-3.737-3.912-3.737-8.75" data-name="Path 1017" transform="translate(-7.678 123.742)"></path>
+                        <path fill="url(#m)" d="m79.047 68.7-.41-.5c.022.367.022.756.022 1.145 0 4.816-1.685 8.747-3.758 8.747 2.333 0 4.147-3.629 4.147-8.747Z" data-name="Path 1018" transform="translate(-22.809 123.742)"></path>
+                    </g>
+
+                    <!-- Currency Symbols -->
+                    <g fill="#fff">
+                        <path d="M358.372 647.254a8 8 0 0 0-.665 2.484l7.354-1.563a8 8 0 0 0 .665-2.484Z" data-name="Path 28007"></path>
+                        <path d="M365.231 644.582a6.2 6.2 0 0 0 .5-1.9l-4.265.93v-1.783l3.77-.821a6.2 6.2 0 0 0 .5-1.9l-4.275.93v-6.426a6.1 6.1 0 0 0-1.706 1.468v5.333l-1.706.372v-8.047a6 6 0 0 0-1.706 1.467v6.95l-3.817.832a6.2 6.2 0 0 0-.5 1.9l4.312-.939v2.251l-4.617 1.002a6.2 6.2 0 0 0-.5 1.9l4.838-1.054a1.54 1.54 0 0 0 .952-.651l.887-1.348a.9.9 0 0 0 .146-.489v-1.987l1.706-.372v3.575l5.476-1.194Z" data-name="Path 28008"></path>
+                    </g>
+                    <g fill="#fff" data-name="Saudi_Riyal_Symbol">
+                        <path d="M360.708 789.14a6 6 0 0 0-.5 1.86l5.506-1.17a6 6 0 0 0 .5-1.86Z" data-name="Path 28007"></path>
+                        <path d="M365.719 786.162a6.5 6.5 0 0 0 .5-1.946l-4.265.955v-1.836l3.77-.843a6.5 6.5 0 0 0 .5-1.946l-4.275.954v-6.6a6.1 6.1 0 0 0-1.706 1.5v5.481l-1.706.382V774a6.1 6.1 0 0 0-1.706 1.507v7.137l-3.817.856a6.5 6.5 0 0 0-.5 1.946l4.312-.965v2.312l-4.617 1.032a6.5 6.5 0 0 0-.5 1.946l4.838-1.082a1.54 1.54 0 0 0 .952-.669l.887-1.384a.93.93 0 0 0 .146-.5V784.1l1.706-.382v3.671l5.476-1.226Z" data-name="Path 28008"></path>
+                    </g>
+                    <g data-name="Saudi_Riyal_Symbol">
+                        <path d="M358.409 754.516a8 8 0 0 0-.665 2.484l7.354-1.563a8 8 0 0 0 .665-2.484Z" data-name="Path 28007"></path>
+                        <path d="M365.268 751.844a6.2 6.2 0 0 0 .5-1.9l-4.265.93v-1.783l3.77-.821a6.2 6.2 0 0 0 .5-1.9l-4.275.93v-6.426a6.1 6.1 0 0 0-1.706 1.468v5.333l-1.706.372V740a6 6 0 0 0-1.706 1.467v6.95l-3.817.832a6.2 6.2 0 0 0-.5 1.9l4.312-.939v2.251l-4.617 1.002a6.2 6.2 0 0 0-.5 1.9l4.838-1.054a1.54 1.54 0 0 0 .952-.651l.887-1.348a.9.9 0 0 0 .146-.489v-1.987l1.706-.372v3.575l5.476-1.194Z" data-name="Path 28008"></path>
+                    </g>
+                    <g data-name="Saudi_Riyal_Symbol">
+                        <path d="M358.372 723.516a8 8 0 0 0-.665 2.484l7.354-1.563a8 8 0 0 0 .665-2.484Z" data-name="Path 28007"></path>
+                        <path d="M365.231 720.844a6.2 6.2 0 0 0 .5-1.9l-4.265.93v-1.783l3.77-.821a6.2 6.2 0 0 0 .5-1.9l-4.275.93v-6.426a6.1 6.1 0 0 0-1.706 1.468v5.333l-1.706.372V709a6 6 0 0 0-1.706 1.467v6.95l-3.817.832a6.2 6.2 0 0 0-.5 1.9l4.312-.939v2.251l-4.617 1.002a6.2 6.2 0 0 0-.5 1.9l4.838-1.054a1.54 1.54 0 0 0 .952-.651l.887-1.348a.9.9 0 0 0 .146-.489v-1.987l1.706-.372v3.575l5.476-1.194Z" data-name="Path 28008"></path>
+                    </g>
+                    <g data-name="Saudi_Riyal_Symbol">
+                        <path d="M358.409 692.516a8 8 0 0 0-.665 2.484l7.354-1.563a8 8 0 0 0 .665-2.484Z" data-name="Path 28007"></path>
+                        <path d="M365.268 689.844a6.2 6.2 0 0 0 .5-1.9l-4.265.93v-1.783l3.77-.821a6.2 6.2 0 0 0 .5-1.9l-4.275.93v-6.426a6.1 6.1 0 0 0-1.706 1.468v5.333l-1.706.372V678a6 6 0 0 0-1.706 1.467v6.95l-3.817.832a6.2 6.2 0 0 0-.5 1.9l4.312-.939v2.251l-4.617 1.002a6.2 6.2 0 0 0-.5 1.9l4.838-1.054a1.54 1.54 0 0 0 .952-.651l.887-1.348a.9.9 0 0 0 .146-.489v-1.987l1.706-.372v3.575l5.476-1.194Z" data-name="Path 28008"></path>
+                    </g>
+
+                    <!-- Saudi Emblem -->
+                    <g data-name="Group 90">
+                        <g data-name="#3f3f41ff">
+                            <path d="M452.007 145.185a6.2 6.2 0 0 1 1.965-.249q62.586.05 125.166.028a2.575 2.575 0 0 1 2.823 2.84c.066 18.844-.011 37.688.039 56.532-.011 1.3.017 3.095-1.45 3.648-1.722.487-3.543.232-5.309.288q-60.634-.025-121.268-.006c-1.34.066-3.023-.31-3.333-1.849a46 46 0 0 1-.116-5.453q0-26.306-.006-52.624c-.055-1.19.2-2.707 1.489-3.155m1.1 1.688c-.9.144-.775 1.373-.886 2.054-.033 7.938.022 15.888-.022 23.826.055.98-.138 2.187.819 2.812a10.5 10.5 0 0 0 2.087.188q26.024-.042 52.054-.011a33.5 33.5 0 0 0 5.425-.177c1.135-.742.747-2.22.847-3.36-.072-7.933.061-15.866-.061-23.793.155-1.672-1.616-1.843-2.856-1.794q-26.315.017-52.629 0a20.3 20.3 0 0 0-4.777.255m62.671.061c-.864.548-.626 1.655-.7 2.513.044 8.11-.022 16.226.033 24.336a1.7 1.7 0 0 0 1.993 1.938c13.485.055 26.976-.017 40.462.033.98-.033 2.081.083 2.884-.609.542-2.231.166-4.567.266-6.842-.105-7.1.216-14.222-.172-21.319a42.4 42.4 0 0 0-7.994-.36c-11.454 0-22.913.017-34.367-.011a6.4 6.4 0 0 0-2.408.321m47.459-.105c-1.074.172-.941 1.34-1.008 2.159q-.008 25.991-.006 51.993a31 31 0 0 0 .133 4.584c.5 1.1 1.893.88 2.884.985 4.257-.022 8.52.072 12.777-.044a1.67 1.67 0 0 0 1.987-1.777c.055-18.429-.017-36.858.033-55.287-.033-.941.127-2.375-1.074-2.657-2.879-.376-5.8-.061-8.691-.155-2.342.089-4.728-.249-7.036.2m-110.402 30.884c-.736.714-.587 1.8-.637 2.724q.033 11.393 0 22.786a5.64 5.64 0 0 0 .5 2.928 8.5 8.5 0 0 0 2.934.41q27.162-.017 54.329 0a8.1 8.1 0 0 0 2.94-.41 5.3 5.3 0 0 0 .526-2.934c-.028-6.1-.017-12.2-.011-18.3-.028-2.452.188-4.949-.41-7.357-2.868-.2-5.746-.1-8.619-.116-16.436-.011-32.872.017-49.308-.017a6.4 6.4 0 0 0-2.248.288m62.367.814c-.266 2.3-.05 4.628-.105 6.942.055 6.881-.127 13.762.1 20.643a36.3 36.3 0 0 0 8.016.443q14.673-.008 29.34 0c2.685-.022 5.409.177 8.049-.437.255-6.693.05-13.4.111-20.1-.066-2.5.183-5.021-.116-7.512-.221-1.135-1.611-1.063-2.5-1.085q-20.211.033-40.423.006c-.925.002-2.181-.015-2.469 1.098Z" data-name="Path 259"></path>
+                        </g>
+                        <path fill-rule="evenodd" d="M572.791 163.542c.524-.556.413-1.183-.006-1.191a.9.9 0 0 1-.325.913c-.33-.284-.671-.6-1.025-.923 1.728-1.427 3.613-2.693 6.08-2.733-2.652-.953-4.776.668-6.571 2.29-1.795-1.622-3.915-3.243-6.571-2.29 2.467.04 4.355 1.305 6.08 2.732-.354.325-.7.64-1.026.923a.91.91 0 0 1-.325-.913c-.418.007-.529.635-.005 1.191a2.7 2.7 0 0 1-.819.541.314.314 0 0 1-.412-.279c-.079-.475-.816-.4-.726.267a.992.992 0 0 0 1.463.6 5.3 5.3 0 0 0 .885-.665.9.9 0 0 1 .325.913c.419-.008.529-.635.006-1.191.372-.317.745-.645 1.125-.968.38.324.753.651 1.125.968-.524.557-.413 1.184.006 1.191a.9.9 0 0 1 .325-.913 5.4 5.4 0 0 0 .885.665.992.992 0 0 0 1.463-.6c.09-.671-.646-.742-.726-.267a.314.314 0 0 1-.412.279 2.7 2.7 0 0 1-.819-.541m-3.258-8.9a4.55 4.55 0 0 0 .154 3.557 5.33 5.33 0 0 1 .762-3.331l.114 1.169h-.134l.134 1.362h-.134l.134 1.369h-.134l.134 1.363-.386.385h1.53l-.384-.385.14-1.363h-.14l.14-1.369h-.14l.14-1.362h-.14l.117-1.166a5.34 5.34 0 0 1 .762 3.328 4.56 4.56 0 0 0 .153-3.559 6.36 6.36 0 0 1 1.441 2.911 4.41 4.41 0 0 0-.942-3.638 5.64 5.64 0 0 1 1.83 2.136 3.74 3.74 0 0 0-1.8-2.973 4.22 4.22 0 0 1 2.16 1.564 3.2 3.2 0 0 0-2.438-2.373 3.47 3.47 0 0 1 2.2.476 2.88 2.88 0 0 0-2.872-1.105 2.43 2.43 0 0 1 1.481-.259 1.95 1.95 0 0 0-2.1-.114l-.371-.926-.367.925a1.95 1.95 0 0 0-2.104.115 2.43 2.43 0 0 1 1.481.259 2.88 2.88 0 0 0-2.874 1.1 3.48 3.48 0 0 1 2.2-.476 3.2 3.2 0 0 0-2.439 2.378 4.22 4.22 0 0 1 2.16-1.564 3.74 3.74 0 0 0-1.8 2.973 5.64 5.64 0 0 1 1.83-2.136 4.41 4.41 0 0 0-.942 3.638 6.36 6.36 0 0 1 1.445-2.909" data-name="Emblem_of_Saudi_Arabia_(2)"></path>
+                        <text font-family="Arial-BoldMT, Arial" font-size="6" font-weight="700" transform="translate(571.42 180.01)">
+                            <tspan x="-2.167" y="0">K</tspan>
+                        </text>
+                        <text font-family="Arial-BoldMT, Arial" font-size="7" font-weight="700" transform="translate(571.419 187.939)">
+                            <tspan x="-2.334" y="0">S</tspan>
+                        </text>
+                        <text font-family="Arial-BoldMT, Arial" font-size="6" font-weight="700" transform="translate(571.439 194.868)">
+                            <tspan x="-2.167" y="0">A</tspan>
+                        </text>
+                        <text data-name="د ق ط" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(538.67 165.959)">
+                            <tspan x="-16.199" y="0"><%= englishAlphabetCombination %></tspan>
+                        </text>
+                        <text data-name="T G D" font-family="Calibri-Bold, Calibri" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(537.67 194.858)">
+                            <tspan x="-17.464" y="0"><%= englishAlphabetCombination %></tspan>
+                        </text>
+                        <text data-name="6430" font-family="Calibri" font-size="18" letter-spacing=".07em" transform="translate(483.658 196.501)">
+                            <tspan x="-20.136" y="0"><%= englishPlateNumber %></tspan>
+                        </text>
+                        <text data-name="6430" font-family="Calligraphr-Regular, Calligraphr" font-size="16" letter-spacing=".07em" transform="translate(483.91 166.803)">
+                            <tspan x="-19.616" y="0"><%= arabicPlateNumber %></tspan>
+                        </text>
+                        <text font-family="Arial-BoldMT, Arial" font-size="5" font-weight="700" transform="translate(571 172)">
+                            <tspan x="-7.251" y="0">السعودية</tspan>
+                        </text>
+                        <circle cx="3" cy="3" r="3" data-name="Ellipse 2" transform="translate(568.5 198)"></circle>
+                    </g>
+
+                    <!-- License Plate -->
+                    <g data-name="Group 55920">
+                        <g fill="#fff" stroke="#959595" data-name="Rectangle 5385" transform="translate(451 113)">
+                            <rect width="131" height="28" stroke="none" rx="4"></rect>
+                            <rect width="130" height="27" x=".5" y=".5" fill="none" rx="3.5"></rect>
+                        </g>
+                        <text font-family="Calibri-Bold, Calibri" font-size="17" font-weight="700" letter-spacing=".15em" transform="translate(466 133)">
+                            <tspan x="0" y="0"><%= interNationalCarNumber %></tspan>
+                        </text>
+                    </g>
+
+                    <!-- Saudi Flag -->
+                    <%= workShop.image %>
+
+                    <!-- Footer Text -->
+                    <text fill="#fff" data-name="Riyadh - old Industrial - ali st." font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(507 830)">
+                        <tspan x="-72.36" y="0"><%= workShopAddress %></tspan>
+                    </text>
+                    <text fill="#fff" data-name="966-5xxxxxxxx" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" letter-spacing=".07em" transform="translate(279 830)">
+                        <tspan x="-41.096" y="0"><%= contact %></tspan>
+                    </text>
+
+                    <!-- Signature Icon -->
+                    <g data-name="Group 55921">
+                        <path fill="#fff" d="m352.708 826.662 1.637-1.637a.47.47 0 0 0 .082-.555l-1.053-1.962a.47.47 0 0 1 .01-.462l1.7-2.863a.47.47 0 0 1 .592-.191c.557.245 1.577.69 2.028.867a.6.6 0 0 1 .249.17c1.654 1.908-.361 5.7-3.267 8.609s-6.702 4.92-8.61 3.262a.6.6 0 0 1-.17-.244 78 78 0 0 0-.867-2.028.47.47 0 0 1 .191-.592l2.863-1.7a.47.47 0 0 1 .462-.01l1.962 1.055a.47.47 0 0 0 .555-.082Z" data-name="Path 28011"></path>
+                        <path fill="#fff" d="M352.451 818.953v1.356a6.1 6.1 0 0 0-6.1 6.1H345a7.46 7.46 0 0 1 7.451-7.456" data-name="Path 28012"></path>
+                        <path fill="#fff" d="M352.451 821.587v1.355a3.466 3.466 0 0 0-3.462 3.467h-1.355a4.82 4.82 0 0 1 4.817-4.822" data-name="Path 28013"></path>
+                        <circle cx="6.608" cy="6.608" r="6.608" fill="#2ab540" data-name="Ellipse 3" transform="translate(328.858 819.285)"></circle>
+                        <path fill="#fff" d="M331.227 825.854a4.25 4.25 0 0 0 .568 2.127l-.6 2.2 2.256-.592a4.25 4.25 0 0 0 2.034.518 4.256 4.256 0 1 0-4.258-4.253m1.344 2.016-.084-.134a3.537 3.537 0 1 1 3 1.657 3.54 3.54 0 0 1-1.8-.493l-.129-.077-1.339.351Zm2.912 2.242" data-name="Path 28009"></path>
+                        <path fill="#fff" d="M334.42 824.079c-.08-.177-.163-.181-.239-.184s-.133 0-.2 0a.4.4 0 0 0-.284.133 1.2 1.2 0 0 0-.372.887 2.07 2.07 0 0 0 .434 1.1 4.37 4.37 0 0 0 1.816 1.605c.9.354 1.081.284 1.276.266a1.07 1.07 0 0 0 .718-.505.9.9 0 0 0 .062-.506c-.027-.044-.1-.071-.2-.124s-.629-.31-.727-.346-.168-.053-.239.053-.275.346-.337.417-.124.08-.23.027a2.9 2.9 0 0 1-.855-.528 3.2 3.2 0 0 1-.592-.736c-.062-.106-.007-.164.047-.217s.106-.124.16-.186a.7.7 0 0 0 .106-.177.2.2 0 0 0-.009-.186c-.027-.053-.233-.579-.328-.789" data-name="Path 28010"></path>
+                    </g>
+
+                    <!-- Barcode -->
+                    <g fill="#fff" data-name="#ffffffff">
+                        <path d="M154.356 34.581c.612.007 1.225 0 1.838 0-.006.61 0 1.219 0 1.828-.606 0-1.212.007-1.818 0-.031-.607-.006-1.218-.02-1.828" data-name="Path 28327"></path>
+                        <path d="M141.536 38.249h1.826c.009.612 0 1.223 0 1.836-.612 0-1.224-.009-1.835 0 .009-.611 0-1.228.009-1.836" data-name="Path 28328"></path>
+                        <path d="M172.681 38.251c.612-.008 1.224 0 1.836 0a62 62 0 0 0 0 1.834h-1.841c.006-.615.005-1.224.005-1.834" data-name="Path 28329"></path>
+                        <path d="M137.874 41.906c.612.007 1.226 0 1.838 0-.017.613-.007 1.227-.006 1.84-.612-.012-1.222-.006-1.834 0 0 .61-.008 1.22 0 1.83-.612.006-1.222 0-1.834 0-.011-.612 0-1.223-.007-1.834.609 0 1.219-.005 1.829 0 .014-.607.001-1.221.014-1.836" data-name="Path 28330"></path>
+                        <path d="M150.694 41.911h1.84c-.014.612-.005 1.223-.005 1.835h-1.832c-.007-.615 0-1.223-.003-1.835" data-name="Path 28331"></path>
+                        <path d="M132.367 43.738c.613.012 1.227.007 1.841 0a80 80 0 0 0 0 1.836h-1.834c-.005-.612.001-1.224-.007-1.836" data-name="Path 28332"></path>
+                        <path d="M134.206 45.575c.611.01 1.221 0 1.832 0v1.831h-1.836c.005-.611 0-1.221.004-1.831" data-name="Path 28333"></path>
+                        <path d="M132.372 47.405c.611.007 1.221 0 1.832.006v1.83c-.612 0-1.223-.009-1.835.009.004-.616-.001-1.23.003-1.845" data-name="Path 28334"></path>
+                        <path d="M141.531 54.734c.61.006 1.221.011 1.831-.007.007.614 0 1.228 0 1.842h-1.827c-.008-.612-.001-1.223-.004-1.835" data-name="Path 28335"></path>
+                        <path d="M137.868 63.902c.612-.007 1.222.006 1.834-.008v1.84c-.611-.017-1.222.008-1.833-.015-.004-.605 0-1.211-.001-1.817" data-name="Path 28336"></path>
+                        <path d="M187.334 78.551c1.831.014 3.661 0 5.492 0 .022 1.831 0 3.664.009 5.5-1.832-.006-3.665.014-5.5-.009 0-1.831.009-3.662 0-5.492m1.839 1.838v1.829c.61.005 1.221 0 1.831 0v-1.831l-1.832.003Z" data-name="Path 28337"></path>
+                        <path d="M194.667 84.051h1.832v1.837c-.611-.007-1.221 0-1.831 0v1.831h-5.5v-1.834c1.832.008 3.664 0 5.5 0 0-.612.003-1.223-.001-1.834" data-name="Path 28338"></path>
+                        <path d="M185.508 85.888h1.838c-.012.611 0 1.222-.008 1.833h-1.828c-.007-.613-.004-1.227-.002-1.833" data-name="Path 28339"></path>
+                    </g>
+
+                    <!-- Barcode Black Bars -->
+                    <%= invoice.qrCode %>
+                    <!-- Thank You Text -->
+                    <text fill="#fff" data-name="Thank you for your visit and we are always at your service" font-family="Calibri" font-size="12" transform="translate(104 812)">
+                        <tspan x="-67.588" y="0">Thank you for your visit and</tspan>
+                        <tspan x="-71.089" y="15">we are always at your service</tspan>
+                    </text>
+
+                    <!-- Warranty English -->
+                    <text data-name="(Warranty and maintenance terms)" font-family="Calibri" font-size="8" transform="translate(157 647)">
+                        <tspan x="-57.055" y="0">(Warranty and maintenance terms)</tspan>
+                    </text>
+
+                    <!-- Works Table Rows -->
+                    <text data-name="1" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 299)">
+                        <tspan x="-3.041" y="0">1</tspan>
+                    </text>
+                    <text data-name="1" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 539)">
+                        <tspan x="-3.041" y="0">1</tspan>
+                    </text>
+                    <text data-name="3017" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(84 299)">
+                        <tspan x="-12.164" y="0"><%= workCode %></tspan>
+                    </text>
+                    <text data-name="865327" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(88 539)">
+                        <tspan x="-18.246" y="0"><%= sparePartCode %></tspan>
+                    </text>
+                    <text data-name="2" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 299)">
+                        <tspan x="-3.041" y="0"><%= workQuantity %></tspan>
+                    </text>
+                    <text data-name="3" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 539)">
+                        <tspan x="-3.041" y="0"><%= sparePartQuantity %></tspan>
+                    </text>
+                    <text data-name="27" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 299)">
+                        <tspan x="-13.767" y="0"><%= workPrice %></tspan>
+                    </text>
+                    <text data-name="8.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 539)">
+                        <tspan x="-10.726" y="0"><%= sparePartCost %></tspan>
+                    </text>
+                    <text data-name="54" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 299)">
+                        <tspan x="-13.767" y="0"><%= workFinalCost %></tspan>
+                    </text>
+                    <text data-name="25.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 539)">
+                        <tspan x="-13.767" y="0"><%= sparePartTotalCost %></tspan>
+                    </text>
+                    <text data-name="Brake fluid change and cleaning" font-family="Calibri" font-size="10" transform="translate(273 303)">
+                        <tspan x="-64.036" y="0"><%= workNameEnglish %></tspan>
+                    </text>
+                    <text data-name="Iron clips - كليبس حديد" font-family="ArialMT, Arial" font-size="10" transform="translate(271 539)">
+                        <tspan x="-42.637" y="0"><%= sparePartNameEnglish %> -</tspan>
+                        <tspan y="0"><%= sparePartNameArabic %></tspan>
+                    </text>
+                    <text data-name="تبديل وتنظيف زيت الفرامل" font-family="ArialMT, Arial" font-size="10" transform="translate(273 292)">
+                        <tspan x="-43.318" y="0"><%= workNameArabic %></tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </svg>
+</body>
+
+</html>
+
      `;
 };
 
@@ -1166,7 +1184,7 @@ export const whatsAppTemplate = {
      defaulterList,
      subscriptionExtended,
      scheduleInvoiceWarningMessage,
-     subscriptionDeleted
+     subscriptionDeleted,
      // resetPassword,
      // resetPasswordByUrl,
      // contactFormTemplate,

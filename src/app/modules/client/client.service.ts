@@ -235,6 +235,20 @@ const sendMessageToRecieveCar = async (id: string, providerWorkShopId: string) =
      await whatsAppHelper.sendWhatsAppTextMessage({ to: result.contact, body: message });
 };
 
+const getClienstByCarNumber = async (carNumber: string) => {
+     const isExistCarByNumber = await Car.findOne({
+          $or: [{ plateNumberForInternational: carNumber }, { slugForSaudiCarPlateNumber: carNumber }],
+     });
+     if (!isExistCarByNumber) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
+     }
+     const client = await Client.find({ cars: { $in: [isExistCarByNumber._id] } });
+     if (!client) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
+     }
+     return client;
+};
+
 export const clientService = {
      createClient,
      getAllClients,
@@ -246,4 +260,5 @@ export const clientService = {
      getClientByClientContact,
      toggleClientStatus,
      sendMessageToRecieveCar,
+     getClienstByCarNumber,
 };

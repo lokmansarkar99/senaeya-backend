@@ -17,7 +17,6 @@ export interface IInvoiceSpareParts {
      finalCost: number; // item.cost * quantity
 }
 
-
 export enum TranslatedFieldEnum {
      en,
      ar,
@@ -49,6 +48,7 @@ export interface IInvoice {
      totalCostOfSparePartsExcludingTax: number;
      car?: Types.ObjectId | null;
      invoiceAwsLink?: string;
+     invoiceQRLink?: string | '';
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

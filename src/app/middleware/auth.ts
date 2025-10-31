@@ -30,17 +30,17 @@ const auth =
                          throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized !!');
                     }
 
-                    if (verifyUser.deviceId) {
-                         const existingToken = await DeviceToken.findOne({
-                              userId: verifyUser.id,
-                         });
-                         if (!existingToken) {
-                              throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
-                         }
-                         if (existingToken.deviceId !== verifyUser.deviceId) {
-                              throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
-                         }
-                    }
+                    // if (verifyUser.deviceId) {
+                    //      const existingToken = await DeviceToken.findOne({
+                    //           userId: verifyUser.id,
+                    //      });
+                    //      if (!existingToken) {
+                    //           throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
+                    //      }
+                    //      if (existingToken.deviceId !== verifyUser.deviceId) {
+                    //           throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized with this device !!');
+                    //      }
+                    // }
 
                     //  user cheak isUserExist or not
                     const user = await User.isExistUserByContact(verifyUser.contact);

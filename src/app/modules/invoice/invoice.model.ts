@@ -38,6 +38,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           car: { type: Schema.Types.ObjectId, ref: 'Car', required: false, default: null },
           discount: { type: Number, required: false },
           discountType: { type: String, enum: DiscountType, required: false },
+          invoiceQRLink: { type: String, required: false, default: '' },
           worksList: { type: [InvoiceWorkSchema], required: true, default: [] },
           sparePartsList: { type: [InvoiceSparePartsSchema], required: false, default: [] },
           totalCostExcludingTax: { type: Number, required: true },

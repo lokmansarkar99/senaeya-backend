@@ -22,7 +22,7 @@ const loginUser = catchAsync(async (req, res) => {
      if (config.node_env === 'production') {
           cookieOptions.sameSite = 'none';
      }
-     sendResponse(res, { success: true, statusCode: StatusCodes.OK, message: 'User logged in successfully.', data: { accessToken: result.accessToken, refreshToken: result.refreshToken, workshops: result.workshops, role: result.role } });
+     sendResponse(res, { success: true, statusCode: StatusCodes.OK, message: 'User logged in successfully.', data: { accessToken: result.accessToken, refreshToken: result.refreshToken, workshops: result.workshops, role: result.role, userId: result.userId } });
 });
 
 const loginUserWithFingerPrint = catchAsync(async (req, res) => {
@@ -33,7 +33,7 @@ const loginUserWithFingerPrint = catchAsync(async (req, res) => {
      if (config.node_env === 'production') {
           cookieOptions.sameSite = 'none';
      }
-     sendResponse(res, { success: true, statusCode: StatusCodes.OK, message: 'User logged in successfully.', data: { accessToken: result.accessToken, refreshToken: result.refreshToken, workshops: result.workshops, role: result.role } });
+     sendResponse(res, { success: true, statusCode: StatusCodes.OK, message: 'User logged in successfully.', data: { accessToken: result.accessToken, refreshToken: result.refreshToken, workshops: result.workshops, role: result.role, userId: result.userId } });
 });
 
 const forgetPassword = catchAsync(async (req, res) => {

@@ -49,6 +49,8 @@ router.post(
      validateUserAuthority(),
      clientController.sendMessageToRecieveCar,
 );
+
+router.get('/clients-by-carNumber/:carNumber', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getClienstByCarNumber);
 router.patch(
      '/:id',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
