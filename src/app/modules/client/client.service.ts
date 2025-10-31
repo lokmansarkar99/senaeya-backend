@@ -242,7 +242,7 @@ const getClienstByCarNumber = async (carNumber: string) => {
      if (!isExistCarByNumber) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
      }
-     const client = await Client.find({ cars: { $in: [isExistCarByNumber._id] } });
+     const client = await Client.find({ cars: { $in: [isExistCarByNumber._id] } }).populate('clientId', 'name');
      if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
      }

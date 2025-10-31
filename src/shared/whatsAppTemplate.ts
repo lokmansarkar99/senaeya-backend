@@ -20,7 +20,48 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
      سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
 };
 
-const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum) => {
+const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
+     const {
+          invoiceQrCode="invoiceQrCode",
+          workShopImage="workShopImage",
+          totalSparePartsFinalCost="totalSparePartsFinalCost",
+          carYear="carYear",
+          carModelName="carModelName",
+          carBrandName="carBrandName",
+          workShopNameArabic="workShopNameArabic",
+          workshopNameAsClient="workshopNameAsClient",
+          crn="crn",
+          clientName="clientName",
+          contact="contact",
+          taxVatNumber="taxVatNumber",
+          invoiceNumber="invoiceNumber",
+          invoiceCreatedAt="invoiceCreatedAt",
+          paymentMethod="paymentMethod",
+          isPostPaid="isPostPaid",
+          finalCost="finalCost",
+          taxAmount="taxAmount",
+          workshopDiscount="workshopDiscount",
+          totalCostWithoutTax="totalCostWithoutTax",
+          englishAlphabetCombination="englishAlphabetCombination",
+          englishPlateNumber="englishPlateNumber",
+          arabicPlateNumber="arabicPlateNumber",
+          interNationalCarNumber="interNationalCarNumber",
+          workShopAddress="workShopAddress",
+          workShopOwnerName="workShopOwnerName",
+          bankNumber="bankNumber",
+          workCode="workCode",
+          workQuantity="workQuantity",
+          workPrice="workPrice",
+          workFinalCost="workFinalCost",
+          workNameEnglish="workNameEnglish",
+          workNameArabic="workNameArabic",
+          sparePartNameArabic="sparePartNameArabic",
+          sparePartNameEnglish="sparePartNameEnglish",
+          sparePartQuantity="sparePartQuantity",
+          sparePartCost="sparePartCost",
+          sparePartCode="sparePartCode",
+          sparePartTotalCost="sparePartTotalCost",
+     } = data;
      return `
      
 <!DOCTYPE html>
@@ -106,19 +147,19 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
 
                     <!-- Company Info -->
                     <text data-name="مركز محمد لصيانة السيارات" font-family="Arial-BoldMT, Arial" font-size="20" font-weight="700" transform="translate(379 38)">
-                        <tspan x="0" y="0"><%= workShopNameArabic %></tspan>
+                        <tspan x="0" y="0">${workShopNameArabic}</tspan>
                     </text>
                     <text data-name="مؤسسة محمد علي التجارية" font-family="ArialMT, Arial" font-size="15" transform="translate(435 64)">
-                        <tspan x="0" y="0"><%= client.name || workshopNameAsClient %></tspan>
+                        <tspan x="0" y="0">${clientName || workshopNameAsClient}</tspan>
                     </text>
                     <text data-name="سجل تجاري" font-family="ArialMT, Arial" font-size="10" transform="translate(524 79)">
                         <tspan x="0" y="0">سجل تجاري</tspan>
                     </text>
                     <text data-name="1010347328" font-family="Calibri" font-size="10" transform="translate(463 80)">
-                        <tspan x="0" y="0"><%= crn %></tspan>
+                        <tspan x="0" y="0">${crn}</tspan>
                     </text>
                     <text data-name="300787972600003" font-family="Calibri" font-size="10" transform="translate(438 94)">
-                        <tspan x="0" y="0"><%= taxVatNumber %></tspan>
+                        <tspan x="0" y="0">${taxVatNumber}</tspan>
                     </text>
                     <text data-name="الرقم الضريبي" font-family="ArialMT, Arial" font-size="10" transform="translate(518 93)">
                         <tspan x="0" y="0">الرقم الضريبي</tspan>
@@ -127,13 +168,13 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                     <!-- Vehicle Info Background -->
                     <path fill="#eee" d="M13 177h432v31H13z" data-name="Rectangle 4"></path>
                     <text font-family="Calibri" font-size="18" transform="translate(88 199)">
-                        <tspan x="0" y="0"><%= carBrandName %></tspan>
+                        <tspan x="0" y="0">${carBrandName}</tspan>
                     </text>
                     <text font-family="Calibri" font-size="18" transform="translate(235 199)">
-                        <tspan x="0" y="0"><%= carModelName %></tspan>
+                        <tspan x="0" y="0">${carModelName}</tspan>
                     </text>
                     <text data-name="2020" font-family="Calibri" font-size="18" transform="translate(380 199)">
-                        <tspan x="0" y="0"><%= carYear %></tspan>
+                        <tspan x="0" y="0">${carYear}</tspan>
                     </text>
 
                     <!-- Customer Info Row -->
@@ -145,19 +186,19 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-13.645" y="0">العميل</tspan>
                     </text>
                     <text data-name="Mohammad Ahmed" font-family="Calibri" font-size="12" transform="translate(489 231)">
-                        <tspan x="-48.844" y="0"><%= clientName %></tspan>
+                        <tspan x="-48.844" y="0">${clientName}</tspan>
                     </text>
                     <text font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(317 232)">
                         <tspan x="-14.656" y="0">الجوال</tspan>
                     </text>
                     <text data-name="966-5xxxxxxxx" font-family="Calibri" font-size="12" transform="translate(260 232)">
-                        <tspan x="-34.79" y="0"><%= contact %></tspan>
+                        <tspan x="-34.79" y="0">${contact}</tspan>
                     </text>
                     <text data-name="الرقم الضريبي" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(169 232)">
                         <tspan x="-32.214" y="0">الرقم الضريبي</tspan>
                     </text>
                     <text data-name="VAT 3xxxxxxxxxxxxx3" font-family="Calibri" font-size="12" transform="translate(77 232)">
-                        <tspan xml:space="preserve" x="-95.627" y="0"><%= taxVatNumber %></tspan>
+                        <tspan xml:space="preserve" x="-95.627" y="0">${taxVatNumber}</tspan>
                     </text>
 
                     <!-- Invoice Details -->
@@ -165,21 +206,21 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-23.3" y="0">رقم الفاتورة</tspan>
                     </text>
                     <text data-name="1062" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(117 143)">
-                        <tspan x="-12.164" y="0"><%= invoiceNumber %></tspan>
+                        <tspan x="-12.164" y="0">${invoiceNumber}</tspan>
                     </text>
                     <text data-name="PM 09:43 25-10-2025" font-family="Calibri" font-size="10" transform="translate(84 166)">
-                        <tspan xml:space="preserve" x="-81.059" y="0"><%= invoiceCreatedAt %></tspan>
+                        <tspan xml:space="preserve" x="-81.059" y="0">${invoiceCreatedAt}</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="وقت وتاريخ الفاتورة" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(182 167)">
                         <tspan x="-40.131" y="0">وقت وتاريخ الفاتورة</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="نقدي - Cash" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(301 157)">
                         <tspan x="-29.502" y="0">نقدي</tspan>
-                        <tspan xml:space="preserve" y="0">- <%= paymentMethod %></tspan>
+                        <tspan xml:space="preserve" y="0">- ${paymentMethod}</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="آجل - Postpaid" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(302 171)">
                         <tspan x="-37.945" y="0">آجل</tspan>
-                        <tspan xml:space="preserve" y="0">- <%= isPostPaid %></tspan>
+                        <tspan xml:space="preserve" y="0">- ${isPostPaid}</tspan>
                     </text>
                     <text data-name="فاتورة ضريبية مبسطة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(299 127)">
                         <tspan x="-54.448" y="0">فاتورة ضريبية مبسطة</tspan>
@@ -295,7 +336,7 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-41.909" y="0">(Total of spare parts)</tspan>
                     </text>
                     <text fill="#fff" data-name="255" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 647)">
-                        <tspan x="-22.41" y="0"><%= totalSparePartsFinalCost %></tspan>
+                        <tspan x="-22.41" y="0">${totalSparePartsFinalCost}</tspan>
                     </text>
                     <text data-name="الخصم قبل الضريبة" font-family="ArialMT, Arial" font-size="14" transform="translate(534 722)">
                         <tspan x="-44.198" y="0">الخصم قبل الضريبة</tspan>
@@ -304,19 +345,19 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-56.741" y="0">الإجمالي شامل الضريبة</tspan>
                     </text>
                     <text fill="#fff" data-name="621" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 788)">
-                        <tspan x="-22.41" y="0"><%= finalCost %></tspan>
+                        <tspan x="-22.41" y="0">${finalCost}</tspan>
                     </text>
                     <text fill="#fff" data-name="(Total including tax)" font-family="Calibri" font-size="10" transform="translate(524 796)">
                         <tspan x="-39.624" y="0">(Total including tax)</tspan>
                     </text>
                     <text data-name="81" font-family="Calibri" font-size="12" transform="translate(391 753)">
-                        <tspan x="-13.679" y="0"><%= taxAmount %></tspan>
+                        <tspan x="-13.679" y="0">${taxAmount}</tspan>
                     </text>
                     <text data-name="10" font-family="Calibri" font-size="12" transform="translate(391 722)">
-                        <tspan x="-13.679" y="0"><%= workshopDiscout %></tspan>
+                        <tspan x="-13.679" y="0">${workshopDiscount}</tspan>
                     </text>
                     <text data-name="550" font-family="Calibri" font-size="12" transform="translate(394 691)">
-                        <tspan x="-16.72" y="0"><%= totalCostWithoutTax %></tspan>
+                        <tspan x="-16.72" y="0">${totalCostWithoutTax}</tspan>
                     </text>
                     <text data-name="(VAT 15%) الضريبة" font-family="ArialMT, Arial" font-size="12" transform="translate(529 753)">
                         <tspan x="-48.573" y="0">(VAT 15%)</tspan>
@@ -348,7 +389,7 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-34.471" y="0">(Workshop Manager)</tspan>
                     </text>
                     <text data-name="Asif Abdulwadud" font-family="Calibri" font-size="10" transform="translate(88 775)">
-                        <tspan x="-34.368" y="0"><%= workshopOwnerName %></tspan>
+                        <tspan x="-34.368" y="0">${workShopOwnerName}</tspan>
                     </text>
 
                     <!-- Bank Account -->
@@ -356,7 +397,7 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="0" y="0">الحساب البنكي</tspan>
                     </text>
                     <text font-family="Calibri" font-size="9" transform="translate(404 107)">
-                        <tspan x="0" y="0"><%= bankNumber %></tspan>
+                        <tspan x="0" y="0">${bankNumber}</tspan>
                     </text>
 
                     <!-- QR Code Placeholder -->
@@ -409,32 +450,19 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <g data-name="#3f3f41ff">
                             <path d="M452.007 145.185a6.2 6.2 0 0 1 1.965-.249q62.586.05 125.166.028a2.575 2.575 0 0 1 2.823 2.84c.066 18.844-.011 37.688.039 56.532-.011 1.3.017 3.095-1.45 3.648-1.722.487-3.543.232-5.309.288q-60.634-.025-121.268-.006c-1.34.066-3.023-.31-3.333-1.849a46 46 0 0 1-.116-5.453q0-26.306-.006-52.624c-.055-1.19.2-2.707 1.489-3.155m1.1 1.688c-.9.144-.775 1.373-.886 2.054-.033 7.938.022 15.888-.022 23.826.055.98-.138 2.187.819 2.812a10.5 10.5 0 0 0 2.087.188q26.024-.042 52.054-.011a33.5 33.5 0 0 0 5.425-.177c1.135-.742.747-2.22.847-3.36-.072-7.933.061-15.866-.061-23.793.155-1.672-1.616-1.843-2.856-1.794q-26.315.017-52.629 0a20.3 20.3 0 0 0-4.777.255m62.671.061c-.864.548-.626 1.655-.7 2.513.044 8.11-.022 16.226.033 24.336a1.7 1.7 0 0 0 1.993 1.938c13.485.055 26.976-.017 40.462.033.98-.033 2.081.083 2.884-.609.542-2.231.166-4.567.266-6.842-.105-7.1.216-14.222-.172-21.319a42.4 42.4 0 0 0-7.994-.36c-11.454 0-22.913.017-34.367-.011a6.4 6.4 0 0 0-2.408.321m47.459-.105c-1.074.172-.941 1.34-1.008 2.159q-.008 25.991-.006 51.993a31 31 0 0 0 .133 4.584c.5 1.1 1.893.88 2.884.985 4.257-.022 8.52.072 12.777-.044a1.67 1.67 0 0 0 1.987-1.777c.055-18.429-.017-36.858.033-55.287-.033-.941.127-2.375-1.074-2.657-2.879-.376-5.8-.061-8.691-.155-2.342.089-4.728-.249-7.036.2m-110.402 30.884c-.736.714-.587 1.8-.637 2.724q.033 11.393 0 22.786a5.64 5.64 0 0 0 .5 2.928 8.5 8.5 0 0 0 2.934.41q27.162-.017 54.329 0a8.1 8.1 0 0 0 2.94-.41 5.3 5.3 0 0 0 .526-2.934c-.028-6.1-.017-12.2-.011-18.3-.028-2.452.188-4.949-.41-7.357-2.868-.2-5.746-.1-8.619-.116-16.436-.011-32.872.017-49.308-.017a6.4 6.4 0 0 0-2.248.288m62.367.814c-.266 2.3-.05 4.628-.105 6.942.055 6.881-.127 13.762.1 20.643a36.3 36.3 0 0 0 8.016.443q14.673-.008 29.34 0c2.685-.022 5.409.177 8.049-.437.255-6.693.05-13.4.111-20.1-.066-2.5.183-5.021-.116-7.512-.221-1.135-1.611-1.063-2.5-1.085q-20.211.033-40.423.006c-.925.002-2.181-.015-2.469 1.098Z" data-name="Path 259"></path>
                         </g>
-                        <path fill-rule="evenodd" d="M572.791 163.542c.524-.556.413-1.183-.006-1.191a.9.9 0 0 1-.325.913c-.33-.284-.671-.6-1.025-.923 1.728-1.427 3.613-2.693 6.08-2.733-2.652-.953-4.776.668-6.571 2.29-1.795-1.622-3.915-3.243-6.571-2.29 2.467.04 4.355 1.305 6.08 2.732-.354.325-.7.64-1.026.923a.91.91 0 0 1-.325-.913c-.418.007-.529.635-.005 1.191a2.7 2.7 0 0 1-.819.541.314.314 0 0 1-.412-.279c-.079-.475-.816-.4-.726.267a.992.992 0 0 0 1.463.6 5.3 5.3 0 0 0 .885-.665.9.9 0 0 1 .325.913c.419-.008.529-.635.006-1.191.372-.317.745-.645 1.125-.968.38.324.753.651 1.125.968-.524.557-.413 1.184.006 1.191a.9.9 0 0 1 .325-.913 5.4 5.4 0 0 0 .885.665.992.992 0 0 0 1.463-.6c.09-.671-.646-.742-.726-.267a.314.314 0 0 1-.412.279 2.7 2.7 0 0 1-.819-.541m-3.258-8.9a4.55 4.55 0 0 0 .154 3.557 5.33 5.33 0 0 1 .762-3.331l.114 1.169h-.134l.134 1.362h-.134l.134 1.369h-.134l.134 1.363-.386.385h1.53l-.384-.385.14-1.363h-.14l.14-1.369h-.14l.14-1.362h-.14l.117-1.166a5.34 5.34 0 0 1 .762 3.328 4.56 4.56 0 0 0 .153-3.559 6.36 6.36 0 0 1 1.441 2.911 4.41 4.41 0 0 0-.942-3.638 5.64 5.64 0 0 1 1.83 2.136 3.74 3.74 0 0 0-1.8-2.973 4.22 4.22 0 0 1 2.16 1.564 3.2 3.2 0 0 0-2.438-2.373 3.47 3.47 0 0 1 2.2.476 2.88 2.88 0 0 0-2.872-1.105 2.43 2.43 0 0 1 1.481-.259 1.95 1.95 0 0 0-2.1-.114l-.371-.926-.367.925a1.95 1.95 0 0 0-2.104.115 2.43 2.43 0 0 1 1.481.259 2.88 2.88 0 0 0-2.874 1.1 3.48 3.48 0 0 1 2.2-.476 3.2 3.2 0 0 0-2.439 2.378 4.22 4.22 0 0 1 2.16-1.564 3.74 3.74 0 0 0-1.8 2.973 5.64 5.64 0 0 1 1.83-2.136 4.41 4.41 0 0 0-.942 3.638 6.36 6.36 0 0 1 1.445-2.909" data-name="Emblem_of_Saudi_Arabia_(2)"></path>
-                        <text font-family="Arial-BoldMT, Arial" font-size="6" font-weight="700" transform="translate(571.42 180.01)">
-                            <tspan x="-2.167" y="0">K</tspan>
-                        </text>
-                        <text font-family="Arial-BoldMT, Arial" font-size="7" font-weight="700" transform="translate(571.419 187.939)">
-                            <tspan x="-2.334" y="0">S</tspan>
-                        </text>
-                        <text font-family="Arial-BoldMT, Arial" font-size="6" font-weight="700" transform="translate(571.439 194.868)">
-                            <tspan x="-2.167" y="0">A</tspan>
-                        </text>
+                        
                         <text data-name="د ق ط" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(538.67 165.959)">
-                            <tspan x="-16.199" y="0"><%= englishAlphabetCombination %></tspan>
+                            <tspan x="-16.199" y="0">${englishAlphabetCombination}</tspan>
                         </text>
                         <text data-name="T G D" font-family="Calibri-Bold, Calibri" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(537.67 194.858)">
-                            <tspan x="-17.464" y="0"><%= englishAlphabetCombination %></tspan>
+                            <tspan x="-17.464" y="0">${englishAlphabetCombination}</tspan>
                         </text>
                         <text data-name="6430" font-family="Calibri" font-size="18" letter-spacing=".07em" transform="translate(483.658 196.501)">
-                            <tspan x="-20.136" y="0"><%= englishPlateNumber %></tspan>
+                            <tspan x="-20.136" y="0">${englishPlateNumber}</tspan>
                         </text>
                         <text data-name="6430" font-family="Calligraphr-Regular, Calligraphr" font-size="16" letter-spacing=".07em" transform="translate(483.91 166.803)">
-                            <tspan x="-19.616" y="0"><%= arabicPlateNumber %></tspan>
+                            <tspan x="-19.616" y="0">${arabicPlateNumber}</tspan>
                         </text>
-                        <text font-family="Arial-BoldMT, Arial" font-size="5" font-weight="700" transform="translate(571 172)">
-                            <tspan x="-7.251" y="0">السعودية</tspan>
-                        </text>
-                        <circle cx="3" cy="3" r="3" data-name="Ellipse 2" transform="translate(568.5 198)"></circle>
                     </g>
 
                     <!-- License Plate -->
@@ -444,19 +472,19 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                             <rect width="130" height="27" x=".5" y=".5" fill="none" rx="3.5"></rect>
                         </g>
                         <text font-family="Calibri-Bold, Calibri" font-size="17" font-weight="700" letter-spacing=".15em" transform="translate(466 133)">
-                            <tspan x="0" y="0"><%= interNationalCarNumber %></tspan>
+                            <tspan x="0" y="0">${interNationalCarNumber}</tspan>
                         </text>
                     </g>
 
                     <!-- Saudi Flag -->
-                    <%= workShop.image %>
+                    ${workShopImage}
 
                     <!-- Footer Text -->
                     <text fill="#fff" data-name="Riyadh - old Industrial - ali st." font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(507 830)">
-                        <tspan x="-72.36" y="0"><%= workShopAddress %></tspan>
+                        <tspan x="-72.36" y="0">${workShopAddress}</tspan>
                     </text>
                     <text fill="#fff" data-name="966-5xxxxxxxx" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" letter-spacing=".07em" transform="translate(279 830)">
-                        <tspan x="-41.096" y="0"><%= contact %></tspan>
+                        <tspan x="-41.096" y="0">${contact}</tspan>
                     </text>
 
                     <!-- Signature Icon -->
@@ -487,7 +515,7 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                     </g>
 
                     <!-- Barcode Black Bars -->
-                    <%= invoice.qrCode %>
+                    ${invoiceQrCode}
                     <!-- Thank You Text -->
                     <text fill="#fff" data-name="Thank you for your visit and we are always at your service" font-family="Calibri" font-size="12" transform="translate(104 812)">
                         <tspan x="-67.588" y="0">Thank you for your visit and</tspan>
@@ -507,38 +535,38 @@ const createInvoice = async (updatedInvoice: IInvoice, lang: TranslatedFieldEnum
                         <tspan x="-3.041" y="0">1</tspan>
                     </text>
                     <text data-name="3017" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(84 299)">
-                        <tspan x="-12.164" y="0"><%= workCode %></tspan>
+                        <tspan x="-12.164" y="0">${workCode}</tspan>
                     </text>
                     <text data-name="865327" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(88 539)">
-                        <tspan x="-18.246" y="0"><%= sparePartCode %></tspan>
+                        <tspan x="-18.246" y="0">${sparePartCode}</tspan>
                     </text>
                     <text data-name="2" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 299)">
-                        <tspan x="-3.041" y="0"><%= workQuantity %></tspan>
+                        <tspan x="-3.041" y="0">${workQuantity}</tspan>
                     </text>
                     <text data-name="3" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 539)">
-                        <tspan x="-3.041" y="0"><%= sparePartQuantity %></tspan>
+                        <tspan x="-3.041" y="0">${sparePartQuantity}</tspan>
                     </text>
                     <text data-name="27" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 299)">
-                        <tspan x="-13.767" y="0"><%= workPrice %></tspan>
+                        <tspan x="-13.767" y="0">${workPrice}</tspan>
                     </text>
                     <text data-name="8.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 539)">
-                        <tspan x="-10.726" y="0"><%= sparePartCost %></tspan>
+                        <tspan x="-10.726" y="0">${sparePartCost}</tspan>
                     </text>
                     <text data-name="54" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 299)">
-                        <tspan x="-13.767" y="0"><%= workFinalCost %></tspan>
+                        <tspan x="-13.767" y="0">${workFinalCost}</tspan>
                     </text>
                     <text data-name="25.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 539)">
-                        <tspan x="-13.767" y="0"><%= sparePartTotalCost %></tspan>
+                        <tspan x="-13.767" y="0">${sparePartTotalCost}</tspan>
                     </text>
                     <text data-name="Brake fluid change and cleaning" font-family="Calibri" font-size="10" transform="translate(273 303)">
-                        <tspan x="-64.036" y="0"><%= workNameEnglish %></tspan>
+                        <tspan x="-64.036" y="0">${workNameEnglish}</tspan>
                     </text>
                     <text data-name="Iron clips - كليبس حديد" font-family="ArialMT, Arial" font-size="10" transform="translate(271 539)">
-                        <tspan x="-42.637" y="0"><%= sparePartNameEnglish %> -</tspan>
-                        <tspan y="0"><%= sparePartNameArabic %></tspan>
+                        <tspan x="-42.637" y="0">${sparePartNameEnglish} -</tspan>
+                        <tspan y="0">${sparePartNameArabic}</tspan>
                     </text>
                     <text data-name="تبديل وتنظيف زيت الفرامل" font-family="ArialMT, Arial" font-size="10" transform="translate(273 292)">
-                        <tspan x="-43.318" y="0"><%= workNameArabic %></tspan>
+                        <tspan x="-43.318" y="0">${workNameArabic}</tspan>
                     </text>
                 </g>
             </g>
