@@ -172,7 +172,31 @@ const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | nul
      if (isExist.image) {
           unlinkFile(isExist.image);
      }
-     return await Car.findByIdAndUpdate(id, payload, { new: true });
+     if (payload.plateNumberForSaudi) {
+          payload.slugForSaudiCarPlateNumber = generateSlug({
+               symbol: (payload.plateNumberForSaudi.symbol ? payload.plateNumberForSaudi.symbol : isExist?.plateNumberForSaudi?.symbol) || '',
+               numberEnglish: (payload.plateNumberForSaudi.numberEnglish ? payload.plateNumberForSaudi.numberEnglish : isExist?.plateNumberForSaudi?.numberEnglish) || '',
+               numberArabic: (payload.plateNumberForSaudi.numberArabic ? payload.plateNumberForSaudi.numberArabic : isExist?.plateNumberForSaudi?.numberArabic) || '',
+               alphabetsCombinations:
+                    (payload.plateNumberForSaudi.alphabetsCombinations ? payload.plateNumberForSaudi.alphabetsCombinations : isExist?.plateNumberForSaudi?.alphabetsCombinations) || [],
+          });
+
+          payload.plateNumberForSaudi = {
+               symbol: payload.plateNumberForSaudi.symbol || isExist?.plateNumberForSaudi?.symbol || '',
+               numberEnglish: payload.plateNumberForSaudi.numberEnglish || isExist?.plateNumberForSaudi?.numberEnglish || '',
+               numberArabic: payload.plateNumberForSaudi.numberArabic || isExist?.plateNumberForSaudi?.numberArabic || '',
+               alphabetsCombinations: payload.plateNumberForSaudi.alphabetsCombinations || isExist?.plateNumberForSaudi?.alphabetsCombinations || [],
+          };
+     }
+
+     const result = await Car.findByIdAndUpdate(id, payload, { new: true });
+     if (!result) {
+          if (payload.image) {
+               unlinkFile(payload.image);
+          }
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
+     }
+     return result;
 };
 
 const deleteCar = async (id: string): Promise<ICar | null> => {
