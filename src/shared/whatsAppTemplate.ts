@@ -314,7 +314,10 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                          data.sparePartsList && data.sparePartsList.length > 0
                               ? data.sparePartsList
                                      .map((sparePart: any, index: any) => {
-                                          const sparePartName = sparePart.itemName || '';
+                                          const sparePartName = sparePart.itemName || '';                                          
+                                          // const sparePartNameObj = await buildTranslatedField(sparePart.itemName as any);
+                                          // const sparePartNameArabic = sparePartNameObj['ar'];
+                                          // const sparePartNameEnglish = sparePartNameObj['en'];
                                           const sparePartQuantity = sparePart.quantity || '';
                                           const sparePartCost = sparePart.cost || '';
                                           const sparePartTotalCost = sparePart.finalCost || '';
