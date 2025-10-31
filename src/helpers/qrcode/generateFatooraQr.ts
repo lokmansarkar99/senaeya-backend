@@ -63,7 +63,7 @@ export async function generateFatooraQR(data: IFatooraQr){
      });
 
      console.log(`🎉 QR Code saved at ${filePath}`);
-     return `/uploads/image/${fileName}`;
+     return `/image/${fileName}`;
 }
 
 // Run the generator

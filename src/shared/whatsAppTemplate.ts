@@ -1,6 +1,8 @@
-import { CLIENT_STATUS } from '../app/modules/client/client.enum';
+import { CLIENT_CAR_TYPE, CLIENT_STATUS } from '../app/modules/client/client.enum';
 import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
+import { PaymentMethod } from '../app/modules/payment/payment.enum';
 import { IworkShop } from '../app/modules/workShop/workShop.interface';
+import config from '../config';
 import { buildTranslatedField } from '../utils/buildTranslatedField';
 
 const createAccount = (values: { name?: string; otp: number; contact: string }) => {
@@ -20,47 +22,49 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
      سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
 };
 
-const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
+const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) => {
+     console.log('🚀 ~ createInvoice ~ data:', data);
      const {
-          invoiceQrCode="invoiceQrCode",
-          workShopImage="workShopImage",
-          totalSparePartsFinalCost="totalSparePartsFinalCost",
-          carYear="carYear",
-          carModelName="carModelName",
-          carBrandName="carBrandName",
-          workShopNameArabic="workShopNameArabic",
-          workshopNameAsClient="workshopNameAsClient",
-          crn="crn",
-          clientName="clientName",
-          contact="contact",
-          taxVatNumber="taxVatNumber",
-          invoiceNumber="invoiceNumber",
-          invoiceCreatedAt="invoiceCreatedAt",
-          paymentMethod="paymentMethod",
-          isPostPaid="isPostPaid",
-          finalCost="finalCost",
-          taxAmount="taxAmount",
-          workshopDiscount="workshopDiscount",
-          totalCostWithoutTax="totalCostWithoutTax",
-          englishAlphabetCombination="englishAlphabetCombination",
-          englishPlateNumber="englishPlateNumber",
-          arabicPlateNumber="arabicPlateNumber",
-          interNationalCarNumber="interNationalCarNumber",
-          workShopAddress="workShopAddress",
-          workShopOwnerName="workShopOwnerName",
-          bankNumber="bankNumber",
-          workCode="workCode",
-          workQuantity="workQuantity",
-          workPrice="workPrice",
-          workFinalCost="workFinalCost",
-          workNameEnglish="workNameEnglish",
-          workNameArabic="workNameArabic",
-          sparePartNameArabic="sparePartNameArabic",
-          sparePartNameEnglish="sparePartNameEnglish",
-          sparePartQuantity="sparePartQuantity",
-          sparePartCost="sparePartCost",
-          sparePartCode="sparePartCode",
-          sparePartTotalCost="sparePartTotalCost",
+          // data?.providerWorkShopId?.image="workShopImage",
+          // data?.providerWorkShopId?.workshopNameArabic="workShopNameArabic",
+          // data?.providerWorkShopId?.address || ""="workShopAddress",
+          // data?.providerWorkShopId?.ownerId?.name || ""="workShopOwnerName",
+          // data?.providerWorkShopId?.crn="crn",
+          //  data?.providerWorkShopId?.bankAccountNumber="bankNumber",
+          // data?.finalDiscountInFlatAmount="workshopDiscount",
+          // data?.totalCostOfSparePartsExcludingTax="totalSparePartsFinalCost",
+          // data?.client?.workShopNameAsClient="workshopNameAsClient",
+          // data?.car?.year="carYear",
+          // data?.car?.model?.title="carModelName",
+          // data?.car?.brand?.title="carBrandName",
+          englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '',
+          arabicAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[1] : '',
+          englishPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberEnglish : '',
+          arabicPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberArabic : '',
+          interNationalCarNumber = data?.car?.carType == CLIENT_CAR_TYPE.INTERNATIONAL ? data?.car?.plateNumberForInternational : '',
+          // data?.client?.clientId?.name="clientName",
+          // contact: data?.client?.contact || ''="contact",
+          // data?.providerWorkShopId?.taxVatNumber="taxVatNumber"
+          // data?._id="invoiceNumber",
+          // data.invoiceQRLink="",
+          // data?.createdAt="invoiceCreatedAt",
+          // data?.paymentMethod="paymentMethod",
+          isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID,
+          // data?.finalCost="finalCost",
+          // data?.taxAmount="taxAmount",
+          // data?.totalCostExcludingTax="totalCostWithoutTax",
+          workCode = 'workCode',
+          workQuantity = 'workQuantity',
+          workPrice = 'workPrice',
+          workFinalCost = 'workFinalCost',
+          workNameEnglish = 'workNameEnglish',
+          workNameArabic = 'workNameArabic',
+          sparePartNameArabic = 'sparePartNameArabic',
+          sparePartNameEnglish = 'sparePartNameEnglish',
+          sparePartQuantity = 'sparePartQuantity',
+          sparePartCost = 'sparePartCost',
+          sparePartCode = 'sparePartCode',
+          sparePartTotalCost = 'sparePartTotalCost',
      } = data;
      return `
      
@@ -147,19 +151,19 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
 
                     <!-- Company Info -->
                     <text data-name="مركز محمد لصيانة السيارات" font-family="Arial-BoldMT, Arial" font-size="20" font-weight="700" transform="translate(379 38)">
-                        <tspan x="0" y="0">${workShopNameArabic}</tspan>
+                        <tspan x="0" y="0">${data?.providerWorkShopId?.workshopNameArabic || ''}</tspan>
                     </text>
                     <text data-name="مؤسسة محمد علي التجارية" font-family="ArialMT, Arial" font-size="15" transform="translate(435 64)">
-                        <tspan x="0" y="0">${clientName || workshopNameAsClient}</tspan>
+                        <tspan x="0" y="0">${data?.client?.clientId?.name || data?.client?.workShopNameAsClient || ''}</tspan>
                     </text>
                     <text data-name="سجل تجاري" font-family="ArialMT, Arial" font-size="10" transform="translate(524 79)">
                         <tspan x="0" y="0">سجل تجاري</tspan>
                     </text>
                     <text data-name="1010347328" font-family="Calibri" font-size="10" transform="translate(463 80)">
-                        <tspan x="0" y="0">${crn}</tspan>
+                        // data?.providerWorkShopId?.crn || ''}</tspan>
                     </text>
                     <text data-name="300787972600003" font-family="Calibri" font-size="10" transform="translate(438 94)">
-                        <tspan x="0" y="0">${taxVatNumber}</tspan>
+                        <tspan x="0" y="0">${data?.providerWorkShopId?.taxVatNumber || ''}</tspan>
                     </text>
                     <text data-name="الرقم الضريبي" font-family="ArialMT, Arial" font-size="10" transform="translate(518 93)">
                         <tspan x="0" y="0">الرقم الضريبي</tspan>
@@ -168,13 +172,13 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                     <!-- Vehicle Info Background -->
                     <path fill="#eee" d="M13 177h432v31H13z" data-name="Rectangle 4"></path>
                     <text font-family="Calibri" font-size="18" transform="translate(88 199)">
-                        <tspan x="0" y="0">${carBrandName}</tspan>
+                        <tspan x="0" y="0">${data?.car?.brand?.title || ''}</tspan>
                     </text>
                     <text font-family="Calibri" font-size="18" transform="translate(235 199)">
-                        <tspan x="0" y="0">${carModelName}</tspan>
+                        <tspan x="0" y="0">${data?.car?.model?.title || ''}</tspan>
                     </text>
                     <text data-name="2020" font-family="Calibri" font-size="18" transform="translate(380 199)">
-                        <tspan x="0" y="0">${carYear}</tspan>
+                        <tspan x="0" y="0">${data?.car?.year || ''}</tspan>
                     </text>
 
                     <!-- Customer Info Row -->
@@ -186,19 +190,19 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-13.645" y="0">العميل</tspan>
                     </text>
                     <text data-name="Mohammad Ahmed" font-family="Calibri" font-size="12" transform="translate(489 231)">
-                        <tspan x="-48.844" y="0">${clientName}</tspan>
+                        <tspan x="-48.844" y="0">${data?.client?.clientId?.name || ''}</tspan>
                     </text>
                     <text font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(317 232)">
                         <tspan x="-14.656" y="0">الجوال</tspan>
                     </text>
                     <text data-name="966-5xxxxxxxx" font-family="Calibri" font-size="12" transform="translate(260 232)">
-                        <tspan x="-34.79" y="0">${contact}</tspan>
+                        <tspan x="-34.79" y="0">${data?.client?.contact || ''}</tspan>
                     </text>
                     <text data-name="الرقم الضريبي" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(169 232)">
                         <tspan x="-32.214" y="0">الرقم الضريبي</tspan>
                     </text>
                     <text data-name="VAT 3xxxxxxxxxxxxx3" font-family="Calibri" font-size="12" transform="translate(77 232)">
-                        <tspan xml:space="preserve" x="-95.627" y="0">${taxVatNumber}</tspan>
+                        <tspan xml:space="preserve" x="-95.627" y="0">${data?.providerWorkShopId?.taxVatNumber || ''}</tspan>
                     </text>
 
                     <!-- Invoice Details -->
@@ -206,21 +210,21 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-23.3" y="0">رقم الفاتورة</tspan>
                     </text>
                     <text data-name="1062" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(117 143)">
-                        <tspan x="-12.164" y="0">${invoiceNumber}</tspan>
+                        <tspan x="-12.164" y="0">${data?._id || ''}</tspan>
                     </text>
                     <text data-name="PM 09:43 25-10-2025" font-family="Calibri" font-size="10" transform="translate(84 166)">
-                        <tspan xml:space="preserve" x="-81.059" y="0">${invoiceCreatedAt}</tspan>
+                        <tspan xml:space="preserve" x="-81.059" y="0">${data?.createdAt || ''}</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="وقت وتاريخ الفاتورة" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(182 167)">
                         <tspan x="-40.131" y="0">وقت وتاريخ الفاتورة</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="نقدي - Cash" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(301 157)">
                         <tspan x="-29.502" y="0">نقدي</tspan>
-                        <tspan xml:space="preserve" y="0">- ${paymentMethod}</tspan>
+                        <tspan xml:space="preserve" y="0">- ${data?.paymentMethod || ''}</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="آجل - Postpaid" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(302 171)">
                         <tspan x="-37.945" y="0">آجل</tspan>
-                        <tspan xml:space="preserve" y="0">- ${isPostPaid}</tspan>
+                        <tspan xml:space="preserve" y="0">- ${isPostPaid || ''}</tspan>
                     </text>
                     <text data-name="فاتورة ضريبية مبسطة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(299 127)">
                         <tspan x="-54.448" y="0">فاتورة ضريبية مبسطة</tspan>
@@ -336,7 +340,7 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-41.909" y="0">(Total of spare parts)</tspan>
                     </text>
                     <text fill="#fff" data-name="255" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 647)">
-                        <tspan x="-22.41" y="0">${totalSparePartsFinalCost}</tspan>
+                        // <tspan x="-22.41" y="0">${data?.totalCostOfSparePartsExcludingTax || ''}</tspan>
                     </text>
                     <text data-name="الخصم قبل الضريبة" font-family="ArialMT, Arial" font-size="14" transform="translate(534 722)">
                         <tspan x="-44.198" y="0">الخصم قبل الضريبة</tspan>
@@ -345,19 +349,19 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-56.741" y="0">الإجمالي شامل الضريبة</tspan>
                     </text>
                     <text fill="#fff" data-name="621" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 788)">
-                        <tspan x="-22.41" y="0">${finalCost}</tspan>
+                        <tspan x="-22.41" y="0">${data?.finalCost || ''}</tspan>
                     </text>
                     <text fill="#fff" data-name="(Total including tax)" font-family="Calibri" font-size="10" transform="translate(524 796)">
                         <tspan x="-39.624" y="0">(Total including tax)</tspan>
                     </text>
                     <text data-name="81" font-family="Calibri" font-size="12" transform="translate(391 753)">
-                        <tspan x="-13.679" y="0">${taxAmount}</tspan>
+                        <tspan x="-13.679" y="0">${data?.taxAmount || ''}</tspan>
                     </text>
                     <text data-name="10" font-family="Calibri" font-size="12" transform="translate(391 722)">
-                        <tspan x="-13.679" y="0">${workshopDiscount}</tspan>
+                        // <tspan x="-13.679" y="0">${data?.finalDiscountInFlatAmount || ''}</tspan>
                     </text>
                     <text data-name="550" font-family="Calibri" font-size="12" transform="translate(394 691)">
-                        <tspan x="-16.72" y="0">${totalCostWithoutTax}</tspan>
+                        <tspan x="-16.72" y="0">${data?.totalCostExcludingTax || ''}</tspan>
                     </text>
                     <text data-name="(VAT 15%) الضريبة" font-family="ArialMT, Arial" font-size="12" transform="translate(529 753)">
                         <tspan x="-48.573" y="0">(VAT 15%)</tspan>
@@ -389,7 +393,7 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-34.471" y="0">(Workshop Manager)</tspan>
                     </text>
                     <text data-name="Asif Abdulwadud" font-family="Calibri" font-size="10" transform="translate(88 775)">
-                        <tspan x="-34.368" y="0">${workShopOwnerName}</tspan>
+                        <tspan x="-34.368" y="0">${data?.providerWorkShopId?.ownerId?.name || ''}</tspan>
                     </text>
 
                     <!-- Bank Account -->
@@ -397,7 +401,7 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="0" y="0">الحساب البنكي</tspan>
                     </text>
                     <text font-family="Calibri" font-size="9" transform="translate(404 107)">
-                        <tspan x="0" y="0">${bankNumber}</tspan>
+                        // data?.providerWorkShopId?.bankAccountNumber || ''}</tspan>
                     </text>
 
                     <!-- QR Code Placeholder -->
@@ -452,16 +456,16 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         </g>
                         
                         <text data-name="د ق ط" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(538.67 165.959)">
-                            <tspan x="-16.199" y="0">${englishAlphabetCombination}</tspan>
+                            <tspan x="-16.199" y="0">${arabicAlphabetCombination || ''}</tspan>
                         </text>
                         <text data-name="T G D" font-family="Calibri-Bold, Calibri" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(537.67 194.858)">
-                            <tspan x="-17.464" y="0">${englishAlphabetCombination}</tspan>
+                            <tspan x="-17.464" y="0">${englishAlphabetCombination || ''}</tspan>
                         </text>
                         <text data-name="6430" font-family="Calibri" font-size="18" letter-spacing=".07em" transform="translate(483.658 196.501)">
-                            <tspan x="-20.136" y="0">${englishPlateNumber}</tspan>
+                            <tspan x="-20.136" y="0">${englishPlateNumber || ''}</tspan>
                         </text>
                         <text data-name="6430" font-family="Calligraphr-Regular, Calligraphr" font-size="16" letter-spacing=".07em" transform="translate(483.91 166.803)">
-                            <tspan x="-19.616" y="0">${arabicPlateNumber}</tspan>
+                            <tspan x="-19.616" y="0">${arabicPlateNumber || ''}</tspan>
                         </text>
                     </g>
 
@@ -472,19 +476,18 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                             <rect width="130" height="27" x=".5" y=".5" fill="none" rx="3.5"></rect>
                         </g>
                         <text font-family="Calibri-Bold, Calibri" font-size="17" font-weight="700" letter-spacing=".15em" transform="translate(466 133)">
-                            <tspan x="0" y="0">${interNationalCarNumber}</tspan>
+                            <tspan x="0" y="0">${interNationalCarNumber || ''}</tspan>
                         </text>
                     </g>
 
                     <!-- Saudi Flag -->
-                    ${workShopImage}
-
+                    <img src="${config.backend_url}${data?.providerWorkShopId?.image || ''}" alt="Girl in a jacket" width="500" height="600">
                     <!-- Footer Text -->
                     <text fill="#fff" data-name="Riyadh - old Industrial - ali st." font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(507 830)">
-                        <tspan x="-72.36" y="0">${workShopAddress}</tspan>
+                        <tspan x="-72.36" y="0">${data?.providerWorkShopId?.address || ''}</tspan>
                     </text>
                     <text fill="#fff" data-name="966-5xxxxxxxx" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" letter-spacing=".07em" transform="translate(279 830)">
-                        <tspan x="-41.096" y="0">${contact}</tspan>
+                        <tspan x="-41.096" y="0">${data?.client?.contact || ''}</tspan>
                     </text>
 
                     <!-- Signature Icon -->
@@ -515,7 +518,8 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                     </g>
 
                     <!-- Barcode Black Bars -->
-                    ${invoiceQrCode}
+                    
+                    <img src="${config.backend_url}${data.invoiceQRLink || ''}" alt="Girl in a jacket" width="500" height="600">
                     <!-- Thank You Text -->
                     <text fill="#fff" data-name="Thank you for your visit and we are always at your service" font-family="Calibri" font-size="12" transform="translate(104 812)">
                         <tspan x="-67.588" y="0">Thank you for your visit and</tspan>
@@ -535,38 +539,38 @@ const createInvoice = async (data: any, lang: TranslatedFieldEnum) => {
                         <tspan x="-3.041" y="0">1</tspan>
                     </text>
                     <text data-name="3017" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(84 299)">
-                        <tspan x="-12.164" y="0">${workCode}</tspan>
+                        <tspan x="-12.164" y="0">${workCode || ''}</tspan>
                     </text>
                     <text data-name="865327" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(88 539)">
-                        <tspan x="-18.246" y="0">${sparePartCode}</tspan>
+                        <tspan x="-18.246" y="0">${sparePartCode || ''}</tspan>
                     </text>
                     <text data-name="2" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 299)">
-                        <tspan x="-3.041" y="0">${workQuantity}</tspan>
+                        <tspan x="-3.041" y="0">${workQuantity || ''}</tspan>
                     </text>
                     <text data-name="3" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 539)">
-                        <tspan x="-3.041" y="0">${sparePartQuantity}</tspan>
+                        <tspan x="-3.041" y="0">${sparePartQuantity || ''}</tspan>
                     </text>
                     <text data-name="27" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 299)">
-                        <tspan x="-13.767" y="0">${workPrice}</tspan>
+                        <tspan x="-13.767" y="0">${workPrice || ''}</tspan>
                     </text>
                     <text data-name="8.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 539)">
-                        <tspan x="-10.726" y="0">${sparePartCost}</tspan>
+                        <tspan x="-10.726" y="0">${sparePartCost || ''}</tspan>
                     </text>
                     <text data-name="54" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 299)">
-                        <tspan x="-13.767" y="0">${workFinalCost}</tspan>
+                        <tspan x="-13.767" y="0">${workFinalCost || ''}</tspan>
                     </text>
                     <text data-name="25.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 539)">
-                        <tspan x="-13.767" y="0">${sparePartTotalCost}</tspan>
+                        <tspan x="-13.767" y="0">${sparePartTotalCost || ''}</tspan>
                     </text>
                     <text data-name="Brake fluid change and cleaning" font-family="Calibri" font-size="10" transform="translate(273 303)">
-                        <tspan x="-64.036" y="0">${workNameEnglish}</tspan>
+                        <tspan x="-64.036" y="0">${workNameEnglish || ''}</tspan>
                     </text>
                     <text data-name="Iron clips - كليبس حديد" font-family="ArialMT, Arial" font-size="10" transform="translate(271 539)">
-                        <tspan x="-42.637" y="0">${sparePartNameEnglish} -</tspan>
-                        <tspan y="0">${sparePartNameArabic}</tspan>
+                        <tspan x="-42.637" y="0">${sparePartNameEnglish || ''} -</tspan>
+                        <tspan y="0">${sparePartNameArabic || ''}</tspan>
                     </text>
                     <text data-name="تبديل وتنظيف زيت الفرامل" font-family="ArialMT, Arial" font-size="10" transform="translate(273 292)">
-                        <tspan x="-43.318" y="0">${workNameArabic}</tspan>
+                        <tspan x="-43.318" y="0">${workNameArabic || ''}</tspan>
                     </text>
                 </g>
             </g>

@@ -213,7 +213,6 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
                }),
           query,
      );
-     console.log('🚀 ~ getAllInvoices ~ queryBuilder finalized query:', queryBuilder.query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['description', 'car']).modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
@@ -285,6 +284,14 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                },
           })
           .populate({
+               path: 'providerWorkShopId',
+               select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
+               populate: {
+                    path: 'ownerId',
+                    select: 'name',
+               },
+          })
+          .populate({
                path: 'sparePartsList',
                select: 'item quantity finalCost',
                populate: {
@@ -294,7 +301,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           })
           .populate({
                path: 'car',
-               select: 'model brand year plateNumberForInternational plateNumberForSaudi',
+               select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
                populate: {
                     path: 'brand plateNumberForSaudi.symbol model',
                     // select: 'title image',
