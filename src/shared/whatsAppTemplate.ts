@@ -23,52 +23,44 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 };
 
 const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) => {
-     console.log('🚀 ~ createInvoice ~ data:', data);
-     const {
-          // data?.providerWorkShopId?.image="workShopImage",
-          // data?.providerWorkShopId?.workshopNameArabic="workShopNameArabic",
-          // data?.providerWorkShopId?.address || ""="workShopAddress",
-          // data?.providerWorkShopId?.ownerId?.name || ""="workShopOwnerName",
-          // data?.providerWorkShopId?.crn="crn",
-          //  data?.providerWorkShopId?.bankAccountNumber="bankNumber",
-          // data?.finalDiscountInFlatAmount="workshopDiscount",
-          // data?.totalCostOfSparePartsExcludingTax="totalSparePartsFinalCost",
-          // data?.client?.workShopNameAsClient="workshopNameAsClient",
-          // data?.car?.year="carYear",
-          // data?.car?.model?.title="carModelName",
-          // data?.car?.brand?.title="carBrandName",
-          englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '',
-          arabicAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[1] : '',
-          englishPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberEnglish : '',
-          arabicPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberArabic : '',
-          interNationalCarNumber = data?.car?.carType == CLIENT_CAR_TYPE.INTERNATIONAL ? data?.car?.plateNumberForInternational : '',
-          // data?.client?.clientId?.name="clientName",
-          // contact: data?.client?.contact || ''="contact",
-          // data?.providerWorkShopId?.taxVatNumber="taxVatNumber"
-          // data?._id="invoiceNumber",
-          // data.invoiceQRLink="",
-          // data?.createdAt="invoiceCreatedAt",
-          // data?.paymentMethod="paymentMethod",
-          isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID,
-          // data?.finalCost="finalCost",
-          // data?.taxAmount="taxAmount",
-          // data?.totalCostExcludingTax="totalCostWithoutTax",
-          workCode = 'workCode',
-          workQuantity = 'workQuantity',
-          workPrice = 'workPrice',
-          workFinalCost = 'workFinalCost',
-          workNameEnglish = 'workNameEnglish',
-          workNameArabic = 'workNameArabic',
-          sparePartNameArabic = 'sparePartNameArabic',
-          sparePartNameEnglish = 'sparePartNameEnglish',
-          sparePartQuantity = 'sparePartQuantity',
-          sparePartCost = 'sparePartCost',
-          sparePartCode = 'sparePartCode',
-          sparePartTotalCost = 'sparePartTotalCost',
-     } = data;
+     //  const {
+     //       worksList: [
+     //            {
+     //                 work: {
+     //                      title: { ar: workNameArabic, en: workNameEnglish, bn, tl, hi, ur },
+     //                      code: workCode,
+     //                 },
+     //                 quantity: workQuantity,
+     //                 cost: workPrice,
+     //                 finalCost: workFinalCost,
+     //            },
+     //       ],
+     //       sparePartsList: [{ itemName, quantity: sparePartQuantity, cost: sparePartCost, finalCost: sparePartTotalCost, code: sparePartCode }],
+     //  } = data;
+
+     const isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID;
+     const englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '';
+     const arabicAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[1] : '';
+     const englishPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberEnglish : '';
+     const arabicPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberArabic : '';
+     const interNationalCarNumber = data?.car?.carType == CLIENT_CAR_TYPE.INTERNATIONAL ? data?.car?.plateNumberForInternational : '';
+     const sparePartNameArabic = 'sparePartNameArabic';
+     const sparePartNameEnglish = 'sparePartNameEnglish';
+
+     //  ⬇️dummy data
+     //  const workCode = 'workCode';
+     //  const workQuantity = 'workQuantity';
+     //  const workPrice = 'workPrice';
+     //  const workFinalCost = 'workFinalCost';
+     //  const workNameEnglish = 'workNameEnglish';
+     //  const workNameArabic = 'workNameArabic';
+     //  const sparePartQuantity = 'sparePartQuantity';
+     //  const sparePartCost = 'sparePartCost';
+     //  const sparePartCode = 'sparePartCode';
+     //  const sparePartTotalCost = 'sparePartTotalCost';
+
      return `
-     
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -160,7 +152,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="0" y="0">سجل تجاري</tspan>
                     </text>
                     <text data-name="1010347328" font-family="Calibri" font-size="10" transform="translate(463 80)">
-                        // data?.providerWorkShopId?.crn || ''}</tspan>
+                        <tspan x="0" y="0">${data?.providerWorkShopId?.crn || ''}</tspan>
                     </text>
                     <text data-name="300787972600003" font-family="Calibri" font-size="10" transform="translate(438 94)">
                         <tspan x="0" y="0">${data?.providerWorkShopId?.taxVatNumber || ''}</tspan>
@@ -224,7 +216,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     </text>
                     <text fill="#cb3c40" data-name="آجل - Postpaid" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(302 171)">
                         <tspan x="-37.945" y="0">آجل</tspan>
-                        <tspan xml:space="preserve" y="0">- ${isPostPaid || ''}</tspan>
+                        <tspan xml:space="preserve" y="0">- ${isPostPaid ? 'Postpaid' : ''}</tspan>
                     </text>
                     <text data-name="فاتورة ضريبية مبسطة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(299 127)">
                         <tspan x="-54.448" y="0">فاتورة ضريبية مبسطة</tspan>
@@ -241,26 +233,129 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <path stroke="none" d="M13 282h569v25H13z"></path>
                         <path fill="none" d="M13.5 282.5h568v24h-568z"></path>
                     </g>
-                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 15">
-                        <path stroke="none" d="M13 526h569v18H13z"></path>
-                        <path fill="none" d="M13.5 526.5h568v17h-568z"></path>
-                    </g>
                     <path fill="#f3f3f3" d="M13 307h569v25H13z" data-name="Rectangle 7"></path>
-                    <path fill="#f3f3f3" d="M13 544h569v18H13z" data-name="Rectangle 16"></path>
                     <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 8">
                         <path stroke="none" d="M13 332h569v25H13z"></path>
                         <path fill="none" d="M13.5 332.5h568v24h-568z"></path>
                     </g>
+                    <path fill="#f3f3f3" d="M13 357h569v25H13z" data-name="Rectangle 9"></path>
+
+                    <!-- Works Table Rows -->
+                    ${
+                         data.worksList && data.worksList.length > 0
+                              ? data.worksList
+                                     .map((workItem: any, index: any) => {
+                                          const work = workItem.work;
+                                          const workNameArabic = work?.title?.ar || '';
+                                          const workNameEnglish = work?.title?.en || '';
+                                          const workCode = work?.code || '';
+                                          const workQuantity = workItem.quantity || '';
+                                          const workPrice = workItem.cost || '';
+                                          const workFinalCost = workItem.finalCost || '';
+                                          const rowY = 282 + index * 25;
+
+                                          return `
+        <!-- Row Background -->
+        ${
+             index % 2 === 0
+                  ? `<path fill="#f3f3f3" d="M13 ${rowY}h569v25H13z"></path>`
+                  : `<g fill="#fff" stroke="#f3f3f3">
+                <path stroke="none" d="M13 ${rowY}h569v25H13z"></path>
+                <path fill="none" d="M13.5 ${rowY + 0.5}h568v24h-568z"></path>
+            </g>`
+        }
+
+        <!-- Row Content -->
+        <text data-name="${index + 1}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 ${rowY + 17})">
+            <tspan x="-3.041" y="0">${index + 1}</tspan>
+        </text>
+        <text data-name="${workCode}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(84 ${rowY + 17})">
+            <tspan x="-12.164" y="0">${workCode}</tspan>
+        </text>
+        <text data-name="${workQuantity}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 ${rowY + 17})">
+            <tspan x="-3.041" y="0">${workQuantity}</tspan>
+        </text>
+        <text data-name="${workPrice}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 ${rowY + 17})">
+            <tspan x="-13.767" y="0">${workPrice}</tspan>
+        </text>
+        <text data-name="${workFinalCost}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 ${rowY + 17})">
+            <tspan x="-13.767" y="0">${workFinalCost}</tspan>
+        </text>
+        <text data-name="${workNameEnglish}" font-family="Calibri" font-size="10" transform="translate(273 ${rowY + 21})">
+            <tspan x="-64.036" y="0">${workNameEnglish}</tspan>
+        </text>
+        <text data-name="${workNameArabic}" font-family="ArialMT, Arial" font-size="10" transform="translate(273 ${rowY + 10})">
+            <tspan x="-43.318" y="0">${workNameArabic}</tspan>
+        </text>
+    `;
+                                     })
+                                     .join('')
+                              : ''
+                    }
+
+                    <!-- Spare Parts Table Headers -->
+                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 15">
+                        <path stroke="none" d="M13 526h569v18H13z"></path>
+                        <path fill="none" d="M13.5 526.5h568v17h-568z"></path>
+                    </g>
+                    <path fill="#f3f3f3" d="M13 544h569v18H13z" data-name="Rectangle 16"></path>
                     <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 17">
                         <path stroke="none" d="M13 562h569v18H13z"></path>
                         <path fill="none" d="M13.5 562.5h568v17h-568z"></path>
                     </g>
+                    <path fill="#f3f3f3" d="M13 580h569v18H13z" data-name="Rectangle 18"></path>
                     <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 24">
                         <path stroke="none" d="M13 598h569v18H13z"></path>
                         <path fill="none" d="M13.5 598.5h568v17h-568z"></path>
                     </g>
-                    <path fill="#f3f3f3" d="M13 357h569v25H13z" data-name="Rectangle 9"></path>
-                    <path fill="#f3f3f3" d="M13 580h569v18H13z" data-name="Rectangle 18"></path>
+
+                    <!-- Spare Parts Table Rows -->
+                    ${
+                         data.sparePartsList && data.sparePartsList.length > 0
+                              ? data.sparePartsList
+                                     .map((sparePart: any, index: any) => {
+                                          const sparePartName = sparePart.itemName || '';
+                                          const sparePartQuantity = sparePart.quantity || '';
+                                          const sparePartCost = sparePart.cost || '';
+                                          const sparePartTotalCost = sparePart.finalCost || '';
+                                          const sparePartCode = sparePart.code || '';
+                                          const rowY = 526 + index * 18;
+
+                                          return `
+        <!-- Row Background -->
+        ${
+             index % 2 === 0
+                  ? `<path fill="#f3f3f3" d="M13 ${rowY}h569v18H13z"></path>`
+                  : `<g fill="#fff" stroke="#f3f3f3">
+                <path stroke="none" d="M13 ${rowY}h569v18H13z"></path>
+                <path fill="none" d="M13.5 ${rowY + 0.5}h568v17h-568z"></path>
+            </g>`
+        }
+
+        <!-- Row Content -->
+        <text data-name="${index + 1}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 ${rowY + 12})">
+            <tspan x="-3.041" y="0">${index + 1}</tspan>
+        </text>
+        <text data-name="${sparePartCode}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(88 ${rowY + 12})">
+            <tspan x="-18.246" y="0">${sparePartCode}</tspan>
+        </text>
+        <text data-name="${sparePartQuantity}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 ${rowY + 12})">
+            <tspan x="-3.041" y="0">${sparePartQuantity}</tspan>
+        </text>
+        <text data-name="${sparePartCost}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 ${rowY + 12})">
+            <tspan x="-10.726" y="0">${sparePartCost}</tspan>
+        </text>
+        <text data-name="${sparePartTotalCost}" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 ${rowY + 12})">
+            <tspan x="-13.767" y="0">${sparePartTotalCost}</tspan>
+        </text>
+        <text data-name="${sparePartName}" font-family="ArialMT, Arial" font-size="10" transform="translate(271 ${rowY + 12})">
+            <tspan x="-42.637" y="0">${sparePartName}</tspan>
+        </text>
+    `;
+                                     })
+                                     .join('')
+                              : ''
+                    }
 
                     <!-- Totals Backgrounds -->
                     <path fill="#f3f3f3" d="M344 672h238v28H344z" data-name="Rectangle 19"></path>
@@ -268,18 +363,6 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     <path fill="#f3f3f3" d="M344 703h238v28H344z" data-name="Rectangle 22"></path>
                     <path fill="#f3f3f3" d="M344 734h238v28H344z" data-name="Rectangle 20"></path>
                     <path fill="#1771b7" d="M344 765h238v35H344z" data-name="Rectangle 21"></path>
-
-                    <!-- Spare Parts Table Headers -->
-                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 10">
-                        <path stroke="none" d="M13 382h569v25H13z"></path>
-                        <path fill="none" d="M13.5 382.5h568v24h-568z"></path>
-                    </g>
-                    <path fill="#f3f3f3" d="M13 407h569v25H13z" data-name="Rectangle 11"></path>
-                    <g fill="#fff" stroke="#f3f3f3" data-name="Rectangle 12">
-                        <path stroke="none" d="M13 432h569v25H13z"></path>
-                        <path fill="none" d="M13.5 432.5h568v24h-568z"></path>
-                    </g>
-                    <path fill="#f3f3f3" d="M13 457h569v25H13z" data-name="Rectangle 13"></path>
 
                     <!-- Table Headers Text -->
                     <text fill="#fff" font-family="ArialMT, Arial" font-size="14" letter-spacing=".07em" transform="translate(27 270)">
@@ -340,7 +423,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="-41.909" y="0">(Total of spare parts)</tspan>
                     </text>
                     <text fill="#fff" data-name="255" font-family="Calibri-Bold, Calibri" font-size="16" font-weight="700" transform="translate(399 647)">
-                        // <tspan x="-22.41" y="0">${data?.totalCostOfSparePartsExcludingTax || ''}</tspan>
+                        <tspan x="-22.41" y="0">${data?.totalCostOfSparePartsExcludingTax || ''}</tspan>
                     </text>
                     <text data-name="الخصم قبل الضريبة" font-family="ArialMT, Arial" font-size="14" transform="translate(534 722)">
                         <tspan x="-44.198" y="0">الخصم قبل الضريبة</tspan>
@@ -358,7 +441,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="-13.679" y="0">${data?.taxAmount || ''}</tspan>
                     </text>
                     <text data-name="10" font-family="Calibri" font-size="12" transform="translate(391 722)">
-                        // <tspan x="-13.679" y="0">${data?.finalDiscountInFlatAmount || ''}</tspan>
+                        <tspan x="-13.679" y="0">${data?.finalDiscountInFlatAmount || ''}</tspan>
                     </text>
                     <text data-name="550" font-family="Calibri" font-size="12" transform="translate(394 691)">
                         <tspan x="-16.72" y="0">${data?.totalCostExcludingTax || ''}</tspan>
@@ -401,7 +484,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="0" y="0">الحساب البنكي</tspan>
                     </text>
                     <text font-family="Calibri" font-size="9" transform="translate(404 107)">
-                        // data?.providerWorkShopId?.bankAccountNumber || ''}</tspan>
+                        <tspan x="0" y="0">${data?.providerWorkShopId?.bankAccountNumber || ''}</tspan>
                     </text>
 
                     <!-- QR Code Placeholder -->
@@ -410,21 +493,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     <!-- Toyota Logo -->
                     <g data-name="Toyota">
                         <path fill="#272425" d="M36 193c0 5.508 7.214 10 16.091 10s16.091-4.492 16.091-10-7.214-10-16.091-10S36 187.492 36 193m.173 0c0-5.443 7.149-9.849 15.918-9.849S68.03 187.557 68.03 193s-7.149 9.849-15.94 9.849-15.917-4.428-15.917-9.849" data-name="Path 1003"></path>
-                        <path fill="#272425" d="M50.578 184.857c-3.693.216-6.458 1.21-6.89 2.441a1 1 0 0 0-.065.346 1.2 1.2 0 0 0 .173.583c.5.864 2.1 1.577 4.384 1.965l.065.022.022-.065c.389-2.376 1.253-4.255 2.376-5.14l.194-.151Zm-6.652 3.3a1.1 1.1 0 0 1-.151-.5.7.7 0 0 1 .065-.3c.41-1.145 3.067-2.1 6.523-2.333a8.82 8.82 0 0 0-2.246 5.011c-2.16-.389-3.736-1.08-4.19-1.879Zm6.091 2.186-.022.086h.083a30 30 0 0 0 3.974 0h.086l-.022-.086c-.346-1.987-1.145-3.218-2.073-3.218-.886 0-1.663 1.231-2.03 3.218Zm2.073-3.067c.821 0 1.533 1.166 1.879 3.024q-.94.065-1.879.065a27 27 0 0 1-1.879-.065c.324-1.879 1.059-3.024 1.88-3.024Zm1.469-2.289c1.123.886 1.965 2.765 2.354 5.14l.022.065.065-.022c2.289-.389 3.866-1.1 4.384-1.965a1.1 1.1 0 0 0 .108-.929c-.454-1.253-3.2-2.225-6.89-2.441l-.259-.022Zm.259.043c3.456.238 6.134 1.188 6.523 2.333a2 2 0 0 1 .065.3.9.9 0 0 1-.151.5c-.454.778-2.03 1.49-4.212 1.879a8.54 8.54 0 0 0-2.225-5.012m-12.591 3.326a6.34 6.34 0 0 0-2.549 4.795c0 4.1 5.054 7.6 11.771 8.1l.238.022-.173-.151c-1.533-1.3-2.484-4.384-2.484-8.013l.022-.713-.065-.022c-3.693-.67-6.242-2.181-6.631-3.974l-.043-.13Zm-2.4 4.795a6.06 6.06 0 0 1 2.4-4.579c.475 1.771 3 3.283 6.631 3.952 0 .108-.022.583-.022.583 0 3.542.907 6.566 2.354 7.97-6.479-.562-11.361-3.931-11.361-7.927Zm10.994-.454v.086c0 3.2.994 5.68 2.268 5.68 1.253 0 2.246-2.484 2.246-5.68v-.169h-.065c-.713.065-1.447.086-2.181.086s-1.469-.022-2.181-.086h-.086Zm.151.086c.691.043 1.4.086 2.117.086s1.425-.022 2.117-.086c0 3.11-.929 5.529-2.117 5.529-1.186.023-2.111-2.418-2.111-5.528Zm12.851-4.384c-.389 1.771-2.916 3.3-6.631 3.974l-.065.022.022.713c0 3.629-.95 6.717-2.484 8.013l-.173.151.238-.022c6.717-.5 11.771-3.974 11.771-8.1a6.34 6.34 0 0 0-2.549-4.795l-.108-.086Zm.13.173a6.1 6.1 0 0 1 2.4 4.579c0 3.974-4.881 7.365-11.4 7.9 1.447-1.4 2.354-4.428 2.354-7.97 0 0-.022-.475-.022-.583 3.672-.67 6.177-2.16 6.674-3.931Z" data-name="Path 1004"></path>
-                        <path fill="url(#d)" d="m33.754 45.622.065.194a2.1 2.1 0 0 1-.043 1.1 6.29 6.29 0 0 1 2.592 4.773c0 4.471-5.961 8.078-13.348 8.078-7.365 0-13.348-3.629-13.348-8.078a6.26 6.26 0 0 1 2.592-4.773 2.1 2.1 0 0 1-.043-1.1c.022-.065.043-.13.065-.216-2.247 1.577-3.586 3.672-3.586 5.918 0 4.946 6.393 8.963 14.3 8.963s14.3-4.017 14.3-8.963c0-2.246-1.343-4.318-3.546-5.896" data-name="Path 1005" transform="translate(29.093 141.46)"></path>
-                        <path fill="url(#a)" d="m64.21 46.609-.41.3c.346-2.57 1.3-4.212 2.4-4.212s2.073 1.641 2.4 4.212l-.41-.3c-.346-1.944-1.1-3.153-1.987-3.153-.891.022-1.647 1.209-1.993 3.153" data-name="Path 1006" transform="translate(-14.107 143.734)"></path>
-                        <path fill="url(#e)" d="m68.176 68.9-.346.626v.086c0 3.2-.972 5.616-2.181 5.616s-2.181-2.419-2.181-5.616V69.5l-.346-.583c-.022.216-.022.454-.022.691 0 3.629 1.123 6.35 2.549 6.35 1.4 0 2.549-2.743 2.549-6.35-.022-.259-.022-.475-.022-.713Z" data-name="Path 1007" transform="translate(-13.558 123.193)"></path>
-                        <path fill="url(#f)" d="M42.991 39c-.626.043-1.3.065-1.987.065s-1.361-.022-1.987-.065l-.41.3c.756.065 1.555.108 2.4.108a21 21 0 0 0 2.4-.108Zm7.3-3.132C49.794 34.231 45.647 33 41 33s-8.79 1.209-9.287 2.873c-.432 1.425 1.944 2.765 5.68 3.283l-.324-.41c-3.024-.5-4.816-1.6-4.406-2.786.5-1.425 4.168-2.441 8.337-2.441s7.84 1.015 8.337 2.441c.41 1.166-1.382 2.268-4.428 2.786l-.324.41c3.762-.497 6.138-1.836 5.706-3.283Z" data-name="Path 1008" transform="translate(11.087 151.339)"></path>
-                        <path fill="#424243" d="M62.868 188.377a6.9 6.9 0 0 1 1.533 1.663 5.7 5.7 0 0 0-1.1-2.592c-.151-.108-.3-.238-.475-.346l.065.194a1.84 1.84 0 0 1-.022 1.08Zm-21.555 0a2.1 2.1 0 0 1-.043-1.1c.022-.065.043-.13.065-.216-.173.108-.324.238-.5.367a5.8 5.8 0 0 0-1.1 2.592 8.7 8.7 0 0 1 1.577-1.641Z" data-name="Path 1009"></path>
-                        <path fill="url(#b)" d="M.8 37.114c0-5.486 7.171-9.914 16-9.914s16 4.449 16 9.914-7.171 9.914-16 9.914S.8 42.6.8 37.114m16 8.942c7.9 0 14.3-4.017 14.3-8.963s-6.393-8.963-14.3-8.963-14.3 4.017-14.3 8.963 6.415 8.963 14.3 8.963" data-name="Path 1010" transform="translate(35.286 155.886)"></path>
-                        <path fill="#fff" d="M37.706 192.979c0 4.989 6.458 9.05 14.384 9.05s14.384-4.06 14.384-9.05-6.457-9.05-14.384-9.05-14.384 4.06-14.384 9.05m.194 0c0-4.881 6.371-8.855 14.19-8.855s14.19 3.974 14.19 8.855-6.374 8.85-14.19 8.85-14.19-3.969-14.19-8.85" data-name="Path 1011"></path>
-                        <path fill="url(#g)" d="M57.5 41.747c0-4.773 1.685-8.747 3.758-8.747s3.758 3.974 3.758 8.747c0 4.816-1.685 8.747-3.758 8.747S57.5 46.585 57.5 41.747m3.758 6.048c1.4 0 2.549-2.743 2.549-6.35 0-3.758-1.123-6.35-2.549-6.35-1.4 0-2.549 2.592-2.549 6.35.022 3.628 1.145 6.35 2.549 6.35" data-name="Path 1012" transform="translate(-9.167 151.339)"></path>
-                        <path fill="url(#h)" d="M24.587 32.017C25 30.376 29.987 28 35.386 28c5.421 0 10.238 1.685 10.8 4.017.648 2.592-4.147 4.924-10.8 4.924s-11.447-2.332-10.799-4.924M35.408 29.1c-4.644 0-8.79 1.21-9.287 2.873-.562 1.857 3.564 3.542 9.287 3.542s9.849-1.685 9.287-3.542c-.495-1.662-4.643-2.873-9.287-2.873" data-name="Path 1013" transform="translate(16.683 155.259)"></path>
-                        <path fill="url(#i)" d="m32.926 53.455.346.6c.691.065 1.425.086 2.181.086s1.49-.022 2.181-.086l.346-.6c-.8.065-1.641.108-2.527.108a24 24 0 0 1-2.527-.108M46.317 49.2c-.065 1.857-2.916 3.5-7.149 4.1l.41.5c4.122-.734 6.847-2.548 6.739-4.6m-21.728 0c-.108 2.052 2.613 3.866 6.717 4.6l.41-.5c-4.19-.6-7.041-2.243-7.127-4.1" data-name="Path 1014" transform="translate(16.638 138.638)"></path>
-                        <path fill="url(#j)" d="m78.485 39.177.324-.41C78.248 35.333 76.693 33 74.9 33c1.685.022 3.11 2.635 3.585 6.177" data-name="Path 1015" transform="translate(-22.809 151.339)"></path>
-                        <path fill="url(#k)" d="M57.024 39.255c.475-3.542 1.922-6.155 3.585-6.155-1.814 0-3.348 2.311-3.909 5.767Z" data-name="Path 1016" transform="translate(-8.54 151.261)"></path>
-                        <path fill="url(#l)" d="M56.01 69.345c0-.389.022-.778.022-1.145l-.41.5c0 .216-.022.432-.022.648 0 5.1 1.836 8.747 4.147 8.747-2.047-.003-3.737-3.912-3.737-8.75" data-name="Path 1017" transform="translate(-7.678 123.742)"></path>
-                        <path fill="url(#m)" d="m79.047 68.7-.41-.5c.022.367.022.756.022 1.145 0 4.816-1.685 8.747-3.758 8.747 2.333 0 4.147-3.629 4.147-8.747Z" data-name="Path 1018" transform="translate(-22.809 123.742)"></path>
+                        <path fill="#272425" d="M50.578 184.857c-3.693.216-6.458 1.21-6.89 2.441a1 1 0 0 0-.065.346 1.2 1.2 0 0 0 .173.583c.5.864 2.1 1.577 4.384 1.965l.065.022.022-.065c.389-2.376 1.253-4.255 2.376-5.14l.194-.151Zm-6.652 3.3a1.1 1.1 0 0 1-.151-.5.7.7 0 0 1 .065-.3c.41-1.145 3.067-2.1 6.523-2.333a8.82 8.82 0 0 0-2.246 5.011c-2.16-.389-3.736-1.08-4.19-1.879Zm6.091 2.186-.022.086h.083a30 30 0 0 0 3.974 0h.086l-.022-.086c-.346-1.987-1.145-3.218-2.073-3.218-.886 0-1.663 1.231-2.03 3.218Zm2.073-3.067c.821 0 1.533 1.166 1.879 3.024q-.94.065-1.879.065a27 27 0 0 1-1.879-.065c.324-1.879 1.059-3.024 1.88-3.024Zm1.469-2.289c1.123.886 1.965 2.765 2.354 5.140l.022.065.065-.022c2.289-.389 3.866-1.1 4.384-1.965a1.1 1.1 0 0 0 .108-.929c-.454-1.253-3.2-2.225-6.89-2.441l-.259-.022Zm.259.043c3.456.238 6.134 1.188 6.523 2.333a2 2 0 0 1 .065.3.9.9 0 0 1-.151.5c-.454.778-2.03 1.49-4.212 1.879a8.54 8.54 0 0 0-2.225-5.012m-12.591 3.326a6.34 6.34 0 0 0-2.549 4.795c0 4.1 5.054 7.6 11.771 8.1l.238.022-.173-.151c-1.533-1.3-2.484-4.384-2.484-8.013l.022-.713-.065-.022c-3.693-.67-6.242-2.181-6.631-3.974l-.043-.13Zm-2.4 4.795a6.06 6.06 0 0 1 2.4-4.579c.475 1.771 3 3.283 6.631 3.952 0 .108-.022.583-.022.583 0 3.542.907 6.566 2.354 7.97-6.479-.562-11.361-3.931-11.361-7.927Zm10.994-.454v.086c0 3.2.994 5.68 2.268 5.68 1.253 0 2.246-2.484 2.246-5.68v-.169h-.065c-.713.065-1.447.086-2.181.086s-1.469-.022-2.181-.086h-.086Zm.151.086c.691.043 1.4.086 2.117.086s1.425-.022 2.117-.086c0 3.11-.929 5.529-2.117 5.529-1.186.023-2.111-2.418-2.111-5.528Zm12.851-4.384c-.389 1.771-2.916 3.3-6.631 3.974l-.065.022.022.713c0 3.629-.95 6.717-2.484 8.013l-.173.151.238-.022c6.717-.5 11.771-3.974 11.771-8.1a6.34 6.34 0 0 0-2.549-4.795l-.108-.086Zm.13.173a6.1 6.1 0 0 1 2.4 4.579c0 3.974-4.881 7.365-11.4 7.9 1.447-1.4 2.354-4.428 2.354-7.97 0 0-.022-.475-.022-.583 3.672-.67 6.177-2.16 6.674-3.931Z" data-name="Path 1004"></path>
                     </g>
 
                     <!-- Currency Symbols -->
@@ -452,7 +521,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     <!-- Saudi Emblem -->
                     <g data-name="Group 90">
                         <g data-name="#3f3f41ff">
-                            <path d="M452.007 145.185a6.2 6.2 0 0 1 1.965-.249q62.586.05 125.166.028a2.575 2.575 0 0 1 2.823 2.84c.066 18.844-.011 37.688.039 56.532-.011 1.3.017 3.095-1.45 3.648-1.722.487-3.543.232-5.309.288q-60.634-.025-121.268-.006c-1.34.066-3.023-.31-3.333-1.849a46 46 0 0 1-.116-5.453q0-26.306-.006-52.624c-.055-1.19.2-2.707 1.489-3.155m1.1 1.688c-.9.144-.775 1.373-.886 2.054-.033 7.938.022 15.888-.022 23.826.055.98-.138 2.187.819 2.812a10.5 10.5 0 0 0 2.087.188q26.024-.042 52.054-.011a33.5 33.5 0 0 0 5.425-.177c1.135-.742.747-2.22.847-3.36-.072-7.933.061-15.866-.061-23.793.155-1.672-1.616-1.843-2.856-1.794q-26.315.017-52.629 0a20.3 20.3 0 0 0-4.777.255m62.671.061c-.864.548-.626 1.655-.7 2.513.044 8.11-.022 16.226.033 24.336a1.7 1.7 0 0 0 1.993 1.938c13.485.055 26.976-.017 40.462.033.98-.033 2.081.083 2.884-.609.542-2.231.166-4.567.266-6.842-.105-7.1.216-14.222-.172-21.319a42.4 42.4 0 0 0-7.994-.36c-11.454 0-22.913.017-34.367-.011a6.4 6.4 0 0 0-2.408.321m47.459-.105c-1.074.172-.941 1.34-1.008 2.159q-.008 25.991-.006 51.993a31 31 0 0 0 .133 4.584c.5 1.1 1.893.88 2.884.985 4.257-.022 8.52.072 12.777-.044a1.67 1.67 0 0 0 1.987-1.777c.055-18.429-.017-36.858.033-55.287-.033-.941.127-2.375-1.074-2.657-2.879-.376-5.8-.061-8.691-.155-2.342.089-4.728-.249-7.036.2m-110.402 30.884c-.736.714-.587 1.8-.637 2.724q.033 11.393 0 22.786a5.64 5.64 0 0 0 .5 2.928 8.5 8.5 0 0 0 2.934.41q27.162-.017 54.329 0a8.1 8.1 0 0 0 2.94-.41 5.3 5.3 0 0 0 .526-2.934c-.028-6.1-.017-12.2-.011-18.3-.028-2.452.188-4.949-.41-7.357-2.868-.2-5.746-.1-8.619-.116-16.436-.011-32.872.017-49.308-.017a6.4 6.4 0 0 0-2.248.288m62.367.814c-.266 2.3-.05 4.628-.105 6.942.055 6.881-.127 13.762.1 20.643a36.3 36.3 0 0 0 8.016.443q14.673-.008 29.34 0c2.685-.022 5.409.177 8.049-.437.255-6.693.05-13.4.111-20.1-.066-2.5.183-5.021-.116-7.512-.221-1.135-1.611-1.063-2.5-1.085q-20.211.033-40.423.006c-.925.002-2.181-.015-2.469 1.098Z" data-name="Path 259"></path>
+                            <path d="M452.007 145.185a6.2 6.2 0 0 1 1.965-.249q62.586.05 125.166.028a2.575 2.575 0 0 1 2.823 2.84c.066 18.844-.011 37.688.039 56.532-.011 1.3.017 3.095-1.45 3.648-1.722.487-3.543.232-5.309.288q-60.634-.025-121.268-.006c-1.34.066-3.023-.31-3.333-1.849a46 46 0 0 1-.116-5.453q0-26.306-.006-52.624c-.055-1.19.2-2.707 1.489-3.155m1.1 1.688c-.9.144-.775 1.373-.886 2.054-.033 7.938.022 15.888-.022 23.826.055.98-.138 2.187.819 2.812a10.5 10.5 0 0 0 2.087.188q26.024-.042 52.054-.011a33.5 33.5 0 0 0 5.425-.177c1.135-.742.747-2.22.847-3.36-.072-7.933.061-15.866-.061-23.793.155-1.672-1.616-1.843-2.856-1.794q-26.315.017-52.629 0a20.3 20.3 0 0 0-4.777.255m62.671.061c-.864.548-.626 1.655-.7 2.513.044 8.11-.022 16.226.033 24.336a1.7 1.7 0 0 0 1.993 1.938c13.485.055 26.976-.017 40.462.033.98-.033 2.081.083 2.884-.609.542-2.231.166-4.567.266-6.842-.105-7.1.216-14.222-.172-21.319a42.4 42.4 0 0 0-7.994-.360c-11.454 0-22.913.017-34.367-.011a6.4 6.4 0 0 0-2.408.321m47.459-.105c-1.074.172-.941 1.34-1.008 2.159q-.008 25.991-.006 51.993a31 31 0 0 0 .133 4.584c.5 1.1 1.893.88 2.884.985 4.257-.022 8.52.072 12.777-.044a1.67 1.67 0 0 0 1.987-1.777c.055-18.429-.017-36.858.033-55.287-.033-.941.127-2.375-1.074-2.657-2.879-.376-5.8-.061-8.691-.155-2.342.089-4.728-.249-7.036.2m-110.402 30.884c-.736.714-.587 1.8-.637 2.724q.033 11.393 0 22.786a5.64 5.64 0 0 0 .5 2.928 8.5 8.5 0 0 0 2.934.41q27.162-.017 54.329 0a8.1 8.1 0 0 0 2.94-.410 5.3 5.3 0 0 0 .526-2.934c-.028-6.1-.017-12.2-.011-18.3-.028-2.452.188-4.949-.41-7.357-2.868-.2-5.746-.1-8.619-.116-16.436-.011-32.872.017-49.308-.017a6.4 6.4 0 0 0-2.248.288m62.367.814c-.266 2.3-.05 4.628-.105 6.942.055 6.881-.127 13.762.1 20.643a36.3 36.3 0 0 0 8.016.443q14.673-.008 29.34 0c2.685-.022 5.409.177 8.049-.437.255-6.693.05-13.4.111-20.1-.066-2.5.183-5.021-.116-7.512-.221-1.135-1.611-1.063-2.5-1.085q-20.211.033-40.423.006c-.925.002-2.181-.015-2.469 1.098Z" data-name="Path 259"></path>
                         </g>
                         
                         <text data-name="د ق ط" font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" letter-spacing=".07em" transform="translate(538.67 165.959)">
@@ -480,8 +549,9 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         </text>
                     </g>
 
-                    <!-- Saudi Flag -->
-                    <img src="${config.backend_url}${data?.providerWorkShopId?.image || ''}" alt="Girl in a jacket" width="500" height="600">
+                    <!-- Workshop Image -->
+                    <image x="13" y="38" width="120" height="120" xlink:href="${config.backend_url} + (${data?.providerWorkShopId?.image} || '')" preserveAspectRatio="xMidYMid meet"/>
+
                     <!-- Footer Text -->
                     <text fill="#fff" data-name="Riyadh - old Industrial - ali st." font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(507 830)">
                         <tspan x="-72.36" y="0">${data?.providerWorkShopId?.address || ''}</tspan>
@@ -517,9 +587,9 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <path d="M185.508 85.888h1.838c-.012.611 0 1.222-.008 1.833h-1.828c-.007-.613-.004-1.227-.002-1.833" data-name="Path 28339"></path>
                     </g>
 
-                    <!-- Barcode Black Bars -->
-                    
-                    <img src="${config.backend_url}${data.invoiceQRLink || ''}" alt="Girl in a jacket" width="500" height="600">
+                    <!-- QR Code -->
+                    <image x="411" y="793" width="25" height="25" xlink:href="${config.backend_url} + (${data?.invoiceQRLink || ''})" preserveAspectRatio="xMidYMid meet"/>
+
                     <!-- Thank You Text -->
                     <text fill="#fff" data-name="Thank you for your visit and we are always at your service" font-family="Calibri" font-size="12" transform="translate(104 812)">
                         <tspan x="-67.588" y="0">Thank you for your visit and</tspan>
@@ -530,56 +600,12 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     <text data-name="(Warranty and maintenance terms)" font-family="Calibri" font-size="8" transform="translate(157 647)">
                         <tspan x="-57.055" y="0">(Warranty and maintenance terms)</tspan>
                     </text>
-
-                    <!-- Works Table Rows -->
-                    <text data-name="1" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 299)">
-                        <tspan x="-3.041" y="0">1</tspan>
-                    </text>
-                    <text data-name="1" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(26 539)">
-                        <tspan x="-3.041" y="0">1</tspan>
-                    </text>
-                    <text data-name="3017" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(84 299)">
-                        <tspan x="-12.164" y="0">${workCode || ''}</tspan>
-                    </text>
-                    <text data-name="865327" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(88 539)">
-                        <tspan x="-18.246" y="0">${sparePartCode || ''}</tspan>
-                    </text>
-                    <text data-name="2" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 299)">
-                        <tspan x="-3.041" y="0">${workQuantity || ''}</tspan>
-                    </text>
-                    <text data-name="3" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(415 539)">
-                        <tspan x="-3.041" y="0">${sparePartQuantity || ''}</tspan>
-                    </text>
-                    <text data-name="27" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 299)">
-                        <tspan x="-13.767" y="0">${workPrice || ''}</tspan>
-                    </text>
-                    <text data-name="8.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(469 539)">
-                        <tspan x="-10.726" y="0">${sparePartCost || ''}</tspan>
-                    </text>
-                    <text data-name="54" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 299)">
-                        <tspan x="-13.767" y="0">${workFinalCost || ''}</tspan>
-                    </text>
-                    <text data-name="25.5" font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(543 539)">
-                        <tspan x="-13.767" y="0">${sparePartTotalCost || ''}</tspan>
-                    </text>
-                    <text data-name="Brake fluid change and cleaning" font-family="Calibri" font-size="10" transform="translate(273 303)">
-                        <tspan x="-64.036" y="0">${workNameEnglish || ''}</tspan>
-                    </text>
-                    <text data-name="Iron clips - كليبس حديد" font-family="ArialMT, Arial" font-size="10" transform="translate(271 539)">
-                        <tspan x="-42.637" y="0">${sparePartNameEnglish || ''} -</tspan>
-                        <tspan y="0">${sparePartNameArabic || ''}</tspan>
-                    </text>
-                    <text data-name="تبديل وتنظيف زيت الفرامل" font-family="ArialMT, Arial" font-size="10" transform="translate(273 292)">
-                        <tspan x="-43.318" y="0">${workNameArabic || ''}</tspan>
-                    </text>
                 </g>
             </g>
         </g>
     </svg>
 </body>
-
 </html>
-
      `;
 };
 

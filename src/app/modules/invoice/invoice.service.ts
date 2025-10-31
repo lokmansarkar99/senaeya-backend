@@ -280,7 +280,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                select: 'work quantity finalCost',
                populate: {
                     path: 'work',
-                    select: 'title cost',
+                    select: 'title cost code',
                },
           })
           .populate({
