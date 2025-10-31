@@ -124,14 +124,10 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
           // Populate invoice data after commit (no session needed)
           const populatedResult = await Invoice.findById(resultInvoice._id)
                .populate({
-                    path: 'providerWorkShopId',
-                    select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
-               })
-               .populate({
                     path: 'client',
                     populate: {
                          path: 'clientId',
-                         select: 'name contact',
+                         select: 'name contact _id',
                     },
                })
                .populate({
@@ -139,14 +135,31 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                     select: 'work quantity finalCost',
                     populate: {
                          path: 'work',
+                         select: 'title cost code',
+                    },
+               })
+               .populate({
+                    path: 'providerWorkShopId',
+                    select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
+                    populate: {
+                         path: 'ownerId',
+                         select: 'name',
+                    },
+               })
+               .populate({
+                    path: 'sparePartsList',
+                    select: 'item quantity finalCost',
+                    populate: {
+                         path: 'item',
                          select: 'title cost',
                     },
                })
                .populate({
                     path: 'car',
-                    select: 'model brand year plateNumberForInternational plateNumberForSaudi',
+                    select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
                     populate: {
-                         path: 'brand plateNumberForSaudi.symbol',
+                         path: 'brand plateNumberForSaudi.symbol model',
+                         // select: 'title image',
                     },
                });
 

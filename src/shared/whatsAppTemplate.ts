@@ -23,41 +23,13 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 };
 
 const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) => {
-     //  const {
-     //       worksList: [
-     //            {
-     //                 work: {
-     //                      title: { ar: workNameArabic, en: workNameEnglish, bn, tl, hi, ur },
-     //                      code: workCode,
-     //                 },
-     //                 quantity: workQuantity,
-     //                 cost: workPrice,
-     //                 finalCost: workFinalCost,
-     //            },
-     //       ],
-     //       sparePartsList: [{ itemName, quantity: sparePartQuantity, cost: sparePartCost, finalCost: sparePartTotalCost, code: sparePartCode }],
-     //  } = data;
-
      const isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID;
      const englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '';
      const arabicAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[1] : '';
      const englishPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberEnglish : '';
      const arabicPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberArabic : '';
      const interNationalCarNumber = data?.car?.carType == CLIENT_CAR_TYPE.INTERNATIONAL ? data?.car?.plateNumberForInternational : '';
-     const sparePartNameArabic = 'sparePartNameArabic';
-     const sparePartNameEnglish = 'sparePartNameEnglish';
-
-     //  ⬇️dummy data
-     //  const workCode = 'workCode';
-     //  const workQuantity = 'workQuantity';
-     //  const workPrice = 'workPrice';
-     //  const workFinalCost = 'workFinalCost';
-     //  const workNameEnglish = 'workNameEnglish';
-     //  const workNameArabic = 'workNameArabic';
-     //  const sparePartQuantity = 'sparePartQuantity';
-     //  const sparePartCost = 'sparePartCost';
-     //  const sparePartCode = 'sparePartCode';
-     //  const sparePartTotalCost = 'sparePartTotalCost';
+     const carSymbol = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.symbol?.image : '';
 
      return `
     <!DOCTYPE html>
@@ -215,8 +187,8 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan xml:space="preserve" y="0">- ${data?.paymentMethod || ''}</tspan>
                     </text>
                     <text fill="#cb3c40" data-name="آجل - Postpaid" font-family="Arial-BoldMT, Arial" font-size="12" font-weight="700" transform="translate(302 171)">
-                        <tspan x="-37.945" y="0">آجل</tspan>
-                        <tspan xml:space="preserve" y="0">- ${isPostPaid ? 'Postpaid' : ''}</tspan>
+                        <tspan x="-37.945" y="0">${isPostPaid ? 'آجل' : 'نقدي'}</tspan>
+                        <tspan xml:space="preserve" y="0">- Postpaid</tspan>
                     </text>
                     <text data-name="فاتورة ضريبية مبسطة" font-family="Arial-BoldMT, Arial" font-size="15" font-weight="700" transform="translate(299 127)">
                         <tspan x="-54.448" y="0">فاتورة ضريبية مبسطة</tspan>
@@ -314,7 +286,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                          data.sparePartsList && data.sparePartsList.length > 0
                               ? data.sparePartsList
                                      .map((sparePart: any, index: any) => {
-                                          const sparePartName = sparePart.itemName || '';                                          
+                                          const sparePartName = sparePart.itemName || '';
                                           // const sparePartNameObj = await buildTranslatedField(sparePart.itemName as any);
                                           // const sparePartNameArabic = sparePartNameObj['ar'];
                                           // const sparePartNameEnglish = sparePartNameObj['en'];
@@ -539,6 +511,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <text data-name="6430" font-family="Calligraphr-Regular, Calligraphr" font-size="16" letter-spacing=".07em" transform="translate(483.91 166.803)">
                             <tspan x="-19.616" y="0">${arabicPlateNumber || ''}</tspan>
                         </text>
+                        <img x="13" y="38" width="120" height="120" src="${config.backend_url} + (${carSymbol} || '')" preserveAspectRatio="xMidYMid meet"/>
                     </g>
 
                     <!-- License Plate -->
@@ -553,7 +526,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     </g>
 
                     <!-- Workshop Image -->
-                    <image x="13" y="38" width="120" height="120" xlink:href="${config.backend_url} + (${data?.providerWorkShopId?.image} || '')" preserveAspectRatio="xMidYMid meet"/>
+                    <img x="13" y="38" width="120" height="120" src="${config.backend_url} + (${data?.providerWorkShopId?.image} || '')" preserveAspectRatio="xMidYMid meet"/>
 
                     <!-- Footer Text -->
                     <text fill="#fff" data-name="Riyadh - old Industrial - ali st." font-family="Calibri-Bold, Calibri" font-size="12" font-weight="700" transform="translate(507 830)">
@@ -591,7 +564,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                     </g>
 
                     <!-- QR Code -->
-                    <image x="411" y="793" width="25" height="25" xlink:href="${config.backend_url} + (${data?.invoiceQRLink || ''})" preserveAspectRatio="xMidYMid meet"/>
+                    <img x="411" y="793" width="25" height="25" src="${config.backend_url} + (${data?.invoiceQRLink || ''})" preserveAspectRatio="xMidYMid meet"/>
 
                     <!-- Thank You Text -->
                     <text fill="#fff" data-name="Thank you for your visit and we are always at your service" font-family="Calibri" font-size="12" transform="translate(104 812)">

@@ -53,7 +53,11 @@ const createPayment = async (
           if (!payment) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Payment not found.');
           }
-          const updatedInvoice = await Invoice.findByIdAndUpdate(invoice._id, { payment: payment._id, paymentStatus: PaymentStatus.PAID,paymentMethod: payload.paymentMethod }, { new: true, session });
+          const updatedInvoice = await Invoice.findByIdAndUpdate(
+               invoice._id,
+               { payment: payment._id, paymentStatus: PaymentStatus.PAID, paymentMethod: payload.paymentMethod },
+               { new: true, session },
+          );
           if (!updatedInvoice) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found**.');
           }
@@ -65,14 +69,10 @@ const createPayment = async (
           // Populate invoice data within transaction to ensure consistency with uncommitted changes
           const populatedResult = await Invoice.findById(updatedInvoice._id)
                .populate({
-                    path: 'providerWorkShopId',
-                    select: 'workshopNameEnglish workshopNameArabic bankAccountNumber taxVatNumber crn image',
-               })
-               .populate({
                     path: 'client',
                     populate: {
                          path: 'clientId',
-                         select: 'name contact',
+                         select: 'name contact _id',
                     },
                })
                .populate({
@@ -80,14 +80,31 @@ const createPayment = async (
                     select: 'work quantity finalCost',
                     populate: {
                          path: 'work',
+                         select: 'title cost code',
+                    },
+               })
+               .populate({
+                    path: 'providerWorkShopId',
+                    select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
+                    populate: {
+                         path: 'ownerId',
+                         select: 'name',
+                    },
+               })
+               .populate({
+                    path: 'sparePartsList',
+                    select: 'item quantity finalCost',
+                    populate: {
+                         path: 'item',
                          select: 'title cost',
                     },
                })
                .populate({
                     path: 'car',
-                    select: 'model brand year plateNumberForInternational plateNumberForSaudi',
+                    select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
                     populate: {
-                         path: 'brand plateNumberForSaudi.symbol',
+                         path: 'brand plateNumberForSaudi.symbol model',
+                         // select: 'title image',
                     },
                });
 
