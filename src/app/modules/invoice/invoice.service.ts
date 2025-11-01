@@ -281,7 +281,7 @@ const hardDeleteInvoice = async (id: string): Promise<IInvoice | null> => {
 
 const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      const result = await Invoice.findById(id)
-          .populate({
+           .populate({
                path: 'client',
                populate: {
                     path: 'clientId',
@@ -293,15 +293,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                select: 'work quantity finalCost',
                populate: {
                     path: 'work',
-                    select: 'title cost code',
-               },
-          })
-          .populate({
-               path: 'providerWorkShopId',
-               select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
-               populate: {
-                    path: 'ownerId',
-                    select: 'name',
+                    select: 'title cost',
                },
           })
           .populate({
@@ -314,7 +306,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           })
           .populate({
                path: 'car',
-               select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
+               select: 'model brand year plateNumberForInternational plateNumberForSaudi',
                populate: {
                     path: 'brand plateNumberForSaudi.symbol model',
                     // select: 'title image',
