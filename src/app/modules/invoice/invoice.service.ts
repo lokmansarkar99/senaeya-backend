@@ -192,8 +192,8 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
           // Post-commit operations: notifications and WhatsApp release (non-transactional)
           if (isReleased) {
                await sendNotifications({
-                    title: `${(populatedResult.client as any).clientId.name}`,
-                    receiver: (populatedResult.client as any).clientId._id,
+                    title: `${(populatedResult.client as any)?.clientId?.name || (populatedResult.client as any)?.workShopNameAsClient || 'Unknown Client'}`,
+                    receiver: (populatedResult.client as any)?.clientId?._id,
                     message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
                     type: 'ALERT',
                });
@@ -202,9 +202,9 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
           return populatedResult;
      } catch (error) {
+          console.error('Error in createInvoice:', error);
           await session.abortTransaction();
           await session.endSession();
-          console.error('Error in createInvoice:', error);
           throw error;
      }
 };
@@ -281,7 +281,7 @@ const hardDeleteInvoice = async (id: string): Promise<IInvoice | null> => {
 
 const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      const result = await Invoice.findById(id)
-           .populate({
+          .populate({
                path: 'client',
                populate: {
                     path: 'clientId',

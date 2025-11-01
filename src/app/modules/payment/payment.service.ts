@@ -122,8 +122,8 @@ const createPayment = async (
 
           // // send invoiceSheet to client
           await sendNotifications({
-               title: `${(populatedResult.client as any).clientId.name}`,
-               receiver: (populatedResult.client as any).clientId._id,
+               title: `${(populatedResult.client as any)?.clientId?.name || (populatedResult.client as any)?.workShopNameAsClient || 'Unknown Client'}`,
+               receiver: (populatedResult.client as any)?.clientId?._id,
                message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
                type: 'ALERT',
           });
