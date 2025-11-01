@@ -1,9 +1,10 @@
 import * as admin from 'firebase-admin';
-import serviceAccount from './../../kappes-aeb17-firebase-adminsdk-fbsvc-e34817737f.json';
+// import serviceAccount from './../../kappes-aeb17-firebase-adminsdk-fbsvc-e34817737f.json';
 import { logger } from '../shared/logger';
+import config from '../config';
 
 // Cast serviceAccount to ServiceAccount type
-const serviceAccountKey: admin.ServiceAccount = serviceAccount as admin.ServiceAccount;
+const serviceAccountKey: admin.ServiceAccount = config.firebase.serviceAccount as admin.ServiceAccount;
 
 // Initialize Firebase SDK
 admin.initializeApp({

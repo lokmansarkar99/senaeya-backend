@@ -22,13 +22,13 @@ export const handleSubscriptionDeleted = async (data: Stripe.Subscription) => {
           await Subscription.findByIdAndUpdate(userSubscription._id, { status: 'cancel' }, { new: true });
 
           // Find the user associated with the subscription
-          const existingUser = await User.findById(userSubscription?.userId);
+          // const existingUser = await User.findById(userSubscription?.userId);
 
-          if (existingUser) {
-               await User.findByIdAndUpdate(existingUser._id, { hasAccess: false, isSubscribed: false }, { new: true });
-          } else {
-               throw new AppError(StatusCodes.NOT_FOUND, `User not found.`);
-          }
+          // if (existingUser) {
+          //      await User.findByIdAndUpdate(existingUser._id, { hasAccess: false, isSubscribed: false }, { new: true });
+          // } else {
+          //      throw new AppError(StatusCodes.NOT_FOUND, `User not found.`);
+          // }
      } else {
           throw new AppError(StatusCodes.NOT_FOUND, `Subscription not found.`);
      }

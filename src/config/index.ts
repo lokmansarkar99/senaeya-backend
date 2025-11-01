@@ -71,4 +71,7 @@ export default {
           profileId: process.env.CLICKPAY_PROFILE_ID,
           authScheme: process.env.CLICKPAY_AUTH_SCHEME,
      },
+     firebase: {
+          serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT,
+     },
 };
