@@ -258,7 +258,7 @@ const deleteSubscriptionPackageToDB = async (packageId: string) => {
 };
 
 const getSubscriptionByIdToDB = async (subscriptionId: string) => {
-     const subscription = await Subscription.findById(subscriptionId);
+     const subscription = await Subscription.findById(subscriptionId).populate('workshop');
      if (!subscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
      }
