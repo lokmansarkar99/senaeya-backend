@@ -222,7 +222,14 @@ const hardDeleteCar = async (id: string): Promise<ICar | null> => {
 };
 
 const getCarById = async (id: string): Promise<ICar | null> => {
-     const result = await Car.findById(id).populate('model', 'title').populate('brand', 'title').populate('plateNumberForSaudi.symbol', 'title image').populate('client', 'name');
+     const result = await Car.findById(id).populate('model', 'title').populate('brand', 'title').populate('plateNumberForSaudi.symbol', 'title image').populate({
+          path: 'client',
+          select: 'clientId workShopNameAsClient clientType',
+          populate: {
+               path: 'clientId',
+               select: 'name',
+          },
+     });
      return result;
 };
 
