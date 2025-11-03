@@ -2,7 +2,7 @@ import { string, z } from 'zod';
 
 export const createUserZodSchema = z.object({
      body: z.object({
-          name: z.string({ required_error: 'Name is required' }).min(2, 'Name must be at least 2 characters long'),
+          name: z.string().optional(),
           email: z.string().optional(),
           deviceToken: z.string().optional(),
           fcmToken: z.string().optional(),
@@ -14,18 +14,6 @@ export const createUserZodSchema = z.object({
                     password: string().min(8, 'Password must be at least 8 characters long'),
                })
                .optional(),
-     }),
-});
-
-const createBusinessUserZodSchema = z.object({
-     body: z.object({
-          name: z.string({ required_error: 'Name is required' }),
-          contact: z.string({ required_error: 'Contact is required' }),
-          email: z.string().optional(),
-          deviceToken: z.string().optional(),
-          fcmToken: z.string().optional(),
-          password: z.string({ required_error: 'Password is required' }).min(8, 'Password must be at least 8 characters long'),
-          profile: z.string().optional(),
      }),
 });
 
@@ -51,5 +39,4 @@ const updateUserZodSchema = z.object({
 export const UserValidation = {
      createUserZodSchema,
      updateUserZodSchema,
-     createBusinessUserZodSchema,
 };
