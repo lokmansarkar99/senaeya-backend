@@ -44,6 +44,8 @@ export interface IworkShop {
      subscriptionId?: Types.ObjectId | null;
      generatedInvoiceCount: number;
      isUsedTrial:boolean;
+     nationality?: string;
+     preferredLanguage?: 'en' | 'bn' | 'ar' | 'ur' | 'hi' | 'tl';
 }
 
 export type IworkShopFilters = {

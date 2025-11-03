@@ -100,6 +100,14 @@ const WorkShopSchema = new Schema<IworkShop>(
                type: Boolean,
                default: true,
           },
+          nationality: {
+               type: String,
+               required: false,
+          },
+          preferredLanguage: {
+               type: String,
+               enum: ['en', 'bn', 'ar', 'ur', 'hi', 'tl'],
+          },
      },
      { timestamps: true },
 );
