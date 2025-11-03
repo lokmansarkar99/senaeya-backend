@@ -50,6 +50,7 @@ const subscriptionsFromDB = async (query: Record<string, unknown>) => {
                {
                     path: 'package',
                     select: 'title paymentType credit description',
+                    options: { strictPopulate: false }  // Add this line
                },
                {
                     path: 'workshop',
