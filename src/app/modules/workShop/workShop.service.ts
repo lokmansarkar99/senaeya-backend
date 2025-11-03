@@ -45,7 +45,7 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
 };
 
 const getAllWorkShops = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworkShop[] }> => {
-     const queryBuilder = new QueryBuilder(WorkShop.find().populate('subscriptionId', 'status'), query);
+     const queryBuilder = new QueryBuilder(WorkShop.find().populate('subscriptionId', 'status').populate('ownerId', 'name nationality preferredLanguage'), query);
      const result = await queryBuilder.filter().search(['contact', 'workshopNameEnglish', 'workshopNameArabic', 'unn', 'crn', 'mln', 'taxVatNumber']).sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
@@ -122,7 +122,7 @@ const hardDeleteWorkShop = async (id: string): Promise<IworkShop | null> => {
 };
 
 const getWorkShopById = async (id: string): Promise<IworkShop | null> => {
-     const result = await WorkShop.findById(id);
+     const result = await WorkShop.findById(id).populate('ownerId', 'name nationality preferredLanguage');
      return result;
 };
 
