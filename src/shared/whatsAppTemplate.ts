@@ -622,7 +622,7 @@ const createReport = (
      const fmtDate = (x: Date) => `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`;
      const dur = s && e ? Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000) + 1) : undefined;
      const dateRange =
-          s && e ? (lang === 'ar' ? `من ${fmtDate(s)} إلى ${fmtDate(e)}${dur ? ` مدة: ${dur} أيام` : ''}` : `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}`) : '';
+          s && e ? (lang === 'ar' ? `من تاريخ ${fmtDate(s)} إلى ${fmtDate(e)}${dur ? ` ولمدة: ${dur} يوم` : ''}` : `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}`) : '';
 
      const fmt = (n: number) =>
           n.toLocaleString(undefined, {
@@ -650,7 +650,7 @@ const createReport = (
           font-weight="700"
           transform="translate(160 131)"
         >
-          <tspan x="0" y="0">${lang === 'ar' ? 'تم إصدار التقرير بواسطة تطبيق Senaeya' : 'Report issued by Senaeya App'}</tspan>
+          <tspan x="0" y="0">${lang === 'ar' ? 'تقرير صادر من تطبيق الصناعية' : 'Report issued by Senaeya App'}</tspan>
         </text>
         <rect
           width="151"
@@ -699,8 +699,7 @@ const createReport = (
           font-weight="700"
           transform="translate(470 241)"
         >
-          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
-          <tspan x="-63.84" y="20">${lang === 'ar' ? 'السندات المدفوعة' : 'completed invoices'}</tspan>
+          <tspan x="-63.84" y="20">${lang === 'ar' ? 'عدد الفواتير المكتملة' : 'Number of completed invoices'}</tspan>
         </text>
         <text
           fill="#f90"
@@ -710,8 +709,7 @@ const createReport = (
           font-weight="700"
           transform="translate(298 241)"
         >
-          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
-          <tspan x="-57.301" y="20">${lang === 'ar' ? 'السندات المدفوعة' : 'Postpaid invoices'}</tspan>
+          <tspan x="-57.301" y="20">${lang === 'ar' ? 'عدد الفواتير الآجلة' : 'Number of Postpaid invoices'}</tspan>
         </text>
         <text
           fill="#cb3c40"
@@ -721,8 +719,7 @@ const createReport = (
           font-weight="700"
           transform="translate(126 241)"
         >
-          <tspan x="-35.875" y="0">${lang === 'ar' ? 'عدد' : 'Number of'}</tspan>
-          <tspan x="-47.555" y="20">${lang === 'ar' ? 'السندات المحفوظة' : 'saved invoices'}</tspan>
+          <tspan x="-47.555" y="20">${lang === 'ar' ? 'عدد الفواتير المحفوظة' : 'Number of saved invoices'}</tspan>
         </text>
         <text
           fill="#11c84e"
@@ -816,7 +813,7 @@ const createReport = (
           font-weight="700"
           transform="translate(410 366)"
         >
-          <tspan x="-115.796" y="0">${lang === 'ar' ? 'إجمالي الدخل الذي تم جمعه' : 'Total income collected'}</tspan>
+          <tspan x="-115.796" y="0">${lang === 'ar' ? 'مجموع الإيرادات المحصلة' : 'Total income collected'}</tspan>
         </text>
         <text
           fill="#fff"
@@ -826,7 +823,7 @@ const createReport = (
           font-weight="700"
           transform="translate(381 428)"
         >
-          <tspan x="-149.021" y="0">${lang === 'ar' ? 'إجمالي الدخل المدفوع والمدخر' : 'Total postpaid and saved income'}</tspan>
+          <tspan x="-149.021" y="0">${lang === 'ar' ? 'مجموع الإيرادات الآجلة والمحفوظة' : 'Total postpaid and saved income'}</tspan>
         </text>
         <text
           fill="#fff"
@@ -836,7 +833,7 @@ const createReport = (
           font-weight="700"
           transform="translate(429 490)"
         >
-          <tspan x="-101.404" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'Total expenses paid'}</tspan>
+          <tspan x="-101.404" y="0">${lang === 'ar' ? 'مجموع المصروفات المدفوعة' : 'Total expenses paid'}</tspan>
         </text>
         <text
           data-name="Number of cars serviced"
@@ -845,7 +842,7 @@ const createReport = (
           font-weight="700"
           transform="translate(420 732)"
         >
-          <tspan x="-110.317" y="0">${lang === 'ar' ? 'عدد السيارات المدفوعة' : 'Number of cars serviced'}</tspan>
+          <tspan x="-110.317" y="0">${lang === 'ar' ? 'عدد السيارات التي تم خدمتها' : 'Number of cars serviced'}</tspan>
         </text>
         <text
           font-family="Calibri-Bold, Calibri"
@@ -853,7 +850,7 @@ const createReport = (
           font-weight="700"
           transform="translate(96 732)"
         >
-          <tspan x="-19.417" y="0">${lang === 'ar' ? 'سيارات' : 'Cars'}</tspan>
+          <tspan x="-19.417" y="0">${lang === 'ar' ? 'سيـارة' : 'Cars'}</tspan>
         </text>
         <g fill="#fff">
           <path
@@ -982,7 +979,7 @@ const createReport = (
           font-weight="700"
           transform="translate(168 577)"
         >
-          <tspan x="-110.591" y="0">${lang === 'ar' ? 'الرصيد المدفوع' : 'Collected financial balance'}</tspan>
+          <tspan x="-110.591" y="0">${lang === 'ar' ? 'الميزان المالي المحصل' : 'Collected financial balance'}</tspan>
         </text>
         <text
           data-name="All income recorded"
@@ -991,7 +988,7 @@ const createReport = (
           font-weight="700"
           transform="translate(429 596)"
         >
-          <tspan x="-45.751" y="0">${lang === 'ar' ? 'إجمالي الإيرادات المدفوعة' : 'All income recorded'}</tspan>
+          <tspan x="-45.751" y="0">${lang === 'ar' ? 'جميع الإيرادات المسجلة' : 'All income recorded'}</tspan>
         </text>
         <text
           data-name="All income collected"
@@ -1000,7 +997,7 @@ const createReport = (
           font-weight="700"
           transform="translate(169 596)"
         >
-          <tspan x="-45.861" y="0">${lang === 'ar' ? 'إجمالي الإيرادات المدفوعة' : 'All income collected'}</tspan>
+          <tspan x="-45.861" y="0">${lang === 'ar' ? 'جميع الإيرادات المحصلة' : 'All income collected'}</tspan>
         </text>
         <text
           data-name="All expenses paid"
@@ -1009,7 +1006,7 @@ const createReport = (
           font-weight="700"
           transform="translate(430 617)"
         >
-          <tspan x="-39.529" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'All expenses paid'}</tspan>
+          <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
         </text>
         <text
           data-name="All expenses paid"
@@ -1018,7 +1015,7 @@ const createReport = (
           font-weight="700"
           transform="translate(169 617)"
         >
-          <tspan x="-39.529" y="0">${lang === 'ar' ? 'إجمالي النفقات المدفوعة' : 'All expenses paid'}</tspan>
+          <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
         </text>
         <text
           data-name="-"
@@ -1074,7 +1071,7 @@ const createReport = (
           font-size="10"
           transform="translate(447 87)"
         >
-          <tspan x="0" y="0">CR - ${report.workshop.crn}</tspan>
+          <tspan x="0" y="0">{lang === 'ar' ? 'سجل تجاري' : 'CR'} - ${report.workshop.crn}</tspan>
         </text>
         <text
           fill="#fff"
@@ -1083,7 +1080,7 @@ const createReport = (
           font-size="10"
           transform="translate(50 87)"
         >
-          <tspan x="0" y="0">VAT - ${report.workshop.taxVatNumber}</tspan>
+          <tspan x="0" y="0">{lang === 'ar' ? 'الرقم الضريبي' : 'VAT'} - ${report.workshop.taxVatNumber}</tspan>
         </text>
         <path
           fill="#cb3c40"
@@ -1165,11 +1162,11 @@ const createReport = (
           transform="translate(110 815)"
         >
           <tspan x="-104.411" y="0">
-            ${lang === 'ar' ? ' يمكنك إصدار تقارير متعددة عبر تطبيق سينايا' : 'You can issue multiple reports via Senaeya App'}
+            ${lang === 'ar' ? 'بإمكانك إصدار تقارير متعددة عبر تطبيق الصناعية' : 'You can issue multiple reports via Senaeya App'}
           </tspan>
           <tspan font-size="10">
             <tspan x="-106.143" y="15">
-              ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - و المزيد' : 'Daily - Weekly - Monthly - Annual Report - and more'}
+              ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - وأكثر' : 'Daily - Weekly - Monthly - Annual Report - and more'}
             </tspan>
           </tspan>
         </text>
