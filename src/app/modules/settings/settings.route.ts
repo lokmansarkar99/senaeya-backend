@@ -24,6 +24,7 @@ SettingsRouter.put(
      .put('/', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), validateRequest(settingsValidation.createUpdateSettingsZodSchemaForApp), settingsController.addSetting)
      .get('/', settingsController.getSettings)
      .get('/privacy-policy', settingsController.getPrivacyPolicy)
+     .get('/app-explain', settingsController.getAppExplain)
      .get('/aboutus', settingsController.getAboutUs)
      .get('/support', settingsController.getSupport)
      .get('/termsOfService', settingsController.getTermsOfService);

@@ -88,8 +88,19 @@ const getWorkshopSetting = catchAsync(async (req, res) => {
           data: result,
      });
 });
+
+const getAppExplain = catchAsync(async (req, res) => {
+     const result = await settingsService.getAppExplain();
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'App explain retrieved successfully',
+          data: result,
+     });
+});
 export const settingsController = {
      addWorkshopSetting,
+     getAppExplain,
      getWorkshopSetting,
      getSettings,
      getPrivacyPolicy,

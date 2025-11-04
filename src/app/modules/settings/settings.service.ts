@@ -111,6 +111,15 @@ const getWorkshopSetting = async (providerWorkShopId: string) => {
      return settings;
 };
 
+const getAppExplain = async () => {
+     const settings: any = await Settings.findOne({ providerWorkShopId: null });
+
+     if (!settings) {
+          return '';
+     }
+     return settings.appExplain;
+};
+
 export const settingsService = {
      addWorkshopSetting,
      getWorkshopSetting,
@@ -121,4 +130,5 @@ export const settingsService = {
      getSupport,
      getTermsOfService,
      getAboutUs,
+     getAppExplain
 };
