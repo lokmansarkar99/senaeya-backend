@@ -6,7 +6,7 @@ export interface Imessage {
      message:string;
      data: any[];
      name?:string;
-     contact:string;
+     contact?:string;
      createdAt: Date;
      updatedAt: Date;
      isDeleted: boolean;

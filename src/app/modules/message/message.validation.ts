@@ -14,7 +14,7 @@ const createMessageZodSchema = z.object({
                .optional(),
           message: z.string({ required_error: 'message text is required' }),
           name: z.string().optional(),
-          contact: z.string({ required_error: 'contact is required' }),
+          contact: z.string().optional(),
      }),
 });
 

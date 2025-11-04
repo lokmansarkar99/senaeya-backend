@@ -7,7 +7,7 @@ const MessageSchema = new Schema<Imessage>({
      message: { type: String, required: true },
      data: { type: [Object], required: true },
      name: { type: String,required: false },
-     contact: { type: String,required: true },
+     contact: { type: String,required: false },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },
      status: { type: String, enum: Object.values(MessageStatus), default: MessageStatus.OPEN },
