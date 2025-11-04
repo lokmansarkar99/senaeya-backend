@@ -221,6 +221,14 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
                     },
                })
                .populate({
+                    path: 'client',
+                    select: 'clientId clientType workShopNameAsClient contact',
+                    populate: {
+                         path: 'clientId',
+                         select: 'name',
+                    },
+               })
+               .populate({
                     path: 'payment',
                     select: 'createdAt',
                }),
@@ -251,8 +259,6 @@ const updateInvoice = async (id: string, payload: Partial<IInvoice & { extraTime
                }
           }
           if (!payload.postPaymentDate && payload.extraTimeForUnpaidPostpaidInvoice) {
-               payload.postPaymentDate = isExist.postPaymentDate;
-               payload.postPaymentDate.setDate(payload.postPaymentDate.getDate() + payload.extraTimeForUnpaidPostpaidInvoice);
                await addToBullQueueToCheckInvoicePaymentStatus(id, isExist.client.toString(), Number(payload.extraTimeForUnpaidPostpaidInvoice));
           }
      }
