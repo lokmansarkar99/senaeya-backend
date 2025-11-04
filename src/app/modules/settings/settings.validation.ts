@@ -12,6 +12,7 @@ const createUpdateSettingsZodSchemaForApp = z.object({
           .object({
                privacyPolicy: z.string().optional(),
                warrantyAndTerms: z.string().optional(),
+               appExplain: z.string().optional(),
                aboutUs: z.string().optional(),
                support: z.string().optional(),
                termsOfService: z.string().optional(),
@@ -34,6 +35,7 @@ const createUpdateSettingsZodSchemaForApp = z.object({
                     'allowedInvoicesCountForFreeUsers',
                     'defaultVat',
                     'warrantyAndTerms',
+                    'appExplain',
                     'socialMedia',
                ];
                const fieldsToModifyforApp = Object.keys(body);

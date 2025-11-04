@@ -7,6 +7,7 @@ export interface ISettings extends Document {
      // for app ⬇️⬇️⬇️
      privacyPolicy: string;
      warrantyAndTerms: string;
+     appExplain: string;
      aboutUs: string;
      support: string;
      termsOfService: string;

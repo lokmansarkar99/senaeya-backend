@@ -19,6 +19,9 @@ const settingsSchema = new Schema<ISettings>(
           warrantyAndTerms: {
                type: String,
           },
+          appExplain: {
+               type: String,
+          },
           aboutUs: {
                type: String,
           },
