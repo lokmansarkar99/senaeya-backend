@@ -8,6 +8,7 @@ export type ISubscription = {
      trxId: string;
      amountPaid: number;
      coupon: string;
+     subscription_qr_code?: string;
      contact: string;
      status: 'expired' | 'active' | 'cancel';
      currentPeriodStart: Date;

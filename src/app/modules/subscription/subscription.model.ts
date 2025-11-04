@@ -26,6 +26,9 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                required: false,
                default: '',
           },
+          subscription_qr_code: {
+               type: String,
+          },
           amountPaid: {
                type: Number,
                required: true,

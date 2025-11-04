@@ -14,6 +14,7 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { Coupon } from '../coupon/coupon.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { generateQRFromObject } from '../../../helpers/qrcode/generateQRFromObject';
 
 const subscriptionDetailsFromDB = async (id: string): Promise<{ subscription: ISubscription | {} }> => {
      const subscription = await Subscription.findOne({ userId: id }).populate('package', 'title credit duration').lean();
@@ -50,7 +51,7 @@ const subscriptionsFromDB = async (query: Record<string, unknown>) => {
                {
                     path: 'package',
                     select: 'title paymentType credit description',
-                    options: { strictPopulate: false }  // Add this line
+                    options: { strictPopulate: false }, // Add this line
                },
                {
                     path: 'workshop',
@@ -259,17 +260,37 @@ const deleteSubscriptionPackageToDB = async (packageId: string) => {
 };
 
 const getSubscriptionByIdToDB = async (subscriptionId: string) => {
-     const subscription = await Subscription.findById(subscriptionId).populate('workshop');
+     let subscription = await Subscription.findById(subscriptionId).populate('workshop');
      if (!subscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
+     }
+     // generate qr code if it doesn't exist
+     if (!subscription.subscription_qr_code) {
+          const qrCode = await generateQRFromObject(subscription);
+          // Update and get the updated document
+          subscription = await Subscription.findByIdAndUpdate(
+               subscription._id,
+               { subscription_qr_code: qrCode.qrImagePath },
+               { new: true }, // This returns the updated document
+          );
      }
      return subscription;
 };
 
 const mySubscriptionDetailsToDB = async (workshopId: string) => {
-     const subscription = await Subscription.findOne({ workshop: workshopId });
+     let subscription = await Subscription.findOne({ workshop: workshopId });
      if (!subscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
+     }
+     // generate qr code if it doesn't exist
+     if (!subscription.subscription_qr_code) {
+          const qrCode = await generateQRFromObject(subscription);
+          // Update and get the updated document
+          subscription = await Subscription.findByIdAndUpdate(
+               subscription._id,
+               { subscription_qr_code: qrCode.qrImagePath },
+               { new: true }, // This returns the updated document
+          );
      }
      return subscription;
 };
@@ -283,5 +304,5 @@ export const SubscriptionService = {
      successMessage,
      deleteSubscriptionPackageToDB,
      getSubscriptionByIdToDB,
-     mySubscriptionDetailsToDB
+     mySubscriptionDetailsToDB,
 };

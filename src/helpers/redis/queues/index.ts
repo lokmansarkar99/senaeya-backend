@@ -1,4 +1,4 @@
-import { Queue, Worker } from 'bullmq';
+import { Queue, Worker, Job } from 'bullmq';
 import redisClient, { redisConfig } from '../redis';
 import { formatDelay } from '../utils/formatDelay';
 import { errorLogger } from '../../../shared/logger';
@@ -8,6 +8,7 @@ import { CLIENT_STATUS, CLIENT_TYPE } from '../../../app/modules/client/client.e
 import { Client } from '../../../app/modules/client/client.model';
 import { SpareParts } from '../../../app/modules/spareParts/spareParts.model';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 
 // Create a reusable connection for BullMQ
 export const connection = {
@@ -35,7 +36,7 @@ export const emailQueue = new Queue('emailQueue', {
      },
 });
 
-// Example worker setup
+// Email worker setup
 export const emailWorker = new Worker(
      'emailQueue',
      async (job) => {
@@ -49,6 +50,69 @@ export const emailWorker = new Worker(
      },
 );
 
+// WhatsApp Queue
+export const whatsAppQueue = new Queue('whatsAppQueue', {
+     connection,
+     defaultJobOptions: {
+          attempts: 3,
+          backoff: {
+               type: 'exponential',
+               delay: 5000,
+          },
+          removeOnComplete: {
+               age: 24 * 3600, // Keep jobs for 24 hours after completion
+               count: 1000, // Keep up to 1000 jobs
+          },
+          removeOnFail: {
+               age: 3 * 24 * 3600, // Keep failed jobs for 3 days
+          },
+     },
+});
+
+// WhatsApp worker setup
+export const whatsAppWorker = new Worker(
+     'whatsAppQueue',
+     async (job: Job<{ type: 'text' | 'pdf' | 'admin'; data: any }>) => {
+          const { type, data } = job.data;
+
+          try {
+               switch (type) {
+                    case 'text':
+                         return await whatsAppHelper.sendWhatsAppTextMessage(data);
+                    case 'pdf':
+                         return await whatsAppHelper.sendWhatsAppPDFMessage(data);
+                    case 'admin':
+                         return await whatsAppHelper.sendWhatsAppForAdmin(data.message, data.adminPhone);
+                    default:
+                         throw new Error(`Unsupported WhatsApp message type: ${type}`);
+               }
+          } catch (error) {
+               errorLogger.error(`Error processing WhatsApp job ${job.id}:`, error);
+               throw error; // Will trigger retry logic
+          }
+     },
+     {
+          connection,
+          autorun: true,
+          concurrency: 5, // Process up to 5 messages concurrently
+     },
+);
+
+/* // Instead of:
+await whatsAppHelper.sendWhatsAppTextMessage({ to: '1234567890', body: 'Hello' });
+
+// Use:
+import { whatsAppQueue } from '../helpers/redis/queues';
+
+await whatsAppQueue.add('send-whatsapp-text', {
+     type: 'text',
+     data: {
+          to: '1234567890',
+          body: 'Hello',
+          // other WhatsApp message options
+     },
+}); */
+
 // Handle worker events
 emailWorker.on('completed', (job) => {
      console.log(`Job ${job.id} has completed!`);
@@ -58,10 +122,20 @@ emailWorker.on('failed', (job, err) => {
      console.error(`Job ${job?.id} has failed with error:`, err);
 });
 
-// Graceful shutdown
+// Gracefully close queues and workers on shutdown
 const shutdown = async () => {
-     await emailWorker.close();
+     console.log('Shutting down queues and workers...');
+
+     // Close email queue and worker
      await emailQueue.close();
+     await emailWorker.close();
+
+     // Close WhatsApp queue and worker
+     await whatsAppQueue.close();
+     await whatsAppWorker.close();
+
+     console.log('All queues and workers have been shut down');
+     process.exit(0);
 };
 
 process.on('SIGTERM', shutdown);
@@ -91,7 +165,7 @@ export const sparePartsWorker = new Worker(
      'sparePartsQueue',
      async (job) => {
           const { sparePart } = job.data;
-          
+
           try {
                // Check if spare part with this code and item already exists
                const existingSparePart = await SpareParts.findOne(
@@ -116,7 +190,7 @@ export const sparePartsWorker = new Worker(
                     if (!newSparePart) {
                          throw new Error('Failed to create spare part');
                     }
-                    
+
                     console.log('Successfully processed spare part:', newSparePart._id);
                }
           } catch (error) {

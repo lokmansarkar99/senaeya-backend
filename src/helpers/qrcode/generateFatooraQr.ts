@@ -27,7 +27,7 @@ export interface IFatooraQr {
      finalCost: string;
      invoiceId: string;
 }
-export async function generateFatooraQR(data: IFatooraQr){
+export async function generateFatooraQR(data: IFatooraQr) {
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
           getTLVForValue(1, data.workshopNameArabic),
@@ -53,7 +53,7 @@ export async function generateFatooraQR(data: IFatooraQr){
      // Generate QR image path
      const fileName = `${data.workshopNameArabic}_${data.invoiceId}_fatoora_qr.png`.replace(/[^a-zA-Z0-9_.-]/g, '_');
      const filePath = path.join(uploadsDir, fileName);
-     
+
      // Generate QR code
      await QRCode.toFile(filePath, qrBase64, {
           type: 'png',
@@ -78,3 +78,5 @@ generateFatooraQR({
 });
 
 // command : npx ts-node src/helpers/qrcode/generateFatooraQr.ts
+
+
