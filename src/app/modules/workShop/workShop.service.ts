@@ -59,13 +59,13 @@ const getAllUnpaginatedWorkShops = async (): Promise<IworkShop[]> => {
 const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any): Promise<IworkShop | null> => {
      console.log('🚀 ~ updateWorkShop ~ payload:', payload);
      if (user.role === USER_ROLES.WORKSHOP_OWNER) {
-          const forbiddenFieldsForShopOwner = ['workshopNameEnglish', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber', 'region', 'city', 'industrialComplexAreaName'];
+          const forbiddenFieldsForShopOwner = ['workshopNameArabic', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber', 'region', 'city', 'industrialComplexAreaName'];
 
           for (const field of forbiddenFieldsForShopOwner) {
                if (Object.prototype.hasOwnProperty.call(payload, field)) {
                     throw new AppError(
                          StatusCodes.BAD_REQUEST,
-                         `WorkShop owner cannot update 'workshopNameEnglish', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber'. Plz connect to shop owner.`,
+                         `WorkShop owner cannot update 'workshopNameArabic', 'unn', 'crn', 'mln', 'taxVatNumber', 'bankAccountNumber'. Plz connect to shop owner.`,
                     );
                }
           }

@@ -14,6 +14,7 @@ import { AuthService } from '../auth/auth.service';
 import mongoose, { Types } from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import session from 'express-session';
+import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
 // create user
 const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string } }) => {
      const user = await User.isExistUserByContact(payload.contact);
@@ -71,27 +72,11 @@ const createUserToDB = async (payload: IUser & { helperUserId: { contact: string
 const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
      //set role
      payload.role = USER_ROLES.ADMIN;
+     payload.verified = true;
      const createAdmin = await User.create(payload);
      if (!createAdmin) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create admin');
      }
-
-     //send email
-     const otp = generateOTP(6);
-     const values = {
-          name: createAdmin.name,
-          otp: otp,
-          email: createAdmin.email!,
-     };
-     const createAccountTemplate = emailTemplate.createAccount(values);
-     emailHelper.sendEmail(createAccountTemplate);
-
-     //save to DB
-     const authentication = {
-          oneTimeCode: otp,
-          expireAt: new Date(Date.now() + 3 * 60000),
-     };
-     await User.findOneAndUpdate({ _id: createAdmin._id }, { $set: { authentication } });
 
      await sendNotifications({
           title: `${createAdmin?.name}`,
@@ -135,6 +120,14 @@ const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser & { he
                throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create helper user');
           }
           payload.helperUserId = helperUser._id;
+     }
+
+     // ensure only verified phone number can be set to edit if payload.contact is avialebl
+     if (payload.contact) {
+          const isVerified = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
+          if (!isVerified) {
+               throw new AppError(StatusCodes.BAD_REQUEST, 'Contact is not verified');
+          }
      }
 
      const updateDoc = await User.findOneAndUpdate({ _id: id }, payload, {

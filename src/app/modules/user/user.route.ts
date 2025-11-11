@@ -7,8 +7,10 @@ import fileUploadHandler from '../../middleware/fileUploadHandler';
 import validateRequest from '../../middleware/validateRequest';
 import parseFileData from '../../middleware/parseFileData';
 import { FOLDER_NAMES } from '../../../enums/files';
+import { HelperUserRouter } from './helperUserCrud/helperUser.route';
 const router = express.Router();
 
+router.use('/helper-user', HelperUserRouter);
 router
      .route('/profile')
      .get(auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.SUPER_ADMIN), UserController.getUserProfile)
