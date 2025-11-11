@@ -4,11 +4,13 @@ import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../user.model';
 import { USER_ROLES } from '../../../../enums/user';
 import mongoose from 'mongoose';
+import { WorkShop } from '../../workShop/workShop.model';
 
 // update user by admin
 const addRemoveEditHelperUserZodSchema = async (
      user: JwtPayload,
      payload: {
+          providerWorkShopId: string;
           type: string;
           contact: string;
           password?: string;
@@ -35,8 +37,11 @@ const addRemoveEditHelperUserZodSchema = async (
 
      if (payload.type == 'remove') {
           isExistUser.helperUserId = null;
+          await User.deleteOne({ _id: isExistHelperUser._id });
+          await WorkShop.findByIdAndUpdate(payload.providerWorkShopId, { helperUserId: null });
      } else if (payload.type == 'edit' || payload.type == 'add') {
           isExistUser.helperUserId = new mongoose.Types.ObjectId(isExistHelperUser._id);
+          await WorkShop.findByIdAndUpdate(payload.providerWorkShopId, { helperUserId: isExistHelperUser._id });
      }
 
      await isExistUser.save();
