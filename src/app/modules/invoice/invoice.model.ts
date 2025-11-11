@@ -92,7 +92,7 @@ InvoiceSchema.pre('validate', async function (next) {
      let isExistWorks: any[] = [];
      let isExistSpareParts: any[] = [];
 
-     const isExistClient = await Client.findOne({ _id: payload.client});
+     const isExistClient = await Client.findOne({ _id: payload.client });
      if (!isExistClient) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.7');
      }
@@ -139,11 +139,24 @@ InvoiceSchema.pre('validate', async function (next) {
           vat = appSettings.defaultVat as number;
      }
 
-     // taxAmount
-     let taxAmountForWorkCost = totalCostOfWorkShopExcludingTax * (vat / 100);
+     // // taxAmount
+     // let taxAmountForWorkCost = totalCostOfWorkShopExcludingTax * (vat / 100);
 
-     // totalCostIncludingTax
-     let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
+     // // totalCostIncludingTax
+     // let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
+
+     // // discount
+     // let finalDiscountInFlatAmount = default_discount;
+     // const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
+     // if (workShopSettings) {
+     //      finalDiscountInFlatAmount = workShopSettings.workShopDiscount as number;
+     // }
+     // if (payload.discount && payload.discountType) {
+     //      finalDiscountInFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (totalCostExcludingTax * payload.discount) / 100 : payload.discount;
+     // }
+
+     // // finalCost
+     // let finalCost = totalCostExcludingTax + taxAmountForWorkCost - finalDiscountInFlatAmount;
 
      // discount
      let finalDiscountInFlatAmount = default_discount;
@@ -155,8 +168,14 @@ InvoiceSchema.pre('validate', async function (next) {
           finalDiscountInFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (totalCostExcludingTax * payload.discount) / 100 : payload.discount;
      }
 
+     // taxAmount
+     let taxAmountForWorkCost = (totalCostOfWorkShopExcludingTax - finalDiscountInFlatAmount) * (vat / 100);
+
+     // totalCostIncludingTax
+     let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
+
      // finalCost
-     let finalCost = totalCostExcludingTax + taxAmountForWorkCost - finalDiscountInFlatAmount;
+     let finalCost = totalCostIncludingTax;
 
      payload.totalCostExcludingTax = totalCostExcludingTax;
      payload.taxAmount = taxAmountForWorkCost;
