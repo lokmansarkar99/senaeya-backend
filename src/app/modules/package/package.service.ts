@@ -41,7 +41,6 @@ const getPackageFromDB = async (queryParms: Record<string, unknown>) => {
      const packages = await queryBuilder.filter().sort()
      // .paginate()
      .fields().sort().modelQuery.exec();
-     console.log(packages);
      // const meta = await queryBuilder.countTotal();
      return {
           packages,

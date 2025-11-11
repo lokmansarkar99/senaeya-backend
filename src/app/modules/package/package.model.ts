@@ -21,6 +21,9 @@ const packageSchema = new Schema<IPackage, PackageModel>(
                type: Number,
                required: true,
           },
+          cutOffprice: {
+               type: Number,
+          },
           monthlyBasePrice: {
                type: Number,
                required: true,
@@ -64,9 +67,11 @@ const packageSchema = new Schema<IPackage, PackageModel>(
 );
 
 packageSchema.pre('save', function (next) {
-     console.log("🚀 ~ this:", this)
      if (this.monthlyBasePrice) {
           this.yearlyBasePrice = this.monthlyBasePrice * 12;
+     }
+     if (this.price) {
+          this.cutOffprice = this.price + (this.price * this.discountPercentage) / 100;
      }
      next();
 });

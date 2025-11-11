@@ -8,6 +8,7 @@ export type IPackage = {
      monthlyBasePrice: number;
      yearlyBasePrice: number;
      price: number;
+     cutOffprice: number;
      duration: PackageDuration;
      paymentType: PackagePaymentType;
      subscriptionType: PackageSubscriptionType;
