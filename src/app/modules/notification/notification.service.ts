@@ -1,13 +1,13 @@
+import { StatusCodes } from 'http-status-codes';
 import { JwtPayload } from 'jsonwebtoken';
+import AppError from '../../../errors/AppError';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { INotification } from './notification.interface';
 import { Notification } from './notification.model';
-import AppError from '../../../errors/AppError';
-import { StatusCodes } from 'http-status-codes';
-import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 // get notifications
 const getNotificationFromDB = async (user: JwtPayload): Promise<INotification> => {
-     const result = await Notification.find({ receiver: user.id });
+     const result = await Notification.find({ receiver: user.id }).sort('-createdAt').lean();
 
      const unreadCount = await Notification.countDocuments({
           receiver: user.id,
@@ -30,7 +30,7 @@ const readNotificationToDB = async (user: JwtPayload): Promise<INotification | u
 
 // get notifications for admin
 const adminNotificationFromDB = async () => {
-     const result = await Notification.find({ type: 'ADMIN' });
+     const result = await Notification.find({ type: 'ADMIN' }).sort('-createdAt').lean();
      return result;
 };
 
