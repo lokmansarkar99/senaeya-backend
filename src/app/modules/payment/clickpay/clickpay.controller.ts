@@ -1,17 +1,16 @@
 import { Request, Response } from 'express';
-import catchAsync from '../../../../shared/catchAsync';
-import sendResponse from '../../../../shared/sendResponse';
-import { initiatePaymentService } from './clickpay.service';
-import { CLICKPAY_CURRENCY } from './clickpay.interface';
-import { TRAN_CLASS, TRAN_TYPE } from './clickpay.enum';
-import { Package } from '../../package/package.model';
-import { Subscription } from '../../subscription/subscription.model';
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../../errors/AppError';
-import { SubscriptionService } from '../../subscription/subscription.service';
-import { WorkShop } from '../../workShop/workShop.model';
-import { Coupon } from '../../coupon/coupon.model';
+import catchAsync from '../../../../shared/catchAsync';
+import sendResponse from '../../../../shared/sendResponse';
 import { CouponService } from '../../coupon/coupon.service';
+import { default_vat } from '../../invoice/invoice.enum';
+import { Package } from '../../package/package.model';
+import Settings from '../../settings/settings.model';
+import { Subscription } from '../../subscription/subscription.model';
+import { TRAN_CLASS, TRAN_TYPE } from './clickpay.enum';
+import { CLICKPAY_CURRENCY } from './clickpay.interface';
+import { initiatePaymentService } from './clickpay.service';
 
 const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      const isExistPackage = await Package.findById(req.params.packageId);
@@ -22,7 +21,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      let toBePaidAmount = isExistPackage.price;
      if (req.query.couponCode) {
           isExistCoupon = await CouponService.getTryCouponByCode(req.params.packageId, req.query.couponCode as string);
-          console.log("🚀 ~ isExistCoupon:", isExistCoupon)
+          console.log('🚀 ~ isExistCoupon:', isExistCoupon);
           if (!isExistCoupon) {
                throw new Error('Coupon not found for this package');
           }
@@ -38,8 +37,13 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      if (isExistSubscription) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You are already subscribed');
      }
+     let vat = default_vat;
+     const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
+     if (appSettings) {
+          vat = appSettings.defaultVat as number;
+     }
 
-     
+     toBePaidAmount = toBePaidAmount + (toBePaidAmount * vat) / 100;
 
      const paymentRequest = {
           cart_amount: toBePaidAmount,
