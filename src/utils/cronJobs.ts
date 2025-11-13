@@ -1,14 +1,14 @@
-import cron from 'node-cron';
-import figlet from 'figlet';
 import chalk from 'chalk';
-import { Subscription } from '../app/modules/subscription/subscription.model';
+import figlet from 'figlet';
+import cron from 'node-cron';
+import { Coupon } from '../app/modules/coupon/coupon.model';
 import { Invoice } from '../app/modules/invoice/invoice.model';
 import { PaymentStatus } from '../app/modules/payment/payment.enum';
-import { whatsAppTemplate } from '../shared/whatsAppTemplate';
-import { whatsAppHelper } from '../helpers/whatsAppHelper';
-import { sendNotifications } from '../helpers/notificationsHelper';
+import { Subscription } from '../app/modules/subscription/subscription.model';
 import { WorkShop } from '../app/modules/workShop/workShop.model';
-import { Coupon } from '../app/modules/coupon/coupon.model';
+import { sendNotifications } from '../helpers/notificationsHelper';
+import { whatsAppHelper } from '../helpers/whatsAppHelper';
+import { whatsAppTemplate } from '../shared/whatsAppTemplate';
 // ====== CRON JOB SCHEDULERS ======
 const scheduleTrialWarningCheck = () => {
      // Run every 5 days at 9:00 AM '0 9 */5 * *'
@@ -170,6 +170,7 @@ const scheduleCouponExpire = () => {
                     {
                          $set: {
                               status: 'expired',
+                              isActive: false,
                          },
                          $inc: { tokenVersion: 1 },
                     },
