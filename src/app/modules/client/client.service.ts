@@ -1,21 +1,20 @@
 import { StatusCodes } from 'http-status-codes';
-import AppError from '../../../errors/AppError';
-import { IClient } from './client.interface';
-import { Client } from './client.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import unlinkFile from '../../../shared/unlinkFile';
-import { CLIENT_CAR_TYPE, CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
-import { WorkShop } from '../workShop/workShop.model';
-import { User } from '../user/user.model';
-import { USER_ROLES } from '../../../enums/user';
+import mongoose from 'mongoose';
 import config from '../../../config';
+import { USER_ROLES } from '../../../enums/user';
+import AppError from '../../../errors/AppError';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import QueryBuilder from '../../builder/QueryBuilder';
 import { Car } from '../car/car.model';
 import { carService } from '../car/car.service';
-import mongoose from 'mongoose';
-import { imageService } from '../image/image.service';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
-import { workShopService } from '../workShop/workShop.service';
+import { Invoice } from '../invoice/invoice.model';
+import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
+import { User } from '../user/user.model';
+import { WorkShop } from '../workShop/workShop.model';
+import { CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
+import { IClient } from './client.interface';
+import { Client } from './client.model';
 
 /** steps
  * client type check user or workshop
@@ -188,6 +187,33 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.4');
      }
 
+     // find expiredInvoices of the user
+     const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+     const expiredPostpaidInvoices = await Invoice.find({
+          client: client._id,
+          paymentStatus: PaymentStatus.UNPAID,
+          $or: [
+               {
+                    paymentType: PaymentMethod.POSTPAID,
+                    postPaymentDate: { $lt: threeDaysAgo },
+               },
+               {
+                    paymentType: { $ne: PaymentMethod.POSTPAID },
+                    createdAt: { $lt: tenDaysAgo },
+               },
+          ],
+     }).select('_id');
+
+     if (expiredPostpaidInvoices.length > 0) {
+          client.hasPaymentIssues = true;
+          await client.save();
+     } else {
+          client.hasPaymentIssues = false;
+          await client.save();
+     }
+
      const carOfClient = await Car.findOne({ client: client._id })
           .populate({
                path: 'client',
@@ -242,11 +268,52 @@ const getClienstByCarNumber = async (carNumber: string) => {
      if (!isExistCarByNumber) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
      }
-     const client = await Client.find({ cars: { $in: [isExistCarByNumber._id] } }).populate('clientId', 'name');
-     if (!client) {
+     const clients = await Client.find({ cars: { $in: [isExistCarByNumber._id] } }).populate('clientId', 'name');
+     if (!clients) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
      }
-     return client;
+
+     const allClientIds = clients.map((client) => client._id);
+     // find expiredInvoices of the user
+     const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+     const expiredPostpaidInvoices = await Invoice.find({
+          client: { $in: allClientIds },
+          paymentStatus: PaymentStatus.UNPAID,
+          $or: [
+               {
+                    paymentType: PaymentMethod.POSTPAID,
+                    postPaymentDate: { $lt: threeDaysAgo },
+               },
+               {
+                    paymentType: { $ne: PaymentMethod.POSTPAID },
+                    createdAt: { $lt: tenDaysAgo },
+               },
+          ],
+     }).select('client');
+
+     const clientIdsWithPaymentIssues = expiredPostpaidInvoices.map((invoice) => invoice.client);
+
+     if (clientIdsWithPaymentIssues.length > 0) {
+          // update manay allthe client to hasPaymentIssues true
+          await Client.updateMany(
+               { _id: { $in: clientIdsWithPaymentIssues } },
+               {
+                    $set: { hasPaymentIssues: true },
+               },
+          );
+     } else {
+          // update manay allthe client to hasPaymentIssues true
+          await Client.updateMany(
+               { _id: { $in: clientIdsWithPaymentIssues } },
+               {
+                    $set: { hasPaymentIssues: false },
+               },
+          );
+     }
+
+     return clients;
 };
 
 export const clientService = {
@@ -257,8 +324,8 @@ export const clientService = {
      deleteClient,
      hardDeleteClient,
      getClientById,
-     getClientByClientContact,
      toggleClientStatus,
      sendMessageToRecieveCar,
+     getClientByClientContact,
      getClienstByCarNumber,
 };

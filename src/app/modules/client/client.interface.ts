@@ -15,6 +15,7 @@ export interface IClient {
      isDeleted: boolean;
      deletedAt?: Date;
      status?: CLIENT_STATUS;
+     hasPaymentIssues?: boolean;
 }
 
 export type IClientFilters = {
@@ -22,4 +23,4 @@ export type IClientFilters = {
      status?: CLIENT_STATUS;
      clientType?: CLIENT_TYPE;
      providerWorkShopId?: Types.ObjectId;
-     };
+};
