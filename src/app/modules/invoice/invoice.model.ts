@@ -1,19 +1,13 @@
-import { Schema, Types, model } from 'mongoose';
-import { IInvoice, IInvoiceWork, IInvoiceSpareParts } from './invoice.interface';
-import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
-import { default_discount, default_vat, DiscountType } from './invoice.enum';
-import { Client } from '../client/client.model';
-import AppError from '../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
-import { Work } from '../work/work.model';
-import Settings from '../settings/settings.model';
+import { model, Schema, Types } from 'mongoose';
+import AppError from '../../../errors/AppError';
 import { Car } from '../car/car.model';
-import { SpareParts } from '../spareParts/spareParts.model';
-import { WorkType } from '../work/work.enum';
-import { SparePartType } from '../spareParts/spareParts.enum';
-import { sparePartsService } from '../spareParts/spareParts.service';
-import { ISpareParts } from '../spareParts/spareParts.interface';
-import { buildTranslatedField } from '../../../utils/buildTranslatedField';
+import { Client } from '../client/client.model';
+import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
+import Settings from '../settings/settings.model';
+import { Work } from '../work/work.model';
+import { default_discount, default_vat, DiscountType } from './invoice.enum';
+import { IInvoice, IInvoiceSpareParts, IInvoiceWork } from './invoice.interface';
 
 const InvoiceWorkSchema = new Schema<IInvoiceWork>({
      work: { type: Schema.Types.ObjectId, ref: 'Work', required: true },
@@ -41,7 +35,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           invoiceQRLink: { type: String, required: false, default: '' },
           worksList: { type: [InvoiceWorkSchema], required: true, default: [] },
           sparePartsList: { type: [InvoiceSparePartsSchema], required: false, default: [] },
-          totalCostExcludingTax: { type: Number, required: true },
+          // totalCostExcludingTax: { type: Number, required: true },
           taxPercentage: { type: Number, required: true },
           taxAmount: { type: Number, required: true },
           totalCostIncludingTax: { type: Number, required: true },
@@ -77,20 +71,8 @@ InvoiceSchema.pre('aggregate', function (next) {
 
 InvoiceSchema.pre('validate', async function (next) {
      const payload = this;
-     //  * steps ⬇️⬇️
-     //  * is client exist and belongs to this workShop ✅
-     //  * is all works exists and belongs to this workShop ✅
-     //  * is all spareParts exists and belongs to this workShop ✅
-     //  * calculate the totalCostExcludingTax ✅
-     //  * fetch the vat from settings module ✅
-     //  * calculate the taxAmount ✅
-     //  * calculate the totalCostIncludingTax ✅
-     //  * cal the discount amount ✅
-     //  * calculate the finalCost ✅
-     //  * create invoice with null payment ✅
 
      let isExistWorks: any[] = [];
-     let isExistSpareParts: any[] = [];
 
      const isExistClient = await Client.findOne({ _id: payload.client });
      if (!isExistClient) {
@@ -122,69 +104,49 @@ InvoiceSchema.pre('validate', async function (next) {
                return sparePart;
           });
      }
-     // totalCostExcludingTax
-     let totalCostOfWorkShopExcludingTax = 0;
+
+     let ট্যাক্সবাদে_কামের_টাকা = 0;
      if (payload.worksList) {
-          totalCostOfWorkShopExcludingTax += payload.worksList.reduce((acc, work) => acc + work.finalCost, 0);
+          ট্যাক্সবাদে_কামের_টাকা += payload.worksList.reduce((acc, work) => acc + work.finalCost, 0);
      }
-     let totalCostOfSparePartsExcludingTax = 0;
-     if (payload.sparePartsList) {
-          totalCostOfSparePartsExcludingTax += payload.sparePartsList.reduce((acc, sparePart) => acc + sparePart.finalCost, 0);
-     }
-     let totalCostExcludingTax = totalCostOfWorkShopExcludingTax + totalCostOfSparePartsExcludingTax;
-
-     let vat = default_vat;
-     const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
-     if (appSettings) {
-          vat = appSettings.defaultVat as number;
-     }
-
-     // // taxAmount
-     // let taxAmountForWorkCost = totalCostOfWorkShopExcludingTax * (vat / 100);
-
-     // // totalCostIncludingTax
-     // let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
-
-     // // discount
-     // let finalDiscountInFlatAmount = default_discount;
-     // const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
-     // if (workShopSettings) {
-     //      finalDiscountInFlatAmount = workShopSettings.workShopDiscount as number;
-     // }
-     // if (payload.discount && payload.discountType) {
-     //      finalDiscountInFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (totalCostExcludingTax * payload.discount) / 100 : payload.discount;
-     // }
-
-     // // finalCost
-     // let finalCost = totalCostExcludingTax + taxAmountForWorkCost - finalDiscountInFlatAmount;
-
      // discount
-     let finalDiscountInFlatAmount = default_discount;
+     let খালি_ডিসকাউন্টের_টাকা = default_discount;
      const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
      if (workShopSettings) {
-          finalDiscountInFlatAmount = workShopSettings.workShopDiscount as number;
+          খালি_ডিসকাউন্টের_টাকা = workShopSettings.workShopDiscount as number;
      }
      if (payload.discount && payload.discountType) {
-          finalDiscountInFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (totalCostExcludingTax * payload.discount) / 100 : payload.discount;
+          খালি_ডিসকাউন্টের_টাকা = payload.discountType === DiscountType.PERCENTAGE ? (ট্যাক্সবাদে_কামের_টাকা * payload.discount) / 100 : payload.discount;
      }
 
+     let ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা = ট্যাক্সবাদে_কামের_টাকা - খালি_ডিসকাউন্টের_টাকা;
+     let vatPercentage = default_vat;
+     const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
+     if (appSettings) {
+          vatPercentage = appSettings.defaultVat as number;
+     }
      // taxAmount
-     let taxAmountForWorkCost = (totalCostOfWorkShopExcludingTax - finalDiscountInFlatAmount) * (vat / 100);
+     let খালি_ট্যাক্সের_টাকা = ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা * (vatPercentage / 100);
 
-     // totalCostIncludingTax
-     let totalCostIncludingTax = totalCostExcludingTax + taxAmountForWorkCost;
+     let ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা = ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা + খালি_ট্যাক্সের_টাকা;
+
+     let ট্যাক্সবাদে_পার্টসের_টাকা = 0;
+     if (payload.sparePartsList) {
+          ট্যাক্সবাদে_পার্টসের_টাকা += payload.sparePartsList.reduce((acc, sparePart) => acc + sparePart.finalCost, 0);
+     }
+
+     let ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা_ও_পার্টসের_টাকা = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা + ট্যাক্সবাদে_পার্টসের_টাকা;
 
      // finalCost
-     let finalCost = totalCostIncludingTax;
+     let finalCost = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা_ও_পার্টসের_টাকা;
 
-     payload.totalCostExcludingTax = totalCostExcludingTax;
-     payload.taxAmount = taxAmountForWorkCost;
-     payload.totalCostIncludingTax = totalCostIncludingTax;
-     payload.finalDiscountInFlatAmount = finalDiscountInFlatAmount;
-     payload.taxPercentage = vat;
+     payload.taxAmount = খালি_ট্যাক্সের_টাকা;
+     payload.totalCostIncludingTax = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা;
+     payload.finalDiscountInFlatAmount = খালি_ডিসকাউন্টের_টাকা;
+     payload.taxPercentage = vatPercentage;
      payload.finalCost = finalCost;
-     payload.totalCostOfWorkShopExcludingTax = totalCostOfWorkShopExcludingTax;
-     payload.totalCostOfSparePartsExcludingTax = totalCostOfSparePartsExcludingTax;
+     payload.totalCostOfWorkShopExcludingTax = ট্যাক্সবাদে_কামের_টাকা;
+     payload.totalCostOfSparePartsExcludingTax = ট্যাক্সবাদে_পার্টসের_টাকা;
 
      next();
 });

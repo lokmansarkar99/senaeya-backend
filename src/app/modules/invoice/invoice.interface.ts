@@ -32,20 +32,20 @@ export interface IInvoice {
      client: Types.ObjectId;
      discount?: number;
      discountType?: DiscountType;
-     worksList?: IInvoiceWork[]; // work.type === 'service'
-     sparePartsList?: IInvoiceSpareParts[]; // work.type === 'spare parts'
+     worksList?: IInvoiceWork[];
+     sparePartsList?: IInvoiceSpareParts[];
      paymentMethod: PaymentMethod | undefined;
      paymentStatus: PaymentStatus;
-     postPaymentDate?: Date | null; // only if the paymentMethod is postpaid
+     postPaymentDate?: Date | null;
      payment?: Types.ObjectId | null;
-     totalCostExcludingTax: number; // based on the total cost(((worksList.reduce((total, work) => total + work.finalCost, 0)) + discount)+sparePartsList.reduce((total, work) => total + work.finalCost, 0))
-     taxAmount: number; // based on the totalCostExcludingTax * taxPercentage
-     totalCostIncludingTax: number; // based on the totalCostExcludingTax + taxAmount
-     taxPercentage: number; // get from website settings
-     finalDiscountInFlatAmount: number; // based on the totalCostExcludingTax + taxAmount - discount
-     finalCost: number; // based on the totalCostExcludingTax + taxAmount - discount
-     totalCostOfWorkShopExcludingTax: number;
+     // totalCostExcludingTax: number;
+     taxAmount: number;
+     totalCostIncludingTax: number;
+     taxPercentage: number;
+     finalDiscountInFlatAmount: number;
+     finalCost: number;
      totalCostOfSparePartsExcludingTax: number;
+     totalCostOfWorkShopExcludingTax: number;
      car?: Types.ObjectId | null;
      invoiceAwsLink?: string;
      invoiceQRLink?: string | '';
