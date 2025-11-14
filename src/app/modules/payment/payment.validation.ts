@@ -8,21 +8,19 @@ const createPaymentZodSchema = z.object({
                invoice: z.string({ required_error: 'Invoice ID is required' }),
                paymentMethod: z.nativeEnum(PaymentMethod, { required_error: 'Payment Method is required' }),
                isCashRecieved: z.boolean({ required_error: 'Is Cash Recieved is required' }).optional(),
-               isRecievedTransfer: z.boolean({ required_error: 'Is Recieved Transfer is required' }).optional(),
                cardApprovalCode: z.string({ required_error: 'Card Approval Code is required' }).optional(),
           })
           .superRefine((data, ctx) => {
-               
                if (data.paymentMethod == PaymentMethod.POSTPAID) {
                     ctx.addIssue({
                          code: z.ZodIssueCode.custom,
                          message: 'Postpaid invoice cannot have payment.',
                     });
                }
-               if (!data.isCashRecieved && !data.isRecievedTransfer && !data.cardApprovalCode) {
+               if (!data.isCashRecieved && !data.cardApprovalCode) {
                     ctx.addIssue({
                          code: z.ZodIssueCode.custom,
-                         message: 'At least one of isCashRecieved, isRecievedTransfer, or cardApprovalCode must be true',
+                         message: 'At least one of isCashRecieved or cardApprovalCode must be true',
                     });
                }
                if (data.paymentMethod == PaymentMethod.CARD && !data.cardApprovalCode) {

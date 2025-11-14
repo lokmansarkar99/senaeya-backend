@@ -1,36 +1,29 @@
+import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 import AppError from '../../../errors/AppError';
-import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
-import { Invoice } from './invoice.model';
+import { S3Helper } from '../../../helpers/aws/s3helper';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { generateFatooraQR } from '../../../helpers/qrcode/generateFatooraQr';
+import { addToBullQueueToCheckInvoicePaymentStatus, sparePartsQueue } from '../../../helpers/redis/queues';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
-import { paymentService } from '../payment/payment.service';
-import { ObjectId } from 'mongodb';
+import { Payment } from '../payment/payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 import { WorkShop } from '../workShop/workShop.model';
-import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
-import { sendNotifications } from '../../../helpers/notificationsHelper';
-import { sparePartsService } from '../spareParts/spareParts.service';
-import { SpareParts } from '../spareParts/spareParts.model';
-import { buildTranslatedField } from '../../../utils/buildTranslatedField';
-import mongoose from 'mongoose';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { S3Helper } from '../../../helpers/aws/s3helper';
-import fs from 'fs';
-import { addToBullQueueToCheckInvoicePaymentStatus, sparePartsQueue } from '../../../helpers/redis/queues';
-import { Payment } from '../payment/payment.model';
-import { generateFatooraQR } from '../../../helpers/qrcode/generateFatooraQr';
+import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
+import { Invoice } from './invoice.model';
 
-const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; isRecievedTransfer: string; cardApprovalCode: string }>) => {
-     const isReleased = payload.isReleased === 'true';
-     const isCashRecieved = payload.isCashRecieved === 'true';
-     const isRecievedTransfer = payload.isRecievedTransfer === 'true';
+const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
+     const isReleased = payload.isReleased === 'true' || false;
+     const isCashRecieved = payload.isCashRecieved === 'true' || false;
      if (payload.paymentMethod !== PaymentMethod.POSTPAID) {
           payload.postPaymentDate = undefined;
           if (payload.paymentMethod == PaymentMethod.CASH) {
                isCashRecieved ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           } else if (payload.paymentMethod == PaymentMethod.TRANSFER) {
-               isRecievedTransfer ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
+               isCashRecieved ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           } else if (payload.paymentMethod == PaymentMethod.CARD) {
                payload.cardApprovalCode ? (payload.paymentStatus = PaymentStatus.PAID) : (payload.paymentStatus = PaymentStatus.UNPAID);
           }

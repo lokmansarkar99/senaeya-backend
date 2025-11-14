@@ -1,23 +1,19 @@
+import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
-import AppError from '../../../errors/AppError';
-import { Ipayment } from './payment.interface';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { Invoice } from '../invoice/invoice.model';
-import { PaymentMethod } from './payment.enum';
-import { PaymentStatus } from './payment.enum';
 import mongoose from 'mongoose';
-import { WorkShop } from '../workShop/workShop.model';
+import AppError from '../../../errors/AppError';
+import { S3Helper } from '../../../helpers/aws/s3helper';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { TranslatedFieldEnum } from '../invoice/invoice.interface';
+import { Invoice } from '../invoice/invoice.model';
+import { PaymentMethod, PaymentStatus } from './payment.enum';
+import { Ipayment } from './payment.interface';
 import { Payment } from './payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
-import { S3Helper } from '../../../helpers/aws/s3helper';
-import fs from 'fs';
-import { TranslatedFieldEnum } from '../invoice/invoice.interface';
-import { sendNotifications } from '../../../helpers/notificationsHelper';
 
-const createPayment = async (
-     payload: Partial<Ipayment & { lang: TranslatedFieldEnum; postPaymentDate: Date | string; isCashRecieved: boolean; isRecievedTransfer: boolean; cardApprovalCode: string }>,
-) => {
+const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedFieldEnum; postPaymentDate: Date | string; isCashRecieved: boolean; cardApprovalCode: string }>) => {
      const isExistPayment = await Payment.findOne({ invoice: payload.invoice, providerWorkShopId: payload.providerWorkShopId, paymentStatus: PaymentStatus.PAID });
      if (isExistPayment) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Payment already paid.');
@@ -30,7 +26,7 @@ const createPayment = async (
 
      if (payload.paymentMethod == PaymentMethod.CASH && !payload.isCashRecieved) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Cash must be recieved.');
-     } else if (payload.paymentMethod == PaymentMethod.TRANSFER && !payload.isRecievedTransfer) {
+     } else if (payload.paymentMethod == PaymentMethod.TRANSFER && !payload.isCashRecieved) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Transfer must be done.');
      } else if (payload.paymentMethod == PaymentMethod.CARD && !payload.cardApprovalCode) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Card approval code must be provided.');

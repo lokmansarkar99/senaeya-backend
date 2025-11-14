@@ -32,7 +32,6 @@ const createInvoiceZodSchema = z.object({
                postPaymentDate: z.string().optional(),
                isCashRecieved: z.enum(['true', 'false']).optional(),
                cardApprovalCode: z.string().optional(),
-               isRecievedTransfer: z.enum(['true', 'false']).optional(),
                isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
           })
           .superRefine((body, ctx) => {
@@ -49,10 +48,10 @@ const createInvoiceZodSchema = z.object({
                          }
                     });
                } else {
-                    if (!body.isCashRecieved && !body.isRecievedTransfer && !body.cardApprovalCode) {
+                    if (!body.isCashRecieved && !body.cardApprovalCode) {
                          ctx.addIssue({
-                              path: ['isCashRecieved', 'isRecievedTransfer', 'cardApprovalCode'],
-                              message: 'At least one of isCashRecieved, isRecievedTransfer, or cardApprovalCode is required',
+                              path: ['isCashRecieved', 'cardApprovalCode'],
+                              message: 'At least one of isCashRecieved or cardApprovalCode is required',
                               code: z.ZodIssueCode.custom,
                          });
                     }
