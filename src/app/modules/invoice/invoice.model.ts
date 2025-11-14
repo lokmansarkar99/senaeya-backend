@@ -105,48 +105,48 @@ InvoiceSchema.pre('validate', async function (next) {
           });
      }
 
-     let ট্যাক্সবাদে_কামের_টাকা = 0;
+     let noTaxOnlyCostOfWorks = 0;
      if (payload.worksList) {
-          ট্যাক্সবাদে_কামের_টাকা += payload.worksList.reduce((acc, work) => acc + work.finalCost, 0);
+          noTaxOnlyCostOfWorks += payload.worksList.reduce((acc, work) => acc + work.finalCost, 0);
      }
      // discount
-     let খালি_ডিসকাউন্টের_টাকা = default_discount;
+     let onlyDiscoutFlatAmount = default_discount;
      const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
      if (workShopSettings) {
-          খালি_ডিসকাউন্টের_টাকা = workShopSettings.workShopDiscount as number;
+          onlyDiscoutFlatAmount = workShopSettings.workShopDiscount as number;
      }
      if (payload.discount && payload.discountType) {
-          খালি_ডিসকাউন্টের_টাকা = payload.discountType === DiscountType.PERCENTAGE ? (ট্যাক্সবাদে_কামের_টাকা * payload.discount) / 100 : payload.discount;
+          onlyDiscoutFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (noTaxOnlyCostOfWorks * payload.discount) / 100 : payload.discount;
      }
 
-     let ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা = ট্যাক্সবাদে_কামের_টাকা - খালি_ডিসকাউন্টের_টাকা;
+     let noTaxButDiscountAdded_WorkCosts = noTaxOnlyCostOfWorks - onlyDiscoutFlatAmount;
      let vatPercentage = default_vat;
      const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
      if (appSettings) {
           vatPercentage = appSettings.defaultVat as number;
      }
      // taxAmount
-     let খালি_ট্যাক্সের_টাকা = ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা * (vatPercentage / 100);
+     let onlyTaxInFlatAmount = noTaxButDiscountAdded_WorkCosts * (vatPercentage / 100);
 
-     let ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা = ট্যাক্সবাদে_ও_ডিসকাউন্টসহ_কামের_টাকা + খালি_ট্যাক্সের_টাকা;
+     let withTaxAndDiscountWorkCosts = noTaxButDiscountAdded_WorkCosts + onlyTaxInFlatAmount;
 
-     let ট্যাক্সবাদে_পার্টসের_টাকা = 0;
+     let noTaxOnlyPartsCosts = 0;
      if (payload.sparePartsList) {
-          ট্যাক্সবাদে_পার্টসের_টাকা += payload.sparePartsList.reduce((acc, sparePart) => acc + sparePart.finalCost, 0);
+          noTaxOnlyPartsCosts += payload.sparePartsList.reduce((acc, sparePart) => acc + sparePart.finalCost, 0);
      }
 
-     let ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা_ও_পার্টসের_টাকা = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা + ট্যাক্সবাদে_পার্টসের_টাকা;
+     let withTaxAndDiscoutAndIncludingPartsCosts = withTaxAndDiscountWorkCosts + noTaxOnlyPartsCosts;
 
      // finalCost
-     let finalCost = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা_ও_পার্টসের_টাকা;
+     let finalCost = withTaxAndDiscoutAndIncludingPartsCosts;
 
-     payload.taxAmount = খালি_ট্যাক্সের_টাকা;
-     payload.totalCostIncludingTax = ট্যাক্সসহ_ও_ডিসকাউন্টসহ_খালি_কামের_টাকা;
-     payload.finalDiscountInFlatAmount = খালি_ডিসকাউন্টের_টাকা;
+     payload.taxAmount = onlyTaxInFlatAmount;
+     payload.totalCostIncludingTax = withTaxAndDiscountWorkCosts;
+     payload.finalDiscountInFlatAmount = onlyDiscoutFlatAmount;
      payload.taxPercentage = vatPercentage;
      payload.finalCost = finalCost;
-     payload.totalCostOfWorkShopExcludingTax = ট্যাক্সবাদে_কামের_টাকা;
-     payload.totalCostOfSparePartsExcludingTax = ট্যাক্সবাদে_পার্টসের_টাকা;
+     payload.totalCostOfWorkShopExcludingTax = noTaxOnlyCostOfWorks;
+     payload.totalCostOfSparePartsExcludingTax = noTaxOnlyPartsCosts;
 
      next();
 });
