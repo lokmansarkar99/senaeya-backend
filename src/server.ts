@@ -1,18 +1,18 @@
+import { createAdapter } from '@socket.io/redis-adapter';
+import colors from 'colors';
 import { createServer, Server as HttpServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import colors from 'colors';
+import { setupCluster } from './DB/cluster';
 import { validateConfig } from './DB/configValidation';
 import { connectToDatabase } from './DB/db';
-import app from './app';
-import config from './config';
-import { logger } from './shared/logger';
-import { socketHelper } from './helpers/socketHelper';
 import { setupProcessHandlers } from './DB/processHandlers';
 import { setupSecurity } from './DB/security';
-import { setupCluster } from './DB/cluster';
-import { redisClient } from './helpers/redis/redis';
-import { createAdapter } from '@socket.io/redis-adapter';
+import app from './app';
+import config from './config';
 import { startScheduleWorker } from './helpers/redis/queues';
+import { redisClient } from './helpers/redis/redis';
+import { socketHelper } from './helpers/socketHelper';
+import { logger } from './shared/logger';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -36,8 +36,11 @@ export async function startServer() {
           httpServer.headersTimeout = 60000;
 
           // Start HTTP server
-          httpServer.listen(httpPort, ipAddress, () => {
-               logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
+          // httpServer.listen(httpPort, ipAddress, () => {
+          //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
+          // });
+          httpServer.listen(httpPort, '0.0.0.0', () => {
+               logger.info(colors.bgCyan(`♻️  Application listening on http://0.0.0.0:${httpPort}`));
           });
 
           // Set up Socket.io server on same port as HTTP server
