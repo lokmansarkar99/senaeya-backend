@@ -2,22 +2,22 @@ import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
+import { USER_ROLES } from '../../../enums/user';
+import AppError from '../../../errors/AppError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { jwtHelper } from '../../../helpers/jwtHelper';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { IAuthResetPassword, IChangePassword, ILoginData, IVerifyEmail } from '../../../types/auth';
+import { createToken } from '../../../utils/createToken';
+import cryptoToken from '../../../utils/cryptoToken';
+import generateOTP from '../../../utils/generateOTP';
+import { verifyToken } from '../../../utils/verifyToken';
+import DeviceToken from '../DeviceToken/DeviceToken.model';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
-import AppError from '../../../errors/AppError';
-import generateOTP from '../../../utils/generateOTP';
-import cryptoToken from '../../../utils/cryptoToken';
-import { verifyToken } from '../../../utils/verifyToken';
-import { createToken } from '../../../utils/createToken';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
-import { USER_ROLES } from '../../../enums/user';
 import { workShopService } from '../workShop/workShop.service';
-import DeviceToken from '../DeviceToken/DeviceToken.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -45,7 +45,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
                          receiver: isExistUser._id,
                          message: `Updated FCM token for user ${isExistUser._id}, presentDevice ${deviceId} | oldDevice ${existingToken.deviceId}`,
                          type: 'ALERT',
-                    }
+                    };
 
                     existingToken.deviceId = deviceId;
                     deviceType && (existingToken.deviceType = deviceType);
@@ -182,7 +182,7 @@ const forgetPasswordToDB = async (contact: string) => {
      await isExistUser.save();
 
      //send message
-     const values = { name: isExistUser.name, password: newPassword, contact: isExistUser.contact };
+     const values = { name: isExistUser.name!, password: newPassword, contact: isExistUser.contact };
      const message = whatsAppTemplate.forgetPassword(values);
      await whatsAppHelper.sendWhatsAppTextMessage({ to: contact, body: message });
 };
