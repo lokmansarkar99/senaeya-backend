@@ -12,7 +12,8 @@
           "seed": "ts-node src/seed/seedAdmin.ts",
           "seed:settings": "ts-node src/seed/seedSettings.ts",
           "build": "tsc",
-          "start": "node dist/server.ts"
+          "start": "node dist/server.js",
+          "start:concurrently": "concurrently \"node dist/server.js\" \"docker compose up -d\""
      },
      "keywords": [],
      "author": "",
