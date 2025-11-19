@@ -9,6 +9,8 @@ import { Client } from '../../../app/modules/client/client.model';
 import { SpareParts } from '../../../app/modules/spareParts/spareParts.model';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import AppError from '../../../errors/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 // Create a reusable connection for BullMQ
 export const connection = {
@@ -184,6 +186,11 @@ export const sparePartsWorker = new Worker(
                          code: sparePart.code.toLowerCase(),
                          title,
                     };
+                    // check if already spare parts exist or not
+                    const isExistSparePartForSameProvider = await SpareParts.findOne({ code: sparePart.code.toLowerCase(), providerWorkShopId: sparePart.providerWorkShopId });
+                    if (isExistSparePartForSameProvider) {
+                         throw new AppError(StatusCodes.CREATED, 'Spare part already exist');
+                    }
 
                     const newSparePart = await SpareParts.create(sparePartData);
 

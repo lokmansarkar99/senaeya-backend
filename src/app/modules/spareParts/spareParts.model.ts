@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { ISpareParts } from './spareParts.interface';
 import { SparePartType } from './spareParts.enum';
+import { ISpareParts } from './spareParts.interface';
 
 const SparePartsSchema = new Schema<ISpareParts>(
      {
@@ -24,7 +24,10 @@ const SparePartsSchema = new Schema<ISpareParts>(
      },
      { timestamps: true },
 );
-SparePartsSchema.index({ code: 1 }, { unique: true });
+SparePartsSchema.index(
+     { code: 1 },
+     // { unique: true }
+);
 
 SparePartsSchema.pre('find', function (next) {
      this.find({ isDeleted: false });

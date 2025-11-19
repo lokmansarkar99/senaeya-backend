@@ -1,14 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 import AppError from '../../../errors/AppError';
-import { ISpareParts } from './spareParts.interface';
-import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
-import mongoose, { ClientSession } from 'mongoose';
 import { buildTranslatedField } from '../../../utils/buildTranslatedField';
-import { WorksCategories } from '../worksCategories/worksCategories.model';
-import { SpareParts } from './spareParts.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 import { getXLXStoJSON } from '../work/work.utils';
 import { SparePartType } from './spareParts.enum';
+import { ISpareParts } from './spareParts.interface';
+import { SpareParts } from './spareParts.model';
 
 const createSpareParts = async (payload: Partial<ISpareParts & { titleObj?: ISpareParts['title']; workCategoryName: string }>): Promise<ISpareParts> => {
      if (payload.itemName) {
@@ -20,6 +19,11 @@ const createSpareParts = async (payload: Partial<ISpareParts & { titleObj?: ISpa
           payload.itemName = payload.titleObj.en;
      }
      payload.code = payload.code!.toLowerCase();
+     // check if already spare parts exist or not
+     const isExistSparePartForSameProvider = await SpareParts.findOne({ code: payload.code, providerWorkShopId: payload.providerWorkShopId });
+     if (isExistSparePartForSameProvider) {
+          throw new AppError(StatusCodes.CREATED, 'Spare part already exist');
+     }
      const result = await SpareParts.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
@@ -172,5 +176,5 @@ export const sparePartsService = {
      hardDeleteSpareParts,
      getSparePartsById,
      createManySpareParts,
-     getSparePartsByCode
+     getSparePartsByCode,
 };
