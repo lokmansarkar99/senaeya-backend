@@ -4,7 +4,7 @@ import { IworksCategories } from './worksCategories.interface';
 const WorksCategoriesSchema = new Schema<IworksCategories>(
      {
           image: { type: String, required: false },
-          workCategoryName: { type: String, required: true, unique: true },
+          workCategoryName: { type: String, required: true },
           title: {
                type: {
                     ar: String,

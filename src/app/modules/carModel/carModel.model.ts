@@ -3,7 +3,7 @@ import { IcarModel } from './carModel.interface';
 
 const CarModelSchema = new Schema<IcarModel>({
      brand: { type: Schema.Types.ObjectId, ref: 'CarBrand', required: true },
-     title: { type: String,required: true, unique: true },
+     title: { type: String,required: true },
      description: { type: String,required: false },
      isDeleted: { type: Boolean, default: false },
      deletedAt: { type: Date },
