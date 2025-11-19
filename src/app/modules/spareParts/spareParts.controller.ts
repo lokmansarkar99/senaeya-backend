@@ -93,7 +93,7 @@ const getSparePartsById = catchAsync(async (req: Request, res: Response) => {
           message: 'Work retrieved successfully',
           data: result || undefined,
      });
-});  
+});
 
 const createManySpareParts = catchAsync(async (req: Request, res: Response) => {
      const result = await sparePartsService.createManySpareParts(req.body);
@@ -108,7 +108,7 @@ const createManySpareParts = catchAsync(async (req: Request, res: Response) => {
 
 const getSparePartsByCode = catchAsync(async (req: Request, res: Response) => {
      const { code } = req.params;
-     const result = await sparePartsService.getSparePartsByCode(code);
+     const result = await sparePartsService.getSparePartsByCode(code, req.body.providerWorkShopId);
 
      sendResponse(res, {
           statusCode: 200,
@@ -128,5 +128,5 @@ export const sparePartsController = {
      deleteSpareParts,
      hardDeleteSpareParts,
      getSparePartsById,
-     getSparePartsByCode
+     getSparePartsByCode,
 };

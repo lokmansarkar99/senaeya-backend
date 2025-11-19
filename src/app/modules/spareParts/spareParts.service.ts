@@ -20,9 +20,9 @@ const createSpareParts = async (payload: Partial<ISpareParts & { titleObj?: ISpa
      }
      payload.code = payload.code!.toLowerCase();
      // check if already spare parts exist or not
-     const isExistSparePartForSameProvider = await SpareParts.findOne({ code: payload.code, providerWorkShopId: payload.providerWorkShopId });
+     const isExistSparePartForSameProvider = await SpareParts.findOne({ code: payload.code, providerWorkShopId: payload.providerWorkShopId, isDeleted: false });
      if (isExistSparePartForSameProvider) {
-          throw new AppError(StatusCodes.CREATED, 'Spare part already exist');
+          throw new AppError(StatusCodes.CREATED, 'Spare part already exist.');
      }
      const result = await SpareParts.create(payload);
      if (!result) {
@@ -161,8 +161,8 @@ const createManySpareParts = async (payload: any): Promise<ISpareParts[]> => {
      return result;
 };
 
-const getSparePartsByCode = async (code: string): Promise<ISpareParts | null> => {
-     const result = await SpareParts.findOne({ code: code.toLowerCase() });
+const getSparePartsByCode = async (code: string, providerWorkShopId: string): Promise<ISpareParts | null> => {
+     const result = await SpareParts.findOne({ code: code.toLowerCase(), providerWorkShopId });
      return result;
 };
 

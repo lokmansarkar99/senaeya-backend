@@ -9,16 +9,20 @@
 import translate from '@google-cloud/translate';
 const client = new translate.v2.Translate();
 
-export async function detectLanguage(text: string): Promise<string> {
-     // const franc = await getFranc();
-     // const code = franc(text);
+export async function detectLanguage(text: string) {
+     try {
+          // const franc = await getFranc();
+          // const code = franc(text);
 
-     const [detection] = await client.detect(text);
+          const [detection] = await client.detect(text);
 
-     //   return detection.language === 'bn' ? 'bn' : 'en';
-     return detection.language || 'en';
+          //   return detection.language === 'bn' ? 'bn' : 'en';
+          return detection.language || 'en';
 
-     // if (code === 'eng') return 'en';
-     // if (code === 'ben') return 'bn';
-     // return 'unknown';
+          // if (code === 'eng') return 'en';
+          // if (code === 'ben') return 'bn';
+          // return 'unknown';
+     } catch (error) {
+          console.log('🚀 ~ detectLanguage ~ error:', error);
+     }
 }
