@@ -66,7 +66,9 @@ const getCarModelById = async (id: string): Promise<IcarModel | null> => {
 };
 
 const getCarModelByBrandId = async (brandId: string): Promise<IcarModel[] | null> => {
-     const result = await CarModel.find({ brand: new mongoose.Types.ObjectId(brandId) });
+     const result = await CarModel.find({ brand: new mongoose.Types.ObjectId(brandId), isDeleted: false })
+          .sort({ title: 1 }) // Sorting here explicitly
+          .populate('brand', 'title');
      return result;
 };
 
