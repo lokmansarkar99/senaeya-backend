@@ -1,49 +1,57 @@
 name: Deploy Backend
 
 on:
-     push:
-          branches: [main]
+  push:
+    branches: [ main ]
 
 jobs:
-     deploy:
-          runs-on: ubuntu-latest
-          steps:
-               - uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-               - name: Setup Node
-                 uses: actions/setup-node@v4
-                 with:
-                      node-version: 20
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-               - name: Install dependencies
-                 run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-               - name: Create .env
-                 run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+      - name: Create .env
+        run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
-               - name: Deploy to EC2
-                 uses: appleboy/ssh-action@v0.1.10
-                 with:
-                      host: ${{ secrets.DEPLOY_HOST }}
-                      username: ${{ secrets.DEPLOY_USER }}
-                      key: ${{ secrets.DEPLOY_KEY }}
-                      script: |
-                           # NVM লোড করা + সঠিক Node ভার্সন ইউজ করা
-                           export NVM_DIR="$HOME/.nvm"
-                           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-                           nvm use 24 || nvm use --lts || nvm use node
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            # NVM লোড
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 24
 
-                           cd ${{ secrets.DEPLOY_PATH }}
-                           git pull origin main
+            cd /applications/senaeya/senaeya-backend
 
-                           # .env কপি (আপনার প্রজেক্ট যদি .env.production লোড করে তাহলে এটা রাখুন, না হলে .env তেই রাখুন)
-                           cp .env .env.production 2>/dev/null || cp .env .env
+            git pull origin main
 
-                           npm ci --omit=dev
-                           npm run build --if-present
+            # .env ওভাররাইট
+            cp .env .env 2>/dev/null || true
 
-                           # PM2 রিস্টার্ট (pm2 এখন PATH-এ আছে কারণ NVM লোড হয়েছে)
-                           pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
+            # এখানে devDependencies সহ সব ইনস্টল করব (কারণ build দরকার)
+            npm ci
 
-                           # অপশনাল: লগ দেখান যাতে কনফার্ম হয়
-                           pm2 status
+            # TypeScript বিল্ড করব (এটা না করলে dist ফোল্ডার হবে না)
+            npm run build
+
+            # এখন প্রোডাকশনের জন্য শুধু production dependencies রাখব (অপশনাল, স্পেস বাঁচানোর জন্য)
+            rm -rf node_modules
+            npm ci --omit=dev
+
+            # PM2 রিস্টার্ট
+            pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
+
+            # স্ট্যাটাস দেখাও
+            pm2 status
