@@ -25,7 +25,7 @@ const getAllCarModels = async (query: Record<string, any>): Promise<{ meta: { to
 };
 
 const getAllUnpaginatedCarModels = async (): Promise<IcarModel[]> => {
-     const result = await CarModel.find().sort({ title: 1 }).populate('brand');
+     const result = await CarModel.find().sort({ title: 1 }).populate('brand', 'title');
      return result;
 };
 

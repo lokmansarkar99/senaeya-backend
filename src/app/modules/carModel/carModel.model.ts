@@ -10,7 +10,8 @@ const CarModelSchema = new Schema<IcarModel>({
 }, { timestamps: true });
 
 CarModelSchema.pre('find', function (next) {
-     this.find({ isDeleted: false });
+     // this.find({ isDeleted: false });
+    this.find({ isDeleted: false }).sort({ title: 1 });
      next();
 });
 
