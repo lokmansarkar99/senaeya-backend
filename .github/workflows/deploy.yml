@@ -28,9 +28,22 @@ jobs:
                       username: ${{ secrets.DEPLOY_USER }}
                       key: ${{ secrets.DEPLOY_KEY }}
                       script: |
+                           # NVM লোড করা + সঠিক Node ভার্সন ইউজ করা
+                           export NVM_DIR="$HOME/.nvm"
+                           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+                           nvm use 24 || nvm use --lts || nvm use node
+
                            cd ${{ secrets.DEPLOY_PATH }}
                            git pull origin main
-                           cp .env .env.production  # যদি আপনি .env.production লোড করেন
+
+                           # .env কপি (আপনার প্রজেক্ট যদি .env.production লোড করে তাহলে এটা রাখুন, না হলে .env তেই রাখুন)
+                           cp .env .env.production 2>/dev/null || cp .env .env
+
                            npm ci --omit=dev
                            npm run build --if-present
+
+                           # PM2 রিস্টার্ট (pm2 এখন PATH-এ আছে কারণ NVM লোড হয়েছে)
                            pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
+
+                           # অপশনাল: লগ দেখান যাতে কনফার্ম হয়
+                           pm2 status
