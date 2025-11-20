@@ -4,6 +4,7 @@ import { IcarModel } from './carModel.interface';
 import { CarModel } from './carModel.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { CarBrand } from '../carBrand/carBrand.model';
+import mongoose from 'mongoose';
 
 const createCarModel = async (payload: IcarModel): Promise<IcarModel> => {
      const isExistBrand = await CarBrand.findById(payload.brand);
@@ -64,6 +65,11 @@ const getCarModelById = async (id: string): Promise<IcarModel | null> => {
      return result;
 };
 
+const getCarModelByBrandId = async (brandId: string): Promise<IcarModel[] | null> => {
+     const result = await CarModel.find({ brand: new mongoose.Types.ObjectId(brandId) });
+     return result;
+};
+
 export const carModelService = {
      createCarModel,
      getAllCarModels,
@@ -72,4 +78,5 @@ export const carModelService = {
      deleteCarModel,
      hardDeleteCarModel,
      getCarModelById,
+     getCarModelByBrandId,
 };

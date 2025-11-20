@@ -84,6 +84,18 @@ const getCarModelById = catchAsync(async (req: Request, res: Response) => {
      });
 });  
 
+const getCarModelByBrandId = catchAsync(async (req: Request, res: Response) => {
+     const { brandId } = req.params;
+     const result = await carModelService.getCarModelByBrandId(brandId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'CarModel retrieved successfully',
+          data: result || undefined,
+     });
+});
+
 export const carModelController = {
      createCarModel,
      getAllCarModels,
@@ -91,5 +103,6 @@ export const carModelController = {
      updateCarModel,
      deleteCarModel,
      hardDeleteCarModel,
-     getCarModelById
+     getCarModelById,
+     getCarModelByBrandId
 };

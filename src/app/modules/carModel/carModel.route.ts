@@ -19,6 +19,7 @@ router.patch('/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateReq
 
 router.delete('/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), carModelController.deleteCarModel);
 
+router.get('/brand/:brandId', carModelController.getCarModelByBrandId);
 router.get('/:id', carModelController.getCarModelById);
 
 export const carModelRoutes = router;
