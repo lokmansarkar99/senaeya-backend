@@ -8,7 +8,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 const createCarBrand = async (payload: IcarBrand): Promise<IcarBrand> => {
      const result = await CarBrand.create(payload);
      if (!result) {
-          if(payload.image){
+          if (payload.image) {
                unlinkFile(payload.image);
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'CarBrand not found.');
@@ -16,8 +16,8 @@ const createCarBrand = async (payload: IcarBrand): Promise<IcarBrand> => {
      return result;
 };
 
-const getAllCarBrands = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number; }; result: IcarBrand[]; }> => {
-     const queryBuilder = new QueryBuilder(CarBrand.find(), query);
+const getAllCarBrands = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IcarBrand[] }> => {
+     const queryBuilder = new QueryBuilder(CarBrand.find().sort({ title: 1 }), query);
      const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
@@ -31,13 +31,13 @@ const getAllUnpaginatedCarBrands = async (): Promise<IcarBrand[]> => {
 const updateCarBrand = async (id: string, payload: Partial<IcarBrand>): Promise<IcarBrand | null> => {
      const isExist = await CarBrand.findById(id);
      if (!isExist) {
-          if(payload.image){
+          if (payload.image) {
                unlinkFile(payload.image);
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'CarBrand not found.');
      }
 
-     if(isExist.image){
+     if (isExist.image) {
           unlinkFile(isExist.image);
      }
      return await CarBrand.findByIdAndUpdate(id, payload, { new: true });
@@ -59,7 +59,7 @@ const hardDeleteCarBrand = async (id: string): Promise<IcarBrand | null> => {
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'CarBrand not found.');
      }
-     if(result.image){
+     if (result.image) {
           unlinkFile(result.image);
      }
      return result;
@@ -68,7 +68,7 @@ const hardDeleteCarBrand = async (id: string): Promise<IcarBrand | null> => {
 const getCarBrandById = async (id: string): Promise<IcarBrand | null> => {
      const result = await CarBrand.findById(id);
      return result;
-};   
+};
 
 export const carBrandService = {
      createCarBrand,
@@ -77,5 +77,5 @@ export const carBrandService = {
      updateCarBrand,
      deleteCarBrand,
      hardDeleteCarBrand,
-     getCarBrandById
+     getCarBrandById,
 };

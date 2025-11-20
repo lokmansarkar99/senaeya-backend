@@ -18,7 +18,7 @@ const createCarModel = async (payload: IcarModel): Promise<IcarModel> => {
 };
 
 const getAllCarModels = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IcarModel[] }> => {
-     const queryBuilder = new QueryBuilder(CarModel.find(), query);
+     const queryBuilder = new QueryBuilder(CarModel.find().sort({ title: 1 }), query);
      const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };

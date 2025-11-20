@@ -104,7 +104,7 @@ const createManySparePartsByXLXS = async (payload: ISpareParts & { document: str
 };
 
 const getAllSpareParts = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ISpareParts[] }> => {
-     const queryBuilder = new QueryBuilder(SpareParts.find().populate('providerWorkShopId', 'workshopNameEnglish workshopNameArabic'), query);
+     const queryBuilder = new QueryBuilder(SpareParts.find().sort({ code: 1 }).populate('providerWorkShopId', 'workshopNameEnglish workshopNameArabic'), query);
      const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };

@@ -17,7 +17,7 @@ const createCarBrandCountries = async (payload: IcarBrandCountries): Promise<Ica
 };
 
 const getAllCarBrandCountriess = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number; }; result: IcarBrandCountries[]; }> => {
-     const queryBuilder = new QueryBuilder(CarBrandCountries.find(), query);
+     const queryBuilder = new QueryBuilder(CarBrandCountries.find().sort({ title: 1 }), query);
      const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };

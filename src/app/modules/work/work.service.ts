@@ -108,7 +108,7 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
 };
 
 const getAllWorks = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: Iwork[] }> => {
-     const queryBuilder = new QueryBuilder(Work.find(), query);
+     const queryBuilder = new QueryBuilder(Work.find().sort({ code: 1 }), query);
      const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };

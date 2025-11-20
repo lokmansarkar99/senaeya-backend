@@ -37,7 +37,7 @@ const createWorksCategories = async (payload: IworksCategories & { titleObj?: Iw
 };
 
 const getAllWorksCategoriess = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IworksCategories[] }> => {
-     const queryBuilder = new QueryBuilder(WorksCategories.find(), query);
+     const queryBuilder = new QueryBuilder(WorksCategories.find().sort({ workCategoryName: 1 }), query);
      const result = await queryBuilder.filter().search(['workCategoryName']).sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
