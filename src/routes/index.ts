@@ -24,6 +24,7 @@ import { sparePartsRoutes } from '../app/modules/spareParts/spareParts.route';
 import { NotificationRoutes } from '../app/modules/notification/notification.routes';
 import { CouponRoutes } from '../app/modules/coupon/coupon.route';
 import { SubscriptionRoutes } from '../app/modules/subscription/subscription.routes';
+import { RuleRoute } from '../app/modules/rule/rule.route';
 const router = express.Router();
 const routes = [
      {
@@ -125,6 +126,10 @@ const routes = [
      {
           path: '/subscription',
           route: SubscriptionRoutes,
+     },
+     {
+          path: '/rule',
+          route: RuleRoute,
      },
 ];
 

@@ -12,3 +12,6 @@ router.route('/privacy-policy').post(auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADM
 
 //terms and conditions
 router.route('/terms-and-conditions').post(auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RuleController.createTermsAndCondition).get(RuleController.getTermsAndCondition);
+
+
+export const RuleRoute = router;
