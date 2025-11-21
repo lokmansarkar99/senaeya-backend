@@ -76,6 +76,99 @@ const getAbout = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+// support and appExplain controller
+const createSupport = catchAsync(async (req: Request, res: Response) => {
+     const { ...supportData } = req.body;
+     const result = await RuleService.createSupportToDB(supportData);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Support content created successfully',
+          data: result,
+     });
+});
+
+const getSupport = catchAsync(async (req: Request, res: Response) => {
+     const result = await RuleService.getSupportFromDB();
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Support content retrieved successfully',
+          data: result,
+     });
+});
+const createAppExplain = catchAsync(async (req: Request, res: Response) => {
+     const { ...appExplainData } = req.body;
+     const result = await RuleService.createAppExplainToDB(appExplainData);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'App explanation created successfully',
+          data: result,
+     });
+});
+
+const getAppExplain = catchAsync(async (req: Request, res: Response) => {
+     const result = await RuleService.getAppExplainFromDB();
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'App explanation retrieved successfully',
+          data: result,
+     });
+});
+// make resonable valdiaiton for allowedInvoicesCountForFreeUsers and defaultVat separetedly
+const createAllowedInvoicesCountForFreeUsers = catchAsync(async (req: Request, res: Response) => {
+     const { value } = req.body;
+     const result = await RuleService.createAllowedInvoicesCountForFreeUsersToDB(value);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Allowed invoices count for free users created successfully',
+          data: result,
+     });
+});
+
+const getAllowedInvoicesCountForFreeUsers = catchAsync(async (req: Request, res: Response) => {
+     const result = await RuleService.getAllowedInvoicesCountForFreeUsersFromDB();
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Allowed invoices count for free users retrieved successfully',
+          data: result,
+     });
+});
+
+const createDefaultVat = catchAsync(async (req: Request, res: Response) => {
+     const { value } = req.body;
+     const result = await RuleService.createDefaultVatToDB(value);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Default VAT created successfully',
+          data: result,
+     });
+});
+
+const getDefaultVat = catchAsync(async (req: Request, res: Response) => {
+     const result = await RuleService.getDefaultVatFromDB();
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Default VAT retrieved successfully',
+          data: result,
+     });
+});
+
+
 export const RuleController = {
      createPrivacyPolicy,
      getPrivacyPolicy,
@@ -83,4 +176,15 @@ export const RuleController = {
      getTermsAndCondition,
      createAbout,
      getAbout,
+     createSupport,
+     getSupport,
+     createAppExplain,
+     getAppExplain,
+     createDefaultVat,
+     getDefaultVat,
+     createAllowedInvoicesCountForFreeUsers,
+     getAllowedInvoicesCountForFreeUsers,
 };
+
+
+

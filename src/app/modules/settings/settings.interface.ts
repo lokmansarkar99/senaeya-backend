@@ -5,15 +5,15 @@ export interface ISettings extends Document {
      providerWorkShopId?: Types.ObjectId | undefined; // null is for app settings and not null is for specific provider settings
      workShopDiscount?: number | undefined; // for specific provider settings it not for app settings
      // for app ⬇️⬇️⬇️
-     privacyPolicy: string;
-     warrantyAndTerms: string;
-     appExplain: string;
-     aboutUs: string;
-     support: string;
-     termsOfService: string;
-     allowedInvoicesCountForFreeUsers: number;
-     defaultVat: number;
-     socialMedia?:{
+     privacyPolicy: string; // ❌
+     warrantyAndTerms: string;// ❌
+     appExplain: string;// ❌
+     support: string;// ❌
+     aboutUs: string;// ❌
+     termsOfService: string;// ❌
+     allowedInvoicesCountForFreeUsers: number; // *
+     defaultVat: number; // *
+     socialMedia?:{ // *
           facebook: string;
           twitter: string;
           instagram: string;

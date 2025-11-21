@@ -1,4 +1,58 @@
-name: Deploy Backend
+# name: Deploy Backend
+
+# on:
+#      push:
+#           branches: [main]
+
+# jobs:
+#      deploy:
+#           runs-on: ubuntu-latest
+#           steps:
+#                - uses: actions/checkout@v4
+
+#                - name: Setup Node
+#                  uses: actions/setup-node@v4
+#                  with:
+#                       node-version: 20
+
+#                - name: Install dependencies
+#                  run: npm ci
+
+#                - name: Create .env
+#                  run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+
+#                - name: Deploy to EC2
+#                  uses: appleboy/ssh-action@v0.1.10
+#                  with:
+#                       host: ${{ secrets.DEPLOY_HOST }}
+#                       username: ${{ secrets.DEPLOY_USER }}
+#                       key: ${{ secrets.DEPLOY_KEY }}
+#                       script: |
+#                            export NVM_DIR="$HOME/.nvm"
+#                            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+#                            nvm use 24
+
+#                            cd /applications/senaeya/senaeya-backend
+
+#                            git pull origin main
+#                            cp .env .env 2>/dev/null || true
+
+#                            # devDependencies সহ ইনস্টল (concurrently দরকার)
+#                            npm ci
+
+#                            # বিল্ড
+#                            npm run build
+
+#                            # প্রোডাকশনে শুধু production + concurrently রাখব (concurrently দরকার আছে)
+#                            npm ci --omit=dev
+#                            npm install concurrently --no-save   # শুধু concurrently ফোর্স ইনস্টল
+
+#                            # PM2 রিস্টার্ট
+#                            pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
+
+#                            pm2 status
+
+name: Build & Deploy Backend
 
 on:
      push:
@@ -7,34 +61,49 @@ on:
 jobs:
      build:
           runs-on: ubuntu-latest
+          outputs:
+               build-success: ${{ steps.build.outcome }}
           steps:
                - uses: actions/checkout@v4
 
-               - uses: actions/setup-node@v4
-                 with:
-                      node-version: 20
-
-               - run: npm ci
-               - run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
-               - run: npm run build
-               - run: echo "Build successful"
-
-     deploy:
-          needs: build
-          runs-on: ubuntu-latest
-          steps:
-               - uses: actions/checkout@v4
-
-               - name: Setup Node
+               - name: Setup Node.js
                  uses: actions/setup-node@v4
                  with:
                       node-version: 20
+                      cache: 'npm'
 
                - name: Install dependencies
                  run: npm ci
 
                - name: Create .env
                  run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+
+               - name: Build TypeScript
+                 id: build
+                 run: |
+                      npm run build
+                      echo "Build completed successfully"
+
+               # বিল্ড করা ফাইলগুলো পরের job-এ পাঠানোর জন্য upload করা
+               - name: Upload build artifacts
+                 uses: actions/upload-artifact@v4
+                 with:
+                      name: dist-and-env
+                      path: |
+                           dist/
+                           .env
+                           package.json
+                           package-lock.json
+
+     deploy:
+          needs: build
+          if: ${{ needs.build.outputs.build-success == 'success' }} # বিল্ড ফেইল হলে deploy হবে না
+          runs-on: ubuntu-latest
+          steps:
+               - name: Download build artifacts
+                 uses: actions/download-artifact@v4
+                 with:
+                      name: dist-and-env
 
                - name: Deploy to EC2
                  uses: appleboy/ssh-action@v0.1.10
@@ -49,20 +118,19 @@ jobs:
 
                            cd /applications/senaeya/senaeya-backend
 
-                           git pull origin main
-                           cp .env .env 2>/dev/null || true
+                           # লেটেস্ট কোড পুল (শুধু সেফটির জন্য)
+                           git fetch origin
+                           git reset --hard origin/main
 
-                           # devDependencies সহ ইনস্টল (concurrently দরকার)
-                           npm ci
+                           # বিল্ড করা dist + .env কপি করা
+                           rsync -av --delete ${{ runner.temp }}/dist-and-env/ ./
 
-                           # বিল্ড
-                           npm run build
-
-                           # প্রোডাকশনে শুধু production + concurrently রাখব (concurrently দরকার আছে)
+                           # প্রোডাকশন dependencies ইনস্টল (concurrently দরকার বলে ফোর্স করা)
                            npm ci --omit=dev
-                           npm install concurrently --no-save   # শুধু concurrently ফোর্স ইনস্টল
+                           npm install concurrently --no-save
 
                            # PM2 রিস্টার্ট
                            pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
 
+                           echo "Deploy successful!"
                            pm2 status

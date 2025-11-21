@@ -34,6 +34,53 @@ const updaterAboutZodSchema = z.object({
      }),
 });
 
+//  support and appExplain
+const createSupportZodSchema = z.object({
+     body: z.object({
+          content: z.string({ required_error: 'Support content is required' }),
+     }),
+});
+const updateSupportZodSchema = z.object({
+     body: z.object({
+          content: z.string().optional(),
+     }),
+});
+
+const createAppExplainZodSchema = z.object({
+     body: z.object({
+          content: z.string({ required_error: 'App explanation content is required' }),
+     }),
+});
+const updateAppExplainZodSchema = z.object({
+     body: z.object({
+          content: z.string().optional(),
+     }),
+});
+
+const createDefaultVat = z.object({
+     body: z.object({
+          value: z.number({ required_error: 'Default VAT is required' }).min(0, 'VAT cannot be negative'),
+     }),
+});
+
+const updateDefaultVat = z.object({
+     body: z.object({
+          value: z.number().min(0, 'VAT cannot be negative').optional(),
+     }),
+});
+
+const createAllowedInvoicesCountForFreeUsers = z.object({
+     body: z.object({
+          value: z.number({ required_error: 'Allowed invoices count is required' }).int('Count must be an integer').min(0, 'Count cannot be negative'),
+     }),
+});
+
+const updateAllowedInvoicesCountForFreeUsers = z.object({
+     body: z.object({
+          value: z.number().int('Count must be an integer').min(0, 'Count cannot be negative').optional(),
+     }),
+});
+
 export const RuleValidation = {
      createPrivacyPolicyZodSchema,
      updatePrivacyPolicyZodSchema,
@@ -41,4 +88,12 @@ export const RuleValidation = {
      updaterAboutZodSchema,
      createTermsAndConditionZodSchema,
      updateTermsAndConditionZodSchema,
+     createSupportZodSchema,
+     updateSupportZodSchema,
+     createAppExplainZodSchema,
+     updateAppExplainZodSchema,
+     createDefaultVat,
+     updateDefaultVat,
+     createAllowedInvoicesCountForFreeUsers,
+     updateAllowedInvoicesCountForFreeUsers,
 };

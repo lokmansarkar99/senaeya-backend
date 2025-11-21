@@ -8,8 +8,17 @@ const ruleSchema = new Schema<IRule, RuleModel>({
      },
      type: {
           type: String,
-          enum: ['privacy', 'terms', 'about'],
+          enum: ['privacy', 'terms', 'about', 'appExplain', 'support'],
           select: 0,
+     },
+     value: {
+          type: Number,
+          required: true,
+     },
+     valuesTypes: {
+          type: String,
+          enum: ['allowedInvoicesCountForFreeUsers', 'defaultVat'],
+          required: true,
      },
 });
 

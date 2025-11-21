@@ -73,6 +73,92 @@ const getAboutFromDB = async () => {
      return result;
 };
 
+//  support and appExplain service
+const createSupportToDB = async (payload: IRule) => {
+     const isExistSupport = await Rule.findOne({ type: 'support' });
+     if (isExistSupport) {
+          const result = await Rule.findOneAndUpdate({ type: 'support' }, { content: payload?.content }, { new: true });
+          const message = 'Support Content Updated successfully';
+          return { message, result };
+     } else {
+          const result = await Rule.create({ ...payload, type: 'support' });
+          const message = 'Support Content Created successfully';
+          return { message, result };
+     }
+};
+
+const getSupportFromDB = async () => {
+     const result = await Rule.findOne({ type: 'support' });
+     if (!result) {
+          throw new AppError(StatusCodes.BAD_REQUEST, "Support content doesn't exist!");
+     }
+     return result;
+};
+
+const createAppExplainToDB = async (payload: IRule) => {
+     const isExistAppExplain = await Rule.findOne({ type: 'appExplain' });
+     if (isExistAppExplain) {
+          const result = await Rule.findOneAndUpdate({ type: 'appExplain' }, { content: payload?.content }, { new: true });
+          const message = 'App Explain Content Updated successfully';
+          return { message, result };
+     } else {
+          const result = await Rule.create({ ...payload, type: 'appExplain' });
+          const message = 'App Explain Content Created successfully';
+          return { message, result };
+     }
+};
+
+const getAppExplainFromDB = async () => {
+     const result = await Rule.findOne({ type: 'appExplain' });
+     if (!result) {
+          throw new AppError(StatusCodes.BAD_REQUEST, "App Explain content doesn't exist!");
+     }
+     return result;
+};
+
+// make resonable controller for allowedInvoicesCountForFreeUsers and defaultVat separetedly
+const createAllowedInvoicesCountForFreeUsersToDB = async (value: IRule) => {
+     const isExist = await Rule.findOne({ type: 'allowedInvoicesCountForFreeUsers' });
+     if (isExist) {
+          const result = await Rule.findOneAndUpdate({ type: 'allowedInvoicesCountForFreeUsers' }, { value }, { new: true });
+          const message = 'Allowed Invoices Count For Free Users Updated successfully';
+          return { message, result };
+     } else {
+          const result = await Rule.create({ value, type: 'allowedInvoicesCountForFreeUsers' });
+          const message = 'Allowed Invoices Count For Free Users Created successfully';
+          return { message, result };
+     }
+};
+
+const getAllowedInvoicesCountForFreeUsersFromDB = async () => {
+     const result = await Rule.findOne({ type: 'allowedInvoicesCountForFreeUsers' });
+     if (!result) {
+          throw new AppError(StatusCodes.BAD_REQUEST, "Allowed Invoices Count For Free Users content doesn't exist!");
+     }
+     return result;
+};
+
+const createDefaultVatToDB = async (value: IRule) => {
+     const isExist = await Rule.findOne({ type: 'defaultVat' });
+     if (isExist) {
+          const result = await Rule.findOneAndUpdate({ type: 'defaultVat' }, { value }, { new: true });
+          const message = 'Default VAT Updated successfully';
+          return { message, result };
+     } else {
+          const result = await Rule.create({ value, type: 'defaultVat' });
+          const message = 'Default VAT Created successfully';
+          return { message, result };
+     }
+};
+
+const getDefaultVatFromDB = async () => {
+     const result = await Rule.findOne({ type: 'defaultVat' });
+     if (!result) {
+          throw new AppError(StatusCodes.BAD_REQUEST, "Default VAT content doesn't exist!");
+     }
+     return result;
+};
+
 export const RuleService = {
      createPrivacyPolicyToDB,
      getPrivacyPolicyFromDB,
@@ -80,4 +166,12 @@ export const RuleService = {
      getTermsAndConditionFromDB,
      createAboutToDB,
      getAboutFromDB,
+     createSupportToDB,
+     getSupportFromDB,
+     createAppExplainToDB,
+     getAppExplainFromDB,
+     createAllowedInvoicesCountForFreeUsersToDB,
+     getAllowedInvoicesCountForFreeUsersFromDB,
+     createDefaultVatToDB,
+     getDefaultVatFromDB,
 };
