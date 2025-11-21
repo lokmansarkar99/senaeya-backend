@@ -118,20 +118,20 @@ const getAppExplainFromDB = async () => {
 
 // make resonable controller for allowedInvoicesCountForFreeUsers and defaultVat separetedly
 const createAllowedInvoicesCountForFreeUsersToDB = async (value: IRule) => {
-     const isExist = await Rule.findOne({ type: 'allowedInvoicesCountForFreeUsers' });
+     const isExist = await Rule.findOne({ valuesTypes: 'allowedInvoicesCountForFreeUsers' });
      if (isExist) {
-          const result = await Rule.findOneAndUpdate({ type: 'allowedInvoicesCountForFreeUsers' }, { value }, { new: true });
+          const result = await Rule.findOneAndUpdate({ valuesTypes: 'allowedInvoicesCountForFreeUsers' }, { value }, { new: true });
           const message = 'Allowed Invoices Count For Free Users Updated successfully';
           return { message, result };
      } else {
-          const result = await Rule.create({ value, type: 'allowedInvoicesCountForFreeUsers' });
+          const result = await Rule.create({ value, valuesTypes: 'allowedInvoicesCountForFreeUsers' });
           const message = 'Allowed Invoices Count For Free Users Created successfully';
           return { message, result };
      }
 };
 
 const getAllowedInvoicesCountForFreeUsersFromDB = async () => {
-     const result = await Rule.findOne({ type: 'allowedInvoicesCountForFreeUsers' });
+     const result = await Rule.findOne({ valuesTypes: 'allowedInvoicesCountForFreeUsers' });
      if (!result) {
           throw new AppError(StatusCodes.BAD_REQUEST, "Allowed Invoices Count For Free Users content doesn't exist!");
      }
@@ -139,22 +139,51 @@ const getAllowedInvoicesCountForFreeUsersFromDB = async () => {
 };
 
 const createDefaultVatToDB = async (value: IRule) => {
-     const isExist = await Rule.findOne({ type: 'defaultVat' });
+     const isExist = await Rule.findOne({ valuesTypes: 'defaultVat' });
      if (isExist) {
-          const result = await Rule.findOneAndUpdate({ type: 'defaultVat' }, { value }, { new: true });
+          const result = await Rule.findOneAndUpdate({ valuesTypes: 'defaultVat' }, { value }, { new: true });
           const message = 'Default VAT Updated successfully';
           return { message, result };
      } else {
-          const result = await Rule.create({ value, type: 'defaultVat' });
+          const result = await Rule.create({ value, valuesTypes: 'defaultVat' });
           const message = 'Default VAT Created successfully';
           return { message, result };
      }
 };
 
 const getDefaultVatFromDB = async () => {
-     const result = await Rule.findOne({ type: 'defaultVat' });
+     const result = await Rule.findOne({ valuesTypes: 'defaultVat' });
      if (!result) {
           throw new AppError(StatusCodes.BAD_REQUEST, "Default VAT content doesn't exist!");
+     }
+     return result;
+};
+
+const createSocialMediaToDB = async (payload: IRule) => {
+     // Use .lean() to get a plain object instead of a Mongoose document
+     const isExistSocialMedia = await Rule.findOne({ type: 'socialMedia' }).select('+socialMedia').lean(); // This will return plain JavaScript object
+
+     if (isExistSocialMedia) {
+          // Merge the payload with the existing socialMedia object
+          const socialMediaDTO = { ...isExistSocialMedia.socialMedia, ...payload };
+
+          // Update the document
+          const result = await Rule.findOneAndUpdate({ type: 'socialMedia' }, { socialMedia: socialMediaDTO }, { new: true });
+
+          const message = 'Social Media Updated successfully';
+          return { message, result };
+     } else {
+          // If no document exists, create a new one
+          const result = await Rule.create({ ...payload, type: 'socialMedia' });
+          const message = 'Social Media Created successfully';
+          return { message, result };
+     }
+};
+
+const getSocialMediaFromDB = async () => {
+     const result = await Rule.findOne({ type: 'socialMedia' }).select('+socialMedia');
+     if (!result) {
+          throw new AppError(StatusCodes.BAD_REQUEST, "Social Media content doesn't exist!");
      }
      return result;
 };
@@ -174,4 +203,6 @@ export const RuleService = {
      getAllowedInvoicesCountForFreeUsersFromDB,
      createDefaultVatToDB,
      getDefaultVatFromDB,
+     getSocialMediaFromDB,
+     createSocialMediaToDB,
 };

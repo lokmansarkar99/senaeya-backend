@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 
 export type IRule = {
      content: string;
-     type: 'privacy' | 'terms' | 'about' | 'appExplain' | 'support';
+     type: 'privacy' | 'terms' | 'about' | 'appExplain' | 'support' | 'socialMedia';
      value: Number;
      valuesTypes:  'allowedInvoicesCountForFreeUsers' | 'defaultVat';
      // allowedInvoicesCountForFreeUsers: number;

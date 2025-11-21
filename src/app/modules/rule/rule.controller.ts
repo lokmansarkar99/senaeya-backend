@@ -168,6 +168,28 @@ const getDefaultVat = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const createSocialMedia = catchAsync(async (req: Request, res: Response) => {
+     const { ...socialMediaData } = req.body;
+     const result = await RuleService.createSocialMediaToDB(socialMediaData);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Social media link created successfully',
+          data: result,
+     });
+});
+
+const getSocialMedia = catchAsync(async (req: Request, res: Response) => {
+     const result = await RuleService.getSocialMediaFromDB();
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'Social media links retrieved successfully',
+          data: result,
+     });
+});
 
 export const RuleController = {
      createPrivacyPolicy,
@@ -184,7 +206,13 @@ export const RuleController = {
      getDefaultVat,
      createAllowedInvoicesCountForFreeUsers,
      getAllowedInvoicesCountForFreeUsers,
+     createSocialMedia,
+     getSocialMedia,
 };
+
+
+
+
 
 
 

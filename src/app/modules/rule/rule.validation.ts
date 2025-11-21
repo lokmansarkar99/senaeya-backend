@@ -71,13 +71,23 @@ const updateDefaultVat = z.object({
 
 const createAllowedInvoicesCountForFreeUsers = z.object({
      body: z.object({
-          value: z.number({ required_error: 'Allowed invoices count is required' }).int('Count must be an integer').min(0, 'Count cannot be negative'),
+          value: z.number({ required_error: 'Allowed invoices value is required' }).int('value must be an integer').min(0, 'value cannot be negative'),
      }),
 });
 
 const updateAllowedInvoicesCountForFreeUsers = z.object({
      body: z.object({
-          value: z.number().int('Count must be an integer').min(0, 'Count cannot be negative').optional(),
+          value: z.number().int('value must be an integer').min(0, 'value cannot be negative').optional(),
+     }),
+});
+
+const socialMediaZodSchema = z.object({
+     body: z.object({
+          facebook: z.string().optional(),
+          twitter: z.string().optional(),
+          instagram: z.string().optional(),
+          linkedin: z.string().optional(),
+          whatsapp: z.string().optional(),
      }),
 });
 
@@ -96,4 +106,5 @@ export const RuleValidation = {
      updateDefaultVat,
      createAllowedInvoicesCountForFreeUsers,
      updateAllowedInvoicesCountForFreeUsers,
+     socialMediaZodSchema
 };

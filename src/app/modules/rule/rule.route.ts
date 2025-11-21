@@ -29,4 +29,9 @@ router
 
 router.route('/default-vat').post(validateRequest(RuleValidation.createDefaultVat), auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RuleController.createDefaultVat).get(RuleController.getDefaultVat);
 
+router
+     .route('/social-media')
+     .post(validateRequest(RuleValidation.socialMediaZodSchema), auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), RuleController.createSocialMedia)
+     .get(RuleController.getSocialMedia);
+
 export const RuleRoute = router;
