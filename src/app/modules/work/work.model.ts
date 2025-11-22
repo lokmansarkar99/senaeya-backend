@@ -4,17 +4,20 @@ import { WorkType } from './work.enum';
 
 const WorkSchema = new Schema<Iwork>(
      {
-          title: { type: {
-               ar: String,
-               bn: String,
-               ur: String,
-               hi: String,
-               tl: String,
-               en: String,
-          }, required: true },
-          workCategoryName: { type: String, required: true},
-          type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SERVICE},
-          code: { type: String, required: true, unique: true },
+          title: {
+               type: {
+                    ar: String,
+                    bn: String,
+                    ur: String,
+                    hi: String,
+                    tl: String,
+                    en: String,
+               },
+               required: true,
+          },
+          workCategoryName: { type: String, required: true },
+          type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SERVICE },
+          code: { type: String, required: true },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
      },

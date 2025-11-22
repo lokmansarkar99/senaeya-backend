@@ -13,6 +13,7 @@ import { startScheduleWorker } from './helpers/redis/queues';
 import { redisClient } from './helpers/redis/redis';
 import { socketHelper } from './helpers/socketHelper';
 import { logger } from './shared/logger';
+import setupTimeManagement from './utils/cronJobs';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -64,6 +65,8 @@ export async function startServer() {
 
           // 🔥 Start BullMQ Worker (listens for schedule jobs)
           startScheduleWorker();
+          // cron jobs
+          setupTimeManagement();
      } catch (error) {
           logger.error(colors.red('Failed to start server'), error);
           process.exit(1);

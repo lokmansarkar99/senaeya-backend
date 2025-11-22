@@ -63,5 +63,5 @@ app.use(globalErrorHandler);
 
 //handle not found route;
 app.use(notFound);
-setupTimeManagement();
+// setupTimeManagement();
 export default app;
