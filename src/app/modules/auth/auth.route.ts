@@ -18,7 +18,7 @@ router.post('/forget-password', validateRequest(AuthValidation.createForgetPassw
 
 // router.post('/dashboard/reset-password', auth(USER_ROLES.ADMIN, USER_ROLES.ADMIN), validateRequest(AuthValidation.createResetPasswordZodSchema), AuthController.resetPasswordByUrl);
 
-// router.post('/change-password', auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.ADMIN), validateRequest(AuthValidation.createChangePasswordZodSchema), AuthController.changePassword);
+router.post('/change-password', auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.ADMIN), validateRequest(AuthValidation.createChangePasswordZodSchema), AuthController.changePassword);
 // router.post('/resend-otp', AuthController.resendOtp);
 
 // OAuth Routes
