@@ -77,7 +77,8 @@ setupProcessHandlers();
 // Set up security middleware
 setupSecurity();
 if (config.node_env === 'production') {
-     setupCluster();
+     // setupCluster();
+     startServer();
 } else {
      startServer();
 }
