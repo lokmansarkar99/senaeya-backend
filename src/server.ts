@@ -2,7 +2,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import colors from 'colors';
 import { createServer, Server as HttpServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { setupCluster } from './DB/cluster';
+// import { setupCluster } from './DB/cluster';
 import { validateConfig } from './DB/configValidation';
 import { connectToDatabase } from './DB/db';
 import { setupProcessHandlers } from './DB/processHandlers';
@@ -76,11 +76,11 @@ export async function startServer() {
 setupProcessHandlers();
 // Set up security middleware
 setupSecurity();
-if (config.node_env === 'production') {
-     // setupCluster();
-     startServer();
-} else {
-     startServer();
-}
+// if (config.node_env === 'production') {
+//      setupCluster();
+// } else {
+//      startServer();
+// }
+startServer();
 // Export server instances
 export { httpServer, socketServer };
