@@ -1,5 +1,5 @@
 config:
-     target: 'http://172.31.6.11:7005'
+     target: 'http://158.252.87.86:7005'
      phases:
           - duration: 60 # running 1 minute
             arrivalRate: 5000 # new request per 20 seconds
