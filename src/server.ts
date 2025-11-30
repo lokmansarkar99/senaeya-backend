@@ -40,8 +40,8 @@ export async function startServer() {
           // httpServer.listen(httpPort, ipAddress, () => {
           //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           // });
-          httpServer.listen(httpPort, '0.0.0.0', () => {
-               logger.info(colors.bgCyan(`♻️  Application listening on http://0.0.0.0:${httpPort}`));
+          httpServer.listen(httpPort, '172.31.6.11', () => {
+               logger.info(colors.bgCyan(`♻️  Application listening on http://172.31.6.11:${httpPort}`));
           });
 
           // Set up Socket.io server on same port as HTTP server
