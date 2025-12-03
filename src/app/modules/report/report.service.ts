@@ -303,6 +303,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 /**
  * Get comprehensive dashboard statistics including workshops, cars, and growth metrics
  */
+
 const getDashboardReport = async () => {
      const [
           // Basic counts

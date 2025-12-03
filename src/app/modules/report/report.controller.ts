@@ -28,5 +28,5 @@ const getDashboardReport = catchAsync(async (req: Request, res: Response) => {
 
 export const reportController = {
      getAllReportsByCreatedDateRange,
-     getDashboardReport
+     getDashboardReport,
 };
