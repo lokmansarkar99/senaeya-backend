@@ -92,24 +92,42 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 //      return pdfPath;
 // };
 
-import pdf, { CreateOptions } from 'html-pdf';
+// // html-pdf ⬇️⬇️
+// import pdf, { CreateOptions } from 'html-pdf';
+// export const generatePDF = async (htmlContent: string): Promise<string> => {
+//      return new Promise((resolve, reject) => {
+//           const options: CreateOptions = {
+//                format: 'A4',
+//                border: '10mm',
+//           };
 
+//           const uploadDir = path.resolve(__dirname, '../../../../uploads/');
+//           const pdfPath = path.join(uploadDir, 'document', 'invoice.pdf');
+
+//           fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
+
+//           pdf.create(htmlContent, options).toFile(pdfPath, (err) => {
+//                if (err) return reject(err);
+//                resolve(pdfPath);
+//           });
+//      });
+// };
+
+// wkhtmltopdf ⬇️⬇️
+import wkhtmltopdf from 'wkhtmltopdf';
 export const generatePDF = async (htmlContent: string): Promise<string> => {
      return new Promise((resolve, reject) => {
-          const options: CreateOptions = {
-               format: 'A4',
-               border: '10mm',
-          };
-
           const uploadDir = path.resolve(__dirname, '../../../../uploads/');
           const pdfPath = path.join(uploadDir, 'document', 'invoice.pdf');
 
           fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
 
-          pdf.create(htmlContent, options).toFile(pdfPath, (err) => {
-               if (err) return reject(err);
-               resolve(pdfPath);
-          });
+          wkhtmltopdf(htmlContent, { pageSize: 'A4' }).pipe(
+               fs
+                    .createWriteStream(pdfPath)
+                    .on('finish', () => resolve(pdfPath))
+                    .on('error', reject),
+          );
      });
 };
 
