@@ -62,34 +62,55 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 // };
 
 // pdf-lib ⬇️⬇️
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+// import { PDFDocument, StandardFonts } from 'pdf-lib';
+
+// export const generatePDF = async (htmlContent: string): Promise<string> => {
+//      const pdfDoc = await PDFDocument.create();
+//      const page = pdfDoc.addPage();
+
+//      const { width, height } = page.getSize();
+//      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+//      const text = htmlContent.replace(/<[^>]*>/g, ''); // simple HTML → text
+
+//      page.drawText(text, {
+//           x: 20,
+//           y: height - 40,
+//           size: 12,
+//           font,
+//           lineHeight: 14,
+//      });
+
+//      const pdfBytes = await pdfDoc.save();
+
+//      const uploadDir = path.resolve(__dirname, '../../../../uploads/');
+//      const pdfPath = path.join(uploadDir, 'document', 'invoice.pdf');
+
+//      fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
+//      fs.writeFileSync(pdfPath, pdfBytes);
+
+//      return pdfPath;
+// };
+
+import pdf, { CreateOptions } from 'html-pdf';
 
 export const generatePDF = async (htmlContent: string): Promise<string> => {
-     const pdfDoc = await PDFDocument.create();
-     const page = pdfDoc.addPage();
+     return new Promise((resolve, reject) => {
+          const options: CreateOptions = {
+               format: 'A4',
+               border: '10mm',
+          };
 
-     const { width, height } = page.getSize();
-     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+          const uploadDir = path.resolve(__dirname, '../../../../uploads/');
+          const pdfPath = path.join(uploadDir, 'document', 'invoice.pdf');
 
-     const text = htmlContent.replace(/<[^>]*>/g, ''); // simple HTML → text
+          fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
 
-     page.drawText(text, {
-          x: 20,
-          y: height - 40,
-          size: 12,
-          font,
-          lineHeight: 14,
+          pdf.create(htmlContent, options).toFile(pdfPath, (err) => {
+               if (err) return reject(err);
+               resolve(pdfPath);
+          });
      });
-
-     const pdfBytes = await pdfDoc.save();
-
-     const uploadDir = path.resolve(__dirname, '../../../../uploads/');
-     const pdfPath = path.join(uploadDir, 'document', 'invoice.pdf');
-
-     fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
-     fs.writeFileSync(pdfPath, pdfBytes);
-
-     return pdfPath;
 };
 
 export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
