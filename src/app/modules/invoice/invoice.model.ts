@@ -112,17 +112,17 @@ InvoiceSchema.pre('validate', async function (next) {
      // discount
      let onlyDiscoutFlatAmount = default_discount;
      const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
-     if (workShopSettings) {
+     if (workShopSettings && workShopSettings.workShopDiscount) {
           onlyDiscoutFlatAmount = workShopSettings.workShopDiscount as number;
      }
-     if (payload.discount && payload.discountType) {
+     if (noTaxOnlyCostOfWorks && payload.discount && payload.discountType) {
           onlyDiscoutFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (noTaxOnlyCostOfWorks * payload.discount) / 100 : payload.discount;
      }
 
      let noTaxButDiscountAdded_WorkCosts = noTaxOnlyCostOfWorks - onlyDiscoutFlatAmount;
      let vatPercentage = default_vat;
      const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
-     if (appSettings) {
+     if (appSettings && appSettings.defaultVat) {
           vatPercentage = appSettings.defaultVat as number;
      }
      // taxAmount
@@ -147,6 +147,7 @@ InvoiceSchema.pre('validate', async function (next) {
      payload.finalCost = finalCost;
      payload.totalCostOfWorkShopExcludingTax = noTaxOnlyCostOfWorks;
      payload.totalCostOfSparePartsExcludingTax = noTaxOnlyPartsCosts;
+     
 
      next();
 });

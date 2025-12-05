@@ -1,56 +1,56 @@
-# name: Deploy Backend
+name: Deploy Backend
 
-# on:
-#      push:
-#           branches: [main]
+on:
+     push:
+          branches: [main]
 
-# jobs:
-#      deploy:
-#           runs-on: ubuntu-latest
-#           steps:
-#                - uses: actions/checkout@v4
+jobs:
+     deploy:
+          runs-on: ubuntu-latest
+          steps:
+               - uses: actions/checkout@v4
 
-#                - name: Setup Node
-#                  uses: actions/setup-node@v4
-#                  with:
-#                       node-version: 20
+               - name: Setup Node
+                 uses: actions/setup-node@v4
+                 with:
+                      node-version: 20
 
-#                - name: Install dependencies
-#                  run: npm ci
+               - name: Install dependencies
+                 run: npm ci
 
-#                - name: Create .env
-#                  run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+               - name: Create .env
+                 run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
 
-#                - name: Deploy to EC2
-#                  uses: appleboy/ssh-action@v0.1.10
-#                  with:
-#                       host: ${{ secrets.DEPLOY_HOST }}
-#                       username: ${{ secrets.DEPLOY_USER }}
-#                       key: ${{ secrets.DEPLOY_KEY }}
-#                       script: |
-#                            export NVM_DIR="$HOME/.nvm"
-#                            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-#                            nvm use 24
+               - name: Deploy to EC2
+                 uses: appleboy/ssh-action@v0.1.10
+                 with:
+                      host: ${{ secrets.DEPLOY_HOST }}
+                      username: ${{ secrets.DEPLOY_USER }}
+                      key: ${{ secrets.DEPLOY_KEY }}
+                      script: |
+                           export NVM_DIR="$HOME/.nvm"
+                           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                           nvm use 24
 
-#                            cd /applications/senaeya/senaeya-backend
+                           cd /applications/senaeya/senaeya-backend
 
-#                            git pull origin main
-#                            cp .env .env 2>/dev/null || true
+                           git pull origin main
+                           cp .env .env 2>/dev/null || true
 
-#                            # devDependencies সহ ইনস্টল (concurrently দরকার)
-#                            npm ci
+                           # devDependencies সহ ইনস্টল (concurrently দরকার)
+                           npm ci
 
-#                            # বিল্ড
-#                            npm run build
+                           # বিল্ড
+                           npm run build
 
-#                            # প্রোডাকশনে শুধু production + concurrently রাখব (concurrently দরকার আছে)
-#                            npm ci --omit=dev
-#                            npm install concurrently --no-save   # শুধু concurrently ফোর্স ইনস্টল
+                           # প্রোডাকশনে শুধু production + concurrently রাখব (concurrently দরকার আছে)
+                           npm ci --omit=dev
+                           npm install concurrently --no-save   # শুধু concurrently ফোর্স ইনস্টল
 
-#                            # PM2 রিস্টার্ট
-#                            pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
+                           # PM2 রিস্টার্ট
+                           pm2 restart senaeya_backend || pm2 start "npm run start:concurrently" --name senaeya_backend
 
-#                            pm2 status
+                           pm2 status
 
 # # name: Build & Deploy Backend
 

@@ -1,30 +1,63 @@
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer';
+// import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+// import { S3Helper } from '../../../helpers/aws/s3helper';
 import path from 'path';
 import fs from 'fs';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { S3Helper } from '../../../helpers/aws/s3helper';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
-export const generatePDF = async (htmlContent: string) => {
-     const browser = await puppeteer.launch();
-     const page = await browser.newPage();
+import htmlToPdf from 'html-pdf-node'; // Import the html-pdf-node package
 
-     await page.setContent(htmlContent); // Set HTML content
-     const pdfBuffer = await page.pdf({
-          format: 'A4',
-          printBackground: true,
-     });
+export const generatePDF = async (htmlContent: string): Promise<string> => {
+     try {
+          const options = {
+               format: 'A4',
+               printBackground: true,
+          };
 
-     const rollBackToRootUploadDir = path.resolve(__dirname, '../../../../uploads/');
+          const file = { content: htmlContent };
 
-     const pdfPath = path.join(rollBackToRootUploadDir, 'document', `invoice.pdf`);
+          // Generate PDF Buffer properly
+          const pdfBuffer: any = await htmlToPdf.generatePdf(file, options);
 
-     // Save the PDF to disk
-     fs.writeFileSync(pdfPath, pdfBuffer);
+          if (!pdfBuffer) {
+               throw new Error('Failed to generate PDF buffer');
+          }
 
-     await browser.close();
+          const rollBackToRootUploadDir = path.resolve(__dirname, '../../../../uploads/');
+          const pdfPath = path.join(rollBackToRootUploadDir, 'document', 'invoice.pdf');
 
-     return pdfPath;
+          fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
+
+          // Save PDF file
+          fs.writeFileSync(pdfPath, pdfBuffer);
+
+          return pdfPath;
+     } catch (error) {
+          console.error('Error generating PDF:', error);
+          throw new Error('Failed to generate PDF');
+     }
 };
+
+// export const generatePDF = async (htmlContent: string) => {
+//      const browser = await puppeteer.launch();
+//      const page = await browser.newPage();
+
+//      await page.setContent(htmlContent); // Set HTML content
+//      const pdfBuffer = await page.pdf({
+//           format: 'A4',
+//           printBackground: true,
+//      });
+
+//      const rollBackToRootUploadDir = path.resolve(__dirname, '../../../../uploads/');
+
+//      const pdfPath = path.join(rollBackToRootUploadDir, 'document', `invoice.pdf`);
+
+//      // Save the PDF to disk
+//      fs.writeFileSync(pdfPath, pdfBuffer);
+
+//      await browser.close();
+
+//      return pdfPath;
+// };
 
 // export const releaseInvoiceToWhatsApp = async (updatedInvoice: any) => {
 //      const createInvoiceTemplate = whatsAppTemplate.createInvoice(updatedInvoice);
