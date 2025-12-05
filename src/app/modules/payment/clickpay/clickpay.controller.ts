@@ -39,7 +39,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      }
      let vat = default_vat;
      const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
-     if (appSettings) {
+     if (appSettings && appSettings.defaultVat) {
           vat = appSettings.defaultVat as number;
      }
 
