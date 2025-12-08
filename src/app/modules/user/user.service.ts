@@ -339,13 +339,13 @@ const unlinkOAuthAccount = async (userId: string, provider: 'google' | 'facebook
 };
 
 // update user by admin
-const updateUserById = async (userId: string, payload: Partial<IUser>) => {
-     const user = await User.findById(userId);
-     if (!user) {
+const updateUserById = async (targetUserId: string, payload: Partial<IUser>, user: any) => {
+     const isExistTargetUser = await User.findById(targetUserId);
+     if (!isExistTargetUser) {
           throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
      }
 
-     return await User.findByIdAndUpdate(userId, { ...payload }, { new: true });
+     return await User.findByIdAndUpdate(targetUserId, { ...payload }, { new: true });
 };
 
 export const UserService = {

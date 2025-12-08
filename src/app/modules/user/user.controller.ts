@@ -49,7 +49,6 @@ const updateProfile = catchAsync(async (req, res) => {
      // If password is provided
      if (req.body.password) {
           req.body.password = await bcrypt.hash(req.body.password, Number(config.bcrypt_salt_rounds));
-          console.log("🚀 ~ req.body:", req.body)
      }
 
      const result = await UserService.updateProfileToDB(user, req.body);
@@ -333,7 +332,7 @@ const deleteOwnAccount = catchAsync(async (req, res) => {
 // update user by admin
 const updateUserById = catchAsync(async (req, res) => {
      const { id } = req.params;
-     const result = await UserService.updateUserById(id, req.body);
+     const result = await UserService.updateUserById(id, req.body, req.user as any);
 
      sendResponse(res, {
           success: true,
@@ -363,5 +362,5 @@ export const UserController = {
      linkOAuthAccount,
      unlinkOAuthAccount,
      deleteOwnAccount,
-     updateUserById
+     updateUserById,
 };

@@ -124,7 +124,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                     },
                })
                .populate({
-                    path: 'worksList sparePartsList',
+                    path: 'worksList',
                     select: 'work quantity finalCost',
                     populate: {
                          path: 'work',

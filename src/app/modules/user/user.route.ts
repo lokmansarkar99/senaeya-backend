@@ -8,14 +8,15 @@ import validateRequest from '../../middleware/validateRequest';
 import parseFileData from '../../middleware/parseFileData';
 import { FOLDER_NAMES } from '../../../enums/files';
 import { HelperUserRouter } from './helperUserCrud/helperUser.route';
+import validateUserAuthority from '../../middleware/validateUserAuthority';
 const router = express.Router();
 
 router.use('/helper-user', HelperUserRouter);
 router
      .route('/profile')
-     .get(auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.SUPER_ADMIN), UserController.getUserProfile)
+     .get(auth(USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.SUPER_ADMIN), UserController.getUserProfile)
      .patch(
-          auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER),
+          auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER),
           fileUploadHandler(),
           parseFileData(FOLDER_NAMES.IMAGE),
           validateRequest(UserValidation.updateUserZodSchema),
@@ -25,26 +26,13 @@ router
 router.route('/').post(validateRequest(UserValidation.createUserZodSchema), UserController.createUser);
 
 // Admin routes for user management
-router.route('/admin').post(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     validateRequest(UserValidation.createUserZodSchema),
-     UserController.createAdmin
-);
+router.route('/admin').post(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateRequest(UserValidation.createUserZodSchema), UserController.createAdmin);
 // User search and management routes
-router.route('/find/id/:id').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.findUserById
-);
+router.route('/find/id/:id').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.findUserById);
 // update user by admin
-router.route('/admin/update/:id').patch(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.updateUserById
-);
+router.route('/admin/update/:id').patch(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), UserController.updateUserById);
 
-router.route('/find/email/:email').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.findUserByEmail
-);
+router.route('/find/email/:email').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.findUserByEmail);
 
 // router.route('/find/google/:googleId').get(
 //      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
@@ -56,35 +44,20 @@ router.route('/find/email/:email').get(
 //      UserController.findUserByFacebookId
 // );
 
-router.route('/all').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.getAllUsers
-);
+router.route('/all').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.getAllUsers);
 
-router.route('/role/:role').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.getUsersByRole
-);
+router.route('/role/:role').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.getUsersByRole);
 
 // router.route('/oauth').get(
 //      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
 //      UserController.getOAuthUsers
 // );
 
-router.route('/local').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.getLocalUsers
-);
+router.route('/local').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.getLocalUsers);
 
-router.route('/search').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.searchUsers
-);
+router.route('/search').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.searchUsers);
 
-router.route('/stats').get(
-     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     UserController.getUserStats
-);
+router.route('/stats').get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.getUserStats);
 
 // router.route('/:userId/link-oauth').post(
 //      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
@@ -97,6 +70,6 @@ router.route('/stats').get(
 // );
 
 // delete own accoutn
-router.route('/delete-own-account').delete(auth(USER_ROLES.WORKSHOP_OWNER,USER_ROLES.WORKSHOP_MEMBER,USER_ROLES.ADMIN), UserController.deleteOwnAccount);
+router.route('/delete-own-account').delete(auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.ADMIN), UserController.deleteOwnAccount);
 
 export const UserRouter = router;
