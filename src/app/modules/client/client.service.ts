@@ -15,6 +15,7 @@ import { WorkShop } from '../workShop/workShop.model';
 import { CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
 import { IClient } from './client.interface';
 import { Client } from './client.model';
+import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
 
 /** steps
  * client type check user or workshop
@@ -39,6 +40,13 @@ import { Client } from './client.model';
  */
 
 const createClient = async (payload: any) => {
+     // check is payload.contact is verified or not
+     if (payload.contact) {
+          const isVerifiedContact = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
+          if (!isVerifiedContact) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'User contact is not verified.');
+          }
+     }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
           let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
