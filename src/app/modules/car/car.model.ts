@@ -3,16 +3,16 @@ import { ICar } from './car.interface';
 import { CLIENT_CAR_TYPE } from '../client/client.enum';
 const CarSchema = new Schema<ICar>(
      {
-          providerWorkShopId:{ type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
+          providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
           brand: { type: Schema.Types.ObjectId, ref: 'CarBrand', required: true },
           model: { type: Schema.Types.ObjectId, ref: 'CarModel', required: true },
           year: { type: String, required: true },
-          vin: { type: String, required: true, unique: true },
+          vin: { type: String, required: true, unique: false },
           client: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
           image: { type: String, required: false },
           description: { type: String, required: false },
           carType: { type: String, enum: CLIENT_CAR_TYPE, required: true },
-          plateNumberForInternational: { type: String, required: false, index: true },          
+          plateNumberForInternational: { type: String, required: false, index: true },
           slugForSaudiCarPlateNumber: {
                type: String,
                required: function (this: any) {
