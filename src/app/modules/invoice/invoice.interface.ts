@@ -30,6 +30,7 @@ export interface IInvoice {
      _id?: Types.ObjectId;
      providerWorkShopId: Types.ObjectId;
      client: Types.ObjectId;
+     customerInvoiceName?: string;
      discount?: number;
      discountType?: DiscountType;
      worksList?: IInvoiceWork[];

@@ -6,6 +6,7 @@ const createInvoiceZodSchema = z.object({
      body: z
           .object({
                client: z.string({ required_error: 'Client is required' }),
+               customerInvoiceName: z.string().optional(),
                providerWorkShopId: z.string({ required_error: 'Provider WorkShop is required' }),
                worksList: z
                     .array(

@@ -29,6 +29,7 @@ const InvoiceSchema = new Schema<IInvoice>(
      {
           providerWorkShopId: { type: Schema.Types.ObjectId, ref: 'WorkShop', required: true },
           client: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
+          customerInvoiceName: { type: String, required: false },
           car: { type: Schema.Types.ObjectId, ref: 'Car', required: false, default: null },
           discount: { type: Number, required: false },
           discountType: { type: String, enum: DiscountType, required: false },
@@ -74,10 +75,12 @@ InvoiceSchema.pre('validate', async function (next) {
 
      let isExistWorks: any[] = [];
 
-     const isExistClient = await Client.findOne({ _id: payload.client });
+     const isExistClient = await Client.findOne({ _id: payload.client }).populate('clientId', 'name');
      if (!isExistClient) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.7');
      }
+
+     payload.customerInvoiceName = payload.customerInvoiceName || (payload.client as any).clientId.name;
 
      if (payload.car) {
           const isExistCar = await Car.findOne({ _id: payload.car });
@@ -147,7 +150,6 @@ InvoiceSchema.pre('validate', async function (next) {
      payload.finalCost = finalCost;
      payload.totalCostOfWorkShopExcludingTax = noTaxOnlyCostOfWorks;
      payload.totalCostOfSparePartsExcludingTax = noTaxOnlyPartsCosts;
-     
 
      next();
 });

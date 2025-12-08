@@ -118,7 +118,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="0" y="0">${data?.providerWorkShopId?.workshopNameArabic || ''}</tspan>
                     </text>
                     <text data-name="مؤسسة محمد علي التجارية" font-family="ArialMT, Arial" font-size="15" transform="translate(435 64)">
-                        <tspan x="0" y="0">${data?.client?.clientId?.name || data?.client?.workShopNameAsClient || ''}</tspan>
+                        <tspan x="0" y="0">${data?.customerInvoiceName || data?.client?.clientId?.name || data?.client?.workShopNameAsClient || ''}</tspan>
                     </text>
                     <text data-name="سجل تجاري" font-family="ArialMT, Arial" font-size="10" transform="translate(524 79)">
                         <tspan x="0" y="0">سجل تجاري</tspan>
@@ -154,7 +154,7 @@ const createInvoice = async (data: IInvoice | any, lang: TranslatedFieldEnum) =>
                         <tspan x="-13.645" y="0">العميل</tspan>
                     </text>
                     <text data-name="Mohammad Ahmed" font-family="Calibri" font-size="12" transform="translate(489 231)">
-                        <tspan x="-48.844" y="0">${data?.client?.clientId?.name || ''}</tspan>
+                        <tspan x="-48.844" y="0">${data?.customerInvoiceName || data?.client?.clientId?.name || ''}</tspan>
                     </text>
                     <text font-family="Arial-BoldMT, Arial" font-size="14" font-weight="700" transform="translate(317 232)">
                         <tspan x="-14.656" y="0">الجوال</tspan>
