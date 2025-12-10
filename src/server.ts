@@ -40,7 +40,10 @@ export async function startServer() {
           // httpServer.listen(httpPort, ipAddress, () => {
           //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           // });
-          httpServer.listen(httpPort, `${ipAddress}`, () => {
+          // httpServer.listen(httpPort, `${ipAddress}`, () => {
+          //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
+          // });
+          httpServer.listen(httpPort, `0.0.0.0`, () => {
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
 
