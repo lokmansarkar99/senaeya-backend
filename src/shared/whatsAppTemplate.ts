@@ -7,7 +7,7 @@ import { ICoupon } from '../app/modules/coupon/coupon.interface';
 import { ImageType } from '../app/modules/image/image.enum';
 import { Image } from '../app/modules/image/image.model';
 import { imageService } from '../app/modules/image/image.service';
-import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
+import { IInvoice, IInvoiceSpareParts, IInvoiceWork, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
 import { PackageDuration } from '../app/modules/package/package.enum';
 import { IPackage } from '../app/modules/package/package.interface';
 import { PaymentMethod } from '../app/modules/payment/payment.enum';
@@ -39,9 +39,9 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 const createInvoice = async (
      data: IInvoice & {
           client: IClient & { clientId: IUser };
-          worksList: Iwork[];
+          worksList: IInvoiceWork[];
           providerWorkShopId: IworkShop & { ownerId: IUser };
-          sparePartsList: ISpareParts[];
+          sparePartsList: IInvoiceSpareParts[];
           car: ICar & {
                brand: IcarBrand;
                model: IcarModel;
@@ -89,6 +89,84 @@ const createInvoice = async (
       </div>
       </div>`
                : `<div></div>`;
+
+     const worksTableComponent = `<div class="table-header">
+      <div>N</div>
+      <div>الرمز<br />Code</div>
+      <div>الأعمــــال Works</div>
+      <div>عدد<br />Qt.</div>
+      <div>السعر<br />Price</div>
+      <div>الإجمالي<br />Total</div>
+    </div>
+    <div class="table-body">
+      ${
+           data.worksList.length > 0
+                ? `
+                ${data.worksList
+                     .map(
+                          (item, index) => `
+                    <div class="table-row">
+                      <div>${index + 1}</div>
+                      <div>${(item.work as any).code}</div>
+                      <div>${(item.work as any).title[lang]}</div>
+                      <div>${item.quantity}</div>
+                      <div>${item.cost}</div>
+                      <div>${item.finalCost}</div>
+                    </div>
+                  `,
+                     )
+                     .join('')}`
+                : `
+                  <div class="table-row">
+                    <div>1</div>
+                    <div>""</div>
+                    <div>""</div>
+                    <div>""</div>
+                    <div>""</div>
+                    <div>""</div>
+                  </div>`
+      }
+    </div>`;
+
+     const sparePartsTableComponent = `<div class="spare-parts-header">
+      <div>N</div>
+      <div>الرمز<br />Code</div>
+      <div>قطع غيار Spare Parts</div>
+      <div>عدد<br />Qt.</div>
+      <div>السعر<br />Price</div>
+      <div>الإجمالي<br />Total</div>
+    </div>
+    <div class="spare-parts-body">    
+
+      ${
+           data.sparePartsList.length > 0
+                ? `
+        ${data.sparePartsList
+             .map(
+                  (item, index) => `
+          <div class="spare-row">
+            <div>${index + 1}</div>
+            <div>${item.code}</div>
+            <div>${item.itemName}</div>
+            <div>${item.quantity}</div>
+            <div>${item.cost}</div>
+            <div>${item.finalCost}</div>
+          </div>
+        `,
+             )
+             .join('')}
+        `
+                : `
+      <div class="spare-row">
+        <div>1</div>
+        <div>""</div>
+        <div>""</div>
+        <div>"</div>
+        <div>""</div>
+        <div>""</div>
+      </div>`
+      }
+    </div>`;
 
      return `
      <!DOCTYPE html>
@@ -702,84 +780,10 @@ const createInvoice = async (
     </div>
 
     <!-- Works Table -->
-    <div class="table-header">
-      <div>N</div>
-      <div>الرمز<br />Code</div>
-      <div>الأعمــــال Works</div>
-      <div>عدد<br />Qt.</div>
-      <div>السعر<br />Price</div>
-      <div>الإجمالي<br />Total</div>
-    </div>
-    <div class="table-body">
-      <div class="table-row">
-        <div>1</div>
-        <div>W001</div>
-        <div>تغيير زيت المحرك وفلتر الزيت - Engine Oil Change</div>
-        <div>1</div>
-        <div>250.00</div>
-        <div>250.00</div>
-      </div>
-      <div class="table-row">
-        <div>2</div>
-        <div>W002</div>
-        <div>فحص شامل للسيارة - Complete Vehicle Inspection</div>
-        <div>1</div>
-        <div>150.00</div>
-        <div>150.00</div>
-      </div>
-      <div class="table-row">
-        <div>3</div>
-        <div>W003</div>
-        <div>تنظيف البخاخات - Injector Cleaning</div>
-        <div>1</div>
-        <div>300.00</div>
-        <div>300.00</div>
-      </div>
-    </div>
+    ${worksTableComponent}
 
     <!-- Spare Parts Table -->
-    <div class="spare-parts-header">
-      <div>N</div>
-      <div>الرمز<br />Code</div>
-      <div>قطع غيار Spare Parts</div>
-      <div>عدد<br />Qt.</div>
-      <div>السعر<br />Price</div>
-      <div>الإجمالي<br />Total</div>
-    </div>
-    <div class="spare-parts-body">
-      <div class="spare-row">
-        <div>1</div>
-        <div>SP001</div>
-        <div>فلتر زيت المحرك - Engine Oil Filter</div>
-        <div>1</div>
-        <div>45.00</div>
-        <div>45.00</div>
-      </div>
-      <div class="spare-row">
-        <div>2</div>
-        <div>SP002</div>
-        <div>فلتر هواء - Air Filter</div>
-        <div>1</div>
-        <div>80.00</div>
-        <div>80.00</div>
-      </div>
-      <div class="spare-row">
-        <div>3</div>
-        <div>SP003</div>
-        <div>زيت محرك صناعي - Synthetic Engine Oil 5W-30</div>
-        <div>4</div>
-        <div>65.00</div>
-        <div>260.00</div>
-      </div>
-      <div class="spare-row">
-        <div>4</div>
-        <div>SP004</div>
-        <div>شمعات احتراق - Spark Plugs</div>
-        <div>4</div>
-        <div>35.00</div>
-        <div>140.00</div>
-      </div>
-    </div>
+    ${sparePartsTableComponent}
 
     <!-- Bottom Section: Terms & Summary -->
     <div class="bottom-section">
