@@ -1,6 +1,13 @@
 import { CLIENT_CAR_TYPE, CLIENT_STATUS } from '../app/modules/client/client.enum';
+import { ICoupon } from '../app/modules/coupon/coupon.interface';
+import { ImageType } from '../app/modules/image/image.enum';
+import { Image } from '../app/modules/image/image.model';
+import { imageService } from '../app/modules/image/image.service';
 import { IInvoice, TranslatedFieldEnum } from '../app/modules/invoice/invoice.interface';
+import { PackageDuration } from '../app/modules/package/package.enum';
+import { IPackage } from '../app/modules/package/package.interface';
 import { PaymentMethod } from '../app/modules/payment/payment.enum';
+import { ISubscription } from '../app/modules/subscription/subscription.interface';
 import { IworkShop } from '../app/modules/workShop/workShop.interface';
 import config from '../config';
 import { buildTranslatedField } from '../utils/buildTranslatedField';
@@ -630,552 +637,1201 @@ const createReport = (
                maximumFractionDigits: 2,
           });
 
-     return `<html>
+     return `
+          <!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>pdf-report.svg</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Senaeya App Banner</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+
+        width: 210mm;
+        height: 297mm;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      /* section one */
+      .card {
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .header {
+        background: #1771b7;
+        padding: 15px 20px;
+        text-align: center;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .header p {
+        font-size: 18px;
+        font-weight: 300;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .footer {
+        background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+        padding: 6px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .footer-left {
+        text-align: left;
+      }
+
+      .footer-right {
+        text-align: right;
+      }
+
+      /* section two */
+      .report-wrapper {
+        background: #ffff;
+        margin: 0 auto;
+      }
+
+      .report-heading {
+        text-align: center;
+        color: #1976d2;
+        padding-top: 15px;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .duration-box {
+        background: linear-gradient(to right, #c0c0c0 0%, #b8b8b8 100%);
+        width: 70%;
+        margin: 0 auto;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 20px;
+      }
+
+      .duration-box p {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .invoice-stats {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .stat-card {
+        background: linear-gradient(to bottom, #f0f0f0 0%, #e5e5e5 100%);
+        border-radius: 20px;
+        padding: 20px;
+        flex: 1;
+        min-width: 200px;
+        max-width: 280px;
+        text-align: center;
+      }
+
+      .stat-label {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+
+      .stat-value {
+        font-size: 42px;
+        font-weight: bold;
+      }
+
+      .text-red {
+        color: #d32f2f;
+      }
+
+      .text-orange {
+        color: #f57c00;
+      }
+
+      .text-green {
+        color: #2e7d32;
+      }
+
+      /* section three */
+      .finance-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .finance-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 40px;
+        border-radius: 12px;
+      }
+
+      .blue-row {
+        background: linear-gradient(to right, #1976d2 0%, #1565c0 100%);
+      }
+
+      .red-row {
+        background: linear-gradient(to right, #c44545 0%, #b33939 100%);
+      }
+
+      .gray-row {
+        background: linear-gradient(to right, #999999 0%, #888888 100%);
+      }
+
+      .amount-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: white;
+      }
+
+      .currency-symbol {
+        font-size: 32px;
+        font-weight: bold;
+      }
+
+      .amount-number {
+        font-size: 36px;
+        font-weight: bold;
+      }
+
+      .label-section {
+        color: white;
+      }
+
+      .finance-label {
+        font-size: 26px;
+        font-weight: bold;
+      }
+
+      /* section four */
+      .balance-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        padding-top: 15px;
+        padding-bottom: 15px;
+      }
+
+      .balance-card {
+        background: linear-gradient(to bottom, #f5f5f5 0%, #ebebeb 100%);
+        border-radius: 20px;
+        padding: 20px;
+        flex: 1;
+        min-width: 280px;
+        max-width: 650px;
+      }
+
+      .card-heading {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+
+      .blue-heading {
+        color: #1976d2;
+      }
+
+      .red-heading {
+        color: #c44545;
+      }
+
+      .card-detail {
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 6px;
+        text-align: center;
+      }
+
+      .card-amount {
+        gap: 15px;
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      .amount-symbol {
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .amount-value {
+        font-size: 36px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .blue-text {
+        color: #1976d2;
+        text-align: center;
+      }
+
+      .red-text {
+        color: #c44545;
+      }
+
+      /* section five */
+      .service-bar {
+        width: 80%;
+        margin: 0 auto;
+        background: linear-gradient(to bottom, #d0d0d0 0%, #c0c0c0 100%);
+        border-radius: 15px;
+        padding: 12px 50px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .item-label {
+        font-size: 28px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .item-count {
+        font-size: 28px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .right-section {
+        display: flex;
+        align-items: center;
+      }
+
+      .description-text {
+        font-size: 28px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      /* section six */
+      .banner-strip {
+        position: relative;
+        width: 100%;
+        min-height: 60px;
+      }
+
+      .blue-side {
+        background: linear-gradient(to left, #1976d2 0%, #1565c0 100%);
+        width: 65%;
+        display: flex;
+        align-items: center;
+        padding: 12px 50px;
+        position: relative;
+        clip-path: polygon(0 0, 85% 0, 93% 100%, 0 100%);
+        z-index: 20;
+        min-height: 60px;
+      }
+
+      .blue-content {
+        max-width: 600px;
+      }
+
+      .primary-text {
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 4px;
+        line-height: 1.3;
+      }
+
+      .secondary-text {
+        color: white;
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      .red-side {
+        background: linear-gradient(to right, #c44545 0%, #b33939 100%);
+        width: 100%;
+        padding: 8px 50px 8px 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        height: auto;
+        z-index: 10;
+      }
+
+      .red-content {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        gap: 40px;
+      }
+
+      .phone-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .phone-number {
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .icon-set {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .icon-svg {
+        width: 24px;
+        height: 24px;
+        padding: 4px;
+        border-radius: 50%;
+      }
+
+      .whatsapp-svg {
+        background: #25d366;
+      }
+
+      .phone-svg {
+        background: white;
+        fill: #c44545;
+      }
+
+      .address-info {
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      @media print {
+        body {
+          width: 210mm;
+          height: 297mm;
+          margin: 0;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <svg xmlns="http://www.w3.org/2000/svg" width="595" height="842">
-      <defs>
-        <clipPath id="a"><path d="M0 0h595v842H0z"></path></clipPath>
-      </defs>
-      <g clip-path="url(#a)">
-        <path fill="#fff" d="M0 0h595v842H0z"></path>
-        <text
-          fill="#1771b7"
-          data-name="Report issued by Senaeya App"
-          font-family="Calibri-Bold, Calibri"
-          font-size="22"
-          font-weight="700"
-          transform="translate(160 131)"
+    <!-- section one  -->
+
+    <div class="card">
+      <div class="header">
+        <h1>${report.workshop.workshopNameArabic}</h1>
+        <p>${report.workshop.workshopNameEnglish}</p>
+      </div>
+
+      <div class="footer">
+        <div class="footer-left">
+          ${lang === 'ar' ? 'الرقم الضريبي' : 'VAT'} -
+          ${report.workshop.taxVatNumber}
+        </div>
+        <div class="footer-right">
+          ${lang === 'ar' ? 'سجل تجاري' : 'CR'} - ${report.workshop.crn}
+        </div>
+      </div>
+
+      <!-- section two -->
+      <div class="report-wrapper">
+        <h1 class="report-heading">
+          ${lang === 'ar' ? 'تقرير صادر من تطبيق الصناعية' : 'Report issued by Senaeya App'}
+        </h1>
+
+        <div class="duration-box">
+          <p>${dateRange}</p>
+        </div>
+
+        <div class="invoice-stats">
+          <div class="stat-card">
+            <h2 class="stat-label text-red">
+              ${lang === 'ar' ? 'عدد' : 'Number of'}<br />${lang === 'ar' ? 'الفواتير المحفوظة' : 'saved invoices'}
+            </h2>
+            <p class="stat-value text-red">${savedInvoicesCount}</p>
+          </div>
+
+          <div class="stat-card">
+            <h2 class="stat-label text-red">
+              ${lang === 'ar' ? 'عدد' : 'Number of'}<br />${lang === 'ar' ? 'الفواتير الآجلة' : 'Postpaid invoices'}
+            </h2>
+            <p class="stat-value text-orange">${postpaidInvoicesCount}</p>
+          </div>
+
+          <div class="stat-card">
+            <h2 class="stat-label text-red">
+              ${lang === 'ar' ? 'عدد' : 'Number of'}<br />${lang === 'ar' ? 'الفواتير المكتملة' : 'completed invoices'}
+            </h2>
+            <p class="stat-value text-green">${completedInvoicesCount}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- section three -->
+    <div class="finance-container">
+      <div class="finance-row blue-row">
+        <div class="label-section">
+          <span class="finance-label"
+            >${lang === 'ar' ? 'مجموع الإيرادات المحصلة' : 'Total income collected'}</span
+          >
+        </div>
+        <div class="amount-section">
+          <span class="amount-number">${fmt(collectedIncome)}</span>
+          <span class="currency-symbol">﷼</span>
+        </div>
+      </div>
+
+      <div class="finance-row red-row">
+        <div class="label-section">
+          <span class="finance-label"
+            >{lang === 'ar' ? 'مجموع الإيرادات الآجلة والمحفوظة' : 'Total
+            postpaid and saved income'}</span
+          >
+        </div>
+        <div class="amount-section">
+          <span class="amount-number">${fmt(postpaidSaved)}</span>
+          <span class="currency-symbol">﷼​​</span>
+        </div>
+      </div>
+
+      <div class="finance-row gray-row">
+        <div class="label-section">
+          <span class="finance-label"
+            >${lang === 'ar' ? 'مجموع المصروفات المدفوعة' : 'Total expenses paid'}</span
+          >
+        </div>
+        <div class="amount-section">
+          <span class="amount-number">${fmt(expenses)}</span>
+          <span class="currency-symbol">﷼</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- section four -->
+    <div class="balance-wrapper">
+      <div class="balance-card recorded-card">
+        <h2 class="card-heading red-heading">
+          ${lang === 'ar' ? 'الرصيد المحفوظ' : 'Recorded financial balance'}
+        </h2>
+        <p class="card-detail">
+          ${lang === 'ar' ? 'جميع الإيرادات المسجلة' : 'All income recorded'}
+        </p>
+        <p class="card-detail">
+          ${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}
+        </p>
+        <div class="card-amount">
+          <span class="amount-value red-text">${fmt(balRecorded)}</span>
+          <span class="amount-symbol red-text">₺</span>
+        </div>
+      </div>
+
+      <div class="balance-card collected-card">
+        <h2 class="card-heading blue-heading">
+          ${lang === 'ar' ? 'الميزان المالي المحصل' : 'Collected financial balance'}
+        </h2>
+        <p class="card-detail">
+          ${lang === 'ar' ? 'جميع الإيرادات المحصلة' : 'All income collected'}
+        </p>
+        <p class="card-detail">
+          ${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}
+        </p>
+        <div class="card-amount">
+          <span class="amount-value blue-text">${fmt(balCollected)}</span>
+          <span class="amount-symbol blue-text">₺</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- section five -->
+    <div class="service-bar">
+      <div class="left-section">
+        <span class="item-label">${lang === 'ar' ? 'سيـارة' : 'Cars'}</span>
+        <span class="item-count">${cars}</span>
+      </div>
+      <div class="right-section">
+        <span class="description-text"
+          >${lang === 'ar' ? 'عدد السيارات التي تم خدمتها' : 'Number of cars serviced'}</span
         >
-          <tspan x="0" y="0">${lang === 'ar' ? 'تقرير صادر من تطبيق الصناعية' : 'Report issued by Senaeya App'}</tspan>
-        </text>
-        <rect
-          width="151"
-          height="91"
-          fill="#f4f5f7"
-          rx="20"
-          transform="translate(394 220)"
-        ></rect>
-        <rect
-          width="237"
-          height="120"
-          fill="#f4f5f7"
-          data-name="card1bg"
-          rx="20"
-          transform="translate(308 547)"
-        ></rect>
-        <rect
-          width="237"
-          height="120"
-          fill="#f4f5f7"
-          data-name="card1bg"
-          rx="20"
-          transform="translate(50 547)"
-        ></rect>
-        <rect
-          width="151"
-          height="91"
-          fill="#f4f5f7"
-          data-name="card1bg"
-          rx="20"
-          transform="translate(222 220)"
-        ></rect>
-        <rect
-          width="151"
-          height="91"
-          fill="#f4f5f7"
-          data-name="card1bg"
-          rx="20"
-          transform="translate(50 220)"
-        ></rect>
-        <text
-          fill="#11c84e"
-          data-name="Number of completed invoices"
-          font-family="Calibri-Bold, Calibri"
-          font-size="16"
-          font-weight="700"
-          transform="translate(470 241)"
-        >
-          <tspan x="-63.84" y="20">${lang === 'ar' ? 'عدد الفواتير المكتملة' : 'Number of completed invoices'}</tspan>
-        </text>
-        <text
-          fill="#f90"
-          data-name="Number of Postpaid invoices"
-          font-family="Calibri-Bold, Calibri"
-          font-size="16"
-          font-weight="700"
-          transform="translate(298 241)"
-        >
-          <tspan x="-57.301" y="20">${lang === 'ar' ? 'عدد الفواتير الآجلة' : 'Number of Postpaid invoices'}</tspan>
-        </text>
-        <text
-          fill="#cb3c40"
-          data-name="Number of saved invoices"
-          font-family="Calibri-Bold, Calibri"
-          font-size="16"
-          font-weight="700"
-          transform="translate(126 241)"
-        >
-          <tspan x="-47.555" y="20">${lang === 'ar' ? 'عدد الفواتير المحفوظة' : 'Number of saved invoices'}</tspan>
-        </text>
-        <text
-          fill="#11c84e"
-          data-name=${completedInvoicesCount}
-          font-family="Calibri-Bold, Calibri"
-          font-size="30"
-          font-weight="700"
-          transform="translate(470 297)"
-        >
-          <tspan x="-15.205" y="0">${completedInvoicesCount}</tspan>
-        </text>
-        <text
-          fill="#f90"
-          data-name=${postpaidInvoicesCount}
-          font-family="Calibri-Bold, Calibri"
-          font-size="30"
-          font-weight="700"
-          transform="translate(298 297)"
-        >
-          <tspan x="-7.603" y="0">${postpaidInvoicesCount}</tspan>
-        </text>
-        <text
-          fill="#cb3c40"
-          data-name=${savedInvoicesCount}
-          font-family="Calibri-Bold, Calibri"
-          font-size="30"
-          font-weight="700"
-          transform="translate(126 297)"
-        >
-          <tspan x="-7.603" y="0">${savedInvoicesCount}</tspan>
-        </text>
-        <rect
-          width="495"
-          height="48"
-          fill="#1771b7"
-          data-name="Rectangle 5386"
-          rx="3"
-          transform="translate(50 333)"
-        ></rect>
-        <rect
-          width="495"
-          height="48"
-          fill="#cb3c40"
-          data-name="Rectangle 5387"
-          rx="3"
-          transform="translate(50 396)"
-        ></rect>
-        <rect
-          width="495"
-          height="48"
-          fill="#959595"
-          data-name="Rectangle 5388"
-          rx="3"
-          transform="translate(50 459)"
-        ></rect>
-        <rect
-          width="495"
-          height="35"
-          fill="#959595"
-          data-name="Rectangle 5392"
-          opacity=".5"
-          rx="3"
-          transform="translate(50 163)"
-        ></rect>
-        <rect
-          width="495"
-          height="35"
-          fill="#959595"
-          data-name="Rectangle 5389"
-          opacity=".5"
-          rx="3"
-          transform="translate(50 707)"
-        ></rect>
-        <text
-          data-name=${dateRange}
-          font-family="Calibri-Bold, Calibri"
-          font-size="20"
-          font-weight="700"
-          transform="translate(297.5 186)"
-          text-anchor="middle"
-        >
-          <tspan xml:space="preserve" x="0" y="0">
-            ${dateRange}
-          </tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name="Total income collected"
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(410 366)"
-        >
-          <tspan x="-115.796" y="0">${lang === 'ar' ? 'مجموع الإيرادات المحصلة' : 'Total income collected'}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name="Total postpaid and saved income"
-          font-family="Calibri-Bold, Calibri"
-          font-size="22"
-          font-weight="700"
-          transform="translate(381 428)"
-        >
-          <tspan x="-149.021" y="0">${lang === 'ar' ? 'مجموع الإيرادات الآجلة والمحفوظة' : 'Total postpaid and saved income'}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name="Total expenses paid"
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(429 490)"
-        >
-          <tspan x="-101.404" y="0">${lang === 'ar' ? 'مجموع المصروفات المدفوعة' : 'Total expenses paid'}</tspan>
-        </text>
-        <text
-          data-name="Number of cars serviced"
-          font-family="Calibri-Bold, Calibri"
-          font-size="22"
-          font-weight="700"
-          transform="translate(420 732)"
-        >
-          <tspan x="-110.317" y="0">${lang === 'ar' ? 'عدد السيارات التي تم خدمتها' : 'Number of cars serviced'}</tspan>
-        </text>
-        <text
-          font-family="Calibri-Bold, Calibri"
-          font-size="22"
-          font-weight="700"
-          transform="translate(96 732)"
-        >
-          <tspan x="-19.417" y="0">${lang === 'ar' ? 'سيـارة' : 'Cars'}</tspan>
-        </text>
-        <g fill="#fff">
-          <path
-            d="M80.947 368.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
-            data-name="Path 28007"
-          ></path>
-          <path
-            d="M89.434 363.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
-            data-name="Path 28008"
-          ></path>
-        </g>
-        <g fill="#fff" data-name="Saudi_Riyal_Symbol">
-          <path
-            d="M80.947 431.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
-            data-name="Path 28007"
-          ></path>
-          <path
-            d="M89.434 426.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
-            data-name="Path 28008"
-          ></path>
-        </g>
-        <g fill="#cb3c40" data-name="Saudi_Riyal_Symbol">
-          <path
-            d="M383.83 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
-            data-name="Path 28007"
-          ></path>
-          <path
-            d="M391.139 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
-            data-name="Path 28008"
-          ></path>
-        </g>
-        <g fill="#1771b7" data-name="Saudi_Riyal_Symbol">
-          <path
-            d="M126.473 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
-            data-name="Path 28007"
-          ></path>
-          <path
-            d="M133.782 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
-            data-name="Path 28008"
-          ></path>
-        </g>
-        <g fill="#fff" data-name="Saudi_Riyal_Symbol">
-          <path
-            d="M80.947 494.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
-            data-name="Path 28007"
-          ></path>
-          <path
-            d="M89.434 489.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
-            data-name="Path 28008"
-          ></path>
-        </g>
-        <text
-          fill="#fff"
-          data-name=${fmt(collectedIncome)}
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(146 366)"
-        >
-          <tspan x="-41.351" y="0">${fmt(collectedIncome)}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${fmt(postpaidSaved)}
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(146 429)"
-        >
-          <tspan x="-41.351" y="0">${fmt(postpaidSaved)}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${fmt(expenses)}
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(146 492)"
-        >
-          <tspan x="-35.016" y="0">${fmt(expenses)}</tspan>
-        </text>
-        <text
-          data-name=${cars}
-          font-family="Calibri-Bold, Calibri"
-          font-size="22"
-          font-weight="700"
-          transform="translate(146 733)"
-        >
-          <tspan x="-11.15" y="0">${cars}</tspan>
-        </text>
-        <text
-          fill="#cb3c40"
-          data-name="Recorded financial balance"
-          font-family="Calibri-Bold, Calibri"
-          font-size="20"
-          font-weight="700"
-          transform="translate(427 577)"
-        >
-          <tspan x="-111.274" y="0">${lang === 'ar' ? 'الرصيد المحفوظ' : 'Recorded financial balance'}</tspan>
-        </text>
-        <text
-          fill="#cb3c40"
-          data-name=${fmt(balRecorded)}
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(441 652)"
-        >
-          <tspan x="-41.351" y="0">${fmt(balRecorded)}</tspan>
-        </text>
-        <text
-          fill="#1771b7"
-          data-name=${fmt(balCollected)}
-          font-family="Calibri-Bold, Calibri"
-          font-size="25"
-          font-weight="700"
-          transform="translate(183.643 652)"
-        >
-          <tspan x="-41.351" y="0">${fmt(balCollected)}</tspan>
-        </text>
-        <text
-          fill="#1771b7"
-          data-name="Collected financial balance"
-          font-family="Calibri-Bold, Calibri"
-          font-size="20"
-          font-weight="700"
-          transform="translate(168 577)"
-        >
-          <tspan x="-110.591" y="0">${lang === 'ar' ? 'الميزان المالي المحصل' : 'Collected financial balance'}</tspan>
-        </text>
-        <text
-          data-name="All income recorded"
-          font-family="Calibri-Bold, Calibri"
-          font-size="11"
-          font-weight="700"
-          transform="translate(429 596)"
-        >
-          <tspan x="-45.751" y="0">${lang === 'ar' ? 'جميع الإيرادات المسجلة' : 'All income recorded'}</tspan>
-        </text>
-        <text
-          data-name="All income collected"
-          font-family="Calibri-Bold, Calibri"
-          font-size="11"
-          font-weight="700"
-          transform="translate(169 596)"
-        >
-          <tspan x="-45.861" y="0">${lang === 'ar' ? 'جميع الإيرادات المحصلة' : 'All income collected'}</tspan>
-        </text>
-        <text
-          data-name="All expenses paid"
-          font-family="Calibri-Bold, Calibri"
-          font-size="11"
-          font-weight="700"
-          transform="translate(430 617)"
-        >
-          <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
-        </text>
-        <text
-          data-name="All expenses paid"
-          font-family="Calibri-Bold, Calibri"
-          font-size="11"
-          font-weight="700"
-          transform="translate(169 617)"
-        >
-          <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
-        </text>
-        <text
-          data-name="-"
-          font-family="Calibri-Bold, Calibri"
-          font-size="20"
-          font-weight="700"
-          transform="translate(430 609)"
-        >
-          <tspan x="-3.062" y="0">-</tspan>
-        </text>
-        <text
-          data-name="-"
-          font-family="Calibri-Bold, Calibri"
-          font-size="20"
-          font-weight="700"
-          transform="translate(166 609)"
-        >
-          <tspan x="-3.062" y="0">-</tspan>
-        </text>
-        <path
-          fill="#1771b7"
-          d="M0 0h595v77H0z"
-          data-name="Rectangle 5390"
-        ></path>
-        <path
-          fill="#cb3c40"
-          d="M0 76h595v15H0z"
-          data-name="Rectangle 5391"
-        ></path>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.workshopNameArabic}
-          font-family="Arial-BoldMT, Arial"
-          font-size="20"
-          font-weight="700"
-          transform="translate(205 41)"
-        >
-          <tspan x="0" y="0">${report.workshop.workshopNameArabic}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.workshopNameEnglish}
-          font-family="ArialMT, Arial"
-          font-size="15"
-          transform="translate(233 69)"
-        >
-          <tspan x="0" y="0">${report.workshop.workshopNameEnglish}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.crn}
-          font-family="ArialMT, Arial"
-          font-size="10"
-          transform="translate(447 87)"
-        >
-          <tspan x="0" y="0">{lang === 'ar' ? 'سجل تجاري' : 'CR'} - ${report.workshop.crn}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.taxVatNumber}
-          font-family="ArialMT, Arial"
-          font-size="10"
-          transform="translate(50 87)"
-        >
-          <tspan x="0" y="0">{lang === 'ar' ? 'الرقم الضريبي' : 'VAT'} - ${report.workshop.taxVatNumber}</tspan>
-        </text>
-        <path
-          fill="#cb3c40"
-          d="M207 815h389v22H207z"
-          data-name="Rectangle 5394"
-        ></path>
-        <path
-          fill="#1771b7"
-          d="M0 796h207v41H0z"
-          data-name="Rectangle 5393"
-        ></path>
-        <path
-          fill="#1771b7"
-          d="m207 796 33.5 41h-67Z"
-          data-name="Polygon 2"
-        ></path>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.address}
-          font-family="Calibri-Bold, Calibri"
-          font-size="12"
-          font-weight="700"
-          transform="translate(488 830)"
-        >
-          <tspan x="-72.36" y="0">${report.workshop.address}</tspan>
-        </text>
-        <text
-          fill="#fff"
-          data-name=${report.workshop.contact}
-          font-family="Calibri-Bold, Calibri"
-          font-size="12"
-          font-weight="700"
-          letter-spacing=".07em"
-          transform="translate(279 830)"
-        >
-          <tspan x="-41.096" y="0">${report.workshop.contact}</tspan>
-        </text>
-        <g data-name="Group 55921">
-          <path
-            fill="#fff"
-            d="m352.708 826.662 1.637-1.637a.47.47 0 0 0 .082-.555l-1.053-1.962a.47.47 0 0 1 .01-.462l1.7-2.863a.47.47 0 0 1 .592-.191c.557.245 1.577.69 2.028.867a.6.6 0 0 1 .249.17c1.654 1.908-.361 5.7-3.267 8.609s-6.702 4.92-8.61 3.262a.6.6 0 0 1-.17-.244 78 78 0 0 0-.867-2.028.47.47 0 0 1 .191-.592l2.863-1.7a.47.47 0 0 1 .462-.01l1.962 1.055a.47.47 0 0 0 .555-.082Z"
-            data-name="Path 28011"
-          ></path>
-          <path
-            fill="#fff"
-            d="M352.451 818.953v1.356a6.1 6.1 0 0 0-6.1 6.1H345a7.46 7.46 0 0 1 7.451-7.456"
-            data-name="Path 28012"
-          ></path>
-          <path
-            fill="#fff"
-            d="M352.451 821.587v1.355a3.466 3.466 0 0 0-3.462 3.467h-1.355a4.82 4.82 0 0 1 4.817-4.822"
-            data-name="Path 28013"
-          ></path>
-          <circle
-            cx="6.608"
-            cy="6.608"
-            r="6.608"
-            fill="#2ab540"
-            data-name="Ellipse 3"
-            transform="translate(328.858 819.285)"
-          ></circle>
-          <path
-            fill="#fff"
-            d="M331.227 825.854a4.25 4.25 0 0 0 .568 2.127l-.6 2.2 2.256-.592a4.25 4.25 0 0 0 2.034.518 4.256 4.256 0 1 0-4.258-4.253m1.344 2.016-.084-.134a3.537 3.537 0 1 1 3 1.657 3.54 3.54 0 0 1-1.8-.493l-.129-.077-1.339.351Zm2.912 2.242"
-            data-name="Path 28009"
-          ></path>
-          <path
-            fill="#fff"
-            d="M334.42 824.079c-.08-.177-.163-.181-.239-.184s-.133 0-.2 0a.4.4 0 0 0-.284.133 1.2 1.2 0 0 0-.372.887 2.07 2.07 0 0 0 .434 1.1 4.37 4.37 0 0 0 1.816 1.605c.9.354 1.081.284 1.276.266a1.07 1.07 0 0 0 .718-.505.9.9 0 0 0 .062-.506c-.027-.044-.1-.071-.2-.124s-.629-.31-.727-.346-.168-.053-.239.053-.275.346-.337.417-.124.08-.23.027a2.9 2.9 0 0 1-.855-.528 3.2 3.2 0 0 1-.592-.736c-.062-.106-.007-.164.047-.217s.106-.124.16-.186a.7.7 0 0 0 .106-.177.2.2 0 0 0-.009-.186c-.027-.053-.233-.579-.328-.789"
-            data-name="Path 28010"
-          ></path>
-        </g>
-        <path fill="none" d="M412.082 793.031h24.6v24.6h-24.6Z"></path>
-        <text
-          fill="#fff"
-          data-name="You can issue multiple reports via Senaeya App Daily - Weekly - Monthly - Annual Report - and more"
-          font-family="Calibri"
-          font-size="11"
-          transform="translate(110 815)"
-        >
-          <tspan x="-104.411" y="0">
+      </div>
+    </div>
+
+    <!-- section six  -->
+    <div class="banner-strip">
+      <div class="blue-side">
+        <div class="blue-content">
+          <h3 class="primary-text">
             ${lang === 'ar' ? 'بإمكانك إصدار تقارير متعددة عبر تطبيق الصناعية' : 'You can issue multiple reports via Senaeya App'}
-          </tspan>
-          <tspan font-size="10">
-            <tspan x="-106.143" y="15">
-              ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - وأكثر' : 'Daily - Weekly - Monthly - Annual Report - and more'}
-            </tspan>
-          </tspan>
-        </text>
-      </g>
-    </svg>
+          </h3>
+          <p class="secondary-text">
+            ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - وأكثر' : 'Daily - Weekly - Monthly - Annual Report - and more'}
+          </p>
+        </div>
+      </div>
+
+      <div class="red-side">
+        <div class="red-content">
+          <div class="phone-section">
+            <span class="phone-number">${report.workshop.contact}</span>
+            <div class="icon-set">
+              <svg
+                class="icon-svg whatsapp-svg"
+                viewBox="0 0 24 24"
+                fill="white"
+              >
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+                />
+              </svg>
+              <svg class="icon-svg phone-svg" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
+                />
+              </svg>
+            </div>
+          </div>
+          <p class="address-info">${report.workshop.address}</p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
-`;
+
+     `;
 };
+
+// const createReportOld = (
+//      report: {
+//           numberOfPaidInvoices: number;
+//           numberOfUnpaidPostpaidInvoices: number;
+//           numberOfUnpaidNonPostpaidInvoices: number;
+//           totalAllIncomeRecorded: number;
+//           totalIncomeCollected: number;
+//           totalUnpaidPostpaidFinalCost: number;
+//           totalExpenses: number;
+//           collectedFinancialBalance: number | undefined;
+//           recordedFinancialBalance: number | undefined;
+//           numberOfCars: number;
+//           range: { start: Date; end: Date };
+//           scopedByProviderWorkShopId: boolean;
+//           workshop: IworkShop;
+//      },
+//      lang: 'ar' | 'en',
+// ) => {
+//      const savedInvoicesCount = report?.numberOfUnpaidNonPostpaidInvoices ?? 0;
+//      const postpaidInvoicesCount = report?.numberOfUnpaidPostpaidInvoices ?? 0;
+//      const completedInvoicesCount = report?.numberOfPaidInvoices ?? 0;
+
+//      const collectedIncome = Number(report?.totalIncomeCollected ?? 0);
+//      const recordedIncome = Number(report?.totalAllIncomeRecorded ?? 0);
+//      const postpaidSaved = Math.max(0, recordedIncome - collectedIncome);
+//      const expenses = Number(report?.totalExpenses ?? 0);
+
+//      const balCollected = Number(report?.collectedFinancialBalance ?? collectedIncome - expenses);
+//      const balRecorded = Number(report?.recordedFinancialBalance ?? recordedIncome - expenses);
+
+//      const cars = report?.numberOfCars ?? 0;
+
+//      const s = report?.range?.start ? new Date(report.range.start) : null;
+//      const e = report?.range?.end ? new Date(report.range.end) : null;
+//      const fmtDate = (x: Date) => `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`;
+//      const dur = s && e ? Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000) + 1) : undefined;
+//      const dateRange =
+//           s && e ? (lang === 'ar' ? `من تاريخ ${fmtDate(s)} إلى ${fmtDate(e)}${dur ? ` ولمدة: ${dur} يوم` : ''}` : `From ${fmtDate(s)} to ${fmtDate(e)}${dur ? ` Duration: ${dur} days` : ''}`) : '';
+
+//      const fmt = (n: number) =>
+//           n.toLocaleString(undefined, {
+//                minimumFractionDigits: 2,
+//                maximumFractionDigits: 2,
+//           });
+
+//      return `<html>
+//   <head>
+//     <meta charset="utf-8" />
+//     <title>pdf-report.svg</title>
+//   </head>
+//   <body>
+//     <svg xmlns="http://www.w3.org/2000/svg" width="595" height="842">
+//       <defs>
+//         <clipPath id="a"><path d="M0 0h595v842H0z"></path></clipPath>
+//       </defs>
+//       <g clip-path="url(#a)">
+//         <path fill="#fff" d="M0 0h595v842H0z"></path>
+//         <text
+//           fill="#1771b7"
+//           data-name="Report issued by Senaeya App"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="22"
+//           font-weight="700"
+//           transform="translate(160 131)"
+//         >
+//           <tspan x="0" y="0">${lang === 'ar' ? 'تقرير صادر من تطبيق الصناعية' : 'Report issued by Senaeya App'}</tspan>
+//         </text>
+//         <rect
+//           width="151"
+//           height="91"
+//           fill="#f4f5f7"
+//           rx="20"
+//           transform="translate(394 220)"
+//         ></rect>
+//         <rect
+//           width="237"
+//           height="120"
+//           fill="#f4f5f7"
+//           data-name="card1bg"
+//           rx="20"
+//           transform="translate(308 547)"
+//         ></rect>
+//         <rect
+//           width="237"
+//           height="120"
+//           fill="#f4f5f7"
+//           data-name="card1bg"
+//           rx="20"
+//           transform="translate(50 547)"
+//         ></rect>
+//         <rect
+//           width="151"
+//           height="91"
+//           fill="#f4f5f7"
+//           data-name="card1bg"
+//           rx="20"
+//           transform="translate(222 220)"
+//         ></rect>
+//         <rect
+//           width="151"
+//           height="91"
+//           fill="#f4f5f7"
+//           data-name="card1bg"
+//           rx="20"
+//           transform="translate(50 220)"
+//         ></rect>
+//         <text
+//           fill="#11c84e"
+//           data-name="Number of completed invoices"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="16"
+//           font-weight="700"
+//           transform="translate(470 241)"
+//         >
+//           <tspan x="-63.84" y="20">${lang === 'ar' ? 'عدد الفواتير المكتملة' : 'Number of completed invoices'}</tspan>
+//         </text>
+//         <text
+//           fill="#f90"
+//           data-name="Number of Postpaid invoices"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="16"
+//           font-weight="700"
+//           transform="translate(298 241)"
+//         >
+//           <tspan x="-57.301" y="20">${lang === 'ar' ? 'عدد الفواتير الآجلة' : 'Number of Postpaid invoices'}</tspan>
+//         </text>
+//         <text
+//           fill="#cb3c40"
+//           data-name="Number of saved invoices"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="16"
+//           font-weight="700"
+//           transform="translate(126 241)"
+//         >
+//           <tspan x="-47.555" y="20">${lang === 'ar' ? 'عدد الفواتير المحفوظة' : 'Number of saved invoices'}</tspan>
+//         </text>
+//         <text
+//           fill="#11c84e"
+//           data-name=${completedInvoicesCount}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="30"
+//           font-weight="700"
+//           transform="translate(470 297)"
+//         >
+//           <tspan x="-15.205" y="0">${completedInvoicesCount}</tspan>
+//         </text>
+//         <text
+//           fill="#f90"
+//           data-name=${postpaidInvoicesCount}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="30"
+//           font-weight="700"
+//           transform="translate(298 297)"
+//         >
+//           <tspan x="-7.603" y="0">${postpaidInvoicesCount}</tspan>
+//         </text>
+//         <text
+//           fill="#cb3c40"
+//           data-name=${savedInvoicesCount}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="30"
+//           font-weight="700"
+//           transform="translate(126 297)"
+//         >
+//           <tspan x="-7.603" y="0">${savedInvoicesCount}</tspan>
+//         </text>
+//         <rect
+//           width="495"
+//           height="48"
+//           fill="#1771b7"
+//           data-name="Rectangle 5386"
+//           rx="3"
+//           transform="translate(50 333)"
+//         ></rect>
+//         <rect
+//           width="495"
+//           height="48"
+//           fill="#cb3c40"
+//           data-name="Rectangle 5387"
+//           rx="3"
+//           transform="translate(50 396)"
+//         ></rect>
+//         <rect
+//           width="495"
+//           height="48"
+//           fill="#959595"
+//           data-name="Rectangle 5388"
+//           rx="3"
+//           transform="translate(50 459)"
+//         ></rect>
+//         <rect
+//           width="495"
+//           height="35"
+//           fill="#959595"
+//           data-name="Rectangle 5392"
+//           opacity=".5"
+//           rx="3"
+//           transform="translate(50 163)"
+//         ></rect>
+//         <rect
+//           width="495"
+//           height="35"
+//           fill="#959595"
+//           data-name="Rectangle 5389"
+//           opacity=".5"
+//           rx="3"
+//           transform="translate(50 707)"
+//         ></rect>
+//         <text
+//           data-name=${dateRange}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(297.5 186)"
+//           text-anchor="middle"
+//         >
+//           <tspan xml:space="preserve" x="0" y="0">
+//             ${dateRange}
+//           </tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name="Total income collected"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(410 366)"
+//         >
+//           <tspan x="-115.796" y="0">${lang === 'ar' ? 'مجموع الإيرادات المحصلة' : 'Total income collected'}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name="Total postpaid and saved income"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="22"
+//           font-weight="700"
+//           transform="translate(381 428)"
+//         >
+//           <tspan x="-149.021" y="0">${lang === 'ar' ? 'مجموع الإيرادات الآجلة والمحفوظة' : 'Total postpaid and saved income'}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name="Total expenses paid"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(429 490)"
+//         >
+//           <tspan x="-101.404" y="0">${lang === 'ar' ? 'مجموع المصروفات المدفوعة' : 'Total expenses paid'}</tspan>
+//         </text>
+//         <text
+//           data-name="Number of cars serviced"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="22"
+//           font-weight="700"
+//           transform="translate(420 732)"
+//         >
+//           <tspan x="-110.317" y="0">${lang === 'ar' ? 'عدد السيارات التي تم خدمتها' : 'Number of cars serviced'}</tspan>
+//         </text>
+//         <text
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="22"
+//           font-weight="700"
+//           transform="translate(96 732)"
+//         >
+//           <tspan x="-19.417" y="0">${lang === 'ar' ? 'سيـارة' : 'Cars'}</tspan>
+//         </text>
+//         <g fill="#fff">
+//           <path
+//             d="M80.947 368.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+//             data-name="Path 28007"
+//           ></path>
+//           <path
+//             d="M89.434 363.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+//             data-name="Path 28008"
+//           ></path>
+//         </g>
+//         <g fill="#fff" data-name="Saudi_Riyal_Symbol">
+//           <path
+//             d="M80.947 431.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+//             data-name="Path 28007"
+//           ></path>
+//           <path
+//             d="M89.434 426.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+//             data-name="Path 28008"
+//           ></path>
+//         </g>
+//         <g fill="#cb3c40" data-name="Saudi_Riyal_Symbol">
+//           <path
+//             d="M383.83 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
+//             data-name="Path 28007"
+//           ></path>
+//           <path
+//             d="M391.139 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
+//             data-name="Path 28008"
+//           ></path>
+//         </g>
+//         <g fill="#1771b7" data-name="Saudi_Riyal_Symbol">
+//           <path
+//             d="M126.473 653.184a8.7 8.7 0 0 0-.726 2.712l8.031-1.707a8.7 8.7 0 0 0 .727-2.712Z"
+//             data-name="Path 28007"
+//           ></path>
+//           <path
+//             d="M133.782 648.84a9.5 9.5 0 0 0 .722-2.839l-6.221 1.393v-2.677l5.5-1.23a9.5 9.5 0 0 0 .722-2.839l-6.221 1.391v-9.627a8.9 8.9 0 0 0-2.488 2.2v7.987l-2.488.557v-12.053a8.9 8.9 0 0 0-2.488 2.2v10.407l-5.567 1.245a9.5 9.5 0 0 0-.723 2.839l6.289-1.407v3.371l-6.74 1.507a9.5 9.5 0 0 0-.722 2.838l7.055-1.578a2.24 2.24 0 0 0 1.389-.975l1.294-2.019a1.35 1.35 0 0 0 .213-.732v-2.97l2.488-.557v5.354l7.986-1.788Z"
+//             data-name="Path 28008"
+//           ></path>
+//         </g>
+//         <g fill="#fff" data-name="Saudi_Riyal_Symbol">
+//           <path
+//             d="M80.947 494.246a10.1 10.1 0 0 0-.844 3.15l9.326-1.982a10.1 10.1 0 0 0 .844-3.15Z"
+//             data-name="Path 28007"
+//           ></path>
+//           <path
+//             d="M89.434 489.203a11 11 0 0 0 .839-3.3l-7.224 1.617v-3.107l6.385-1.428a11 11 0 0 0 .839-3.3l-7.224 1.618v-11.179a10.3 10.3 0 0 0-2.889 2.552v9.275l-2.889.646v-13.994a10.3 10.3 0 0 0-2.89 2.552v12.088l-6.465 1.446a11 11 0 0 0-.839 3.3l7.3-1.634v3.915l-7.824 1.748a11 11 0 0 0-.839 3.3l8.194-1.833a2.6 2.6 0 0 0 1.616-1.135l1.5-2.347a1.57 1.57 0 0 0 .247-.85v-3.45l2.889-.646v6.218z"
+//             data-name="Path 28008"
+//           ></path>
+//         </g>
+//         <text
+//           fill="#fff"
+//           data-name=${fmt(collectedIncome)}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(146 366)"
+//         >
+//           <tspan x="-41.351" y="0">${fmt(collectedIncome)}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${fmt(postpaidSaved)}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(146 429)"
+//         >
+//           <tspan x="-41.351" y="0">${fmt(postpaidSaved)}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${fmt(expenses)}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(146 492)"
+//         >
+//           <tspan x="-35.016" y="0">${fmt(expenses)}</tspan>
+//         </text>
+//         <text
+//           data-name=${cars}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="22"
+//           font-weight="700"
+//           transform="translate(146 733)"
+//         >
+//           <tspan x="-11.15" y="0">${cars}</tspan>
+//         </text>
+//         <text
+//           fill="#cb3c40"
+//           data-name="Recorded financial balance"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(427 577)"
+//         >
+//           <tspan x="-111.274" y="0">${lang === 'ar' ? 'الرصيد المحفوظ' : 'Recorded financial balance'}</tspan>
+//         </text>
+//         <text
+//           fill="#cb3c40"
+//           data-name=${fmt(balRecorded)}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(441 652)"
+//         >
+//           <tspan x="-41.351" y="0">${fmt(balRecorded)}</tspan>
+//         </text>
+//         <text
+//           fill="#1771b7"
+//           data-name=${fmt(balCollected)}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="25"
+//           font-weight="700"
+//           transform="translate(183.643 652)"
+//         >
+//           <tspan x="-41.351" y="0">${fmt(balCollected)}</tspan>
+//         </text>
+//         <text
+//           fill="#1771b7"
+//           data-name="Collected financial balance"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(168 577)"
+//         >
+//           <tspan x="-110.591" y="0">${lang === 'ar' ? 'الميزان المالي المحصل' : 'Collected financial balance'}</tspan>
+//         </text>
+//         <text
+//           data-name="All income recorded"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="11"
+//           font-weight="700"
+//           transform="translate(429 596)"
+//         >
+//           <tspan x="-45.751" y="0">${lang === 'ar' ? 'جميع الإيرادات المسجلة' : 'All income recorded'}</tspan>
+//         </text>
+//         <text
+//           data-name="All income collected"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="11"
+//           font-weight="700"
+//           transform="translate(169 596)"
+//         >
+//           <tspan x="-45.861" y="0">${lang === 'ar' ? 'جميع الإيرادات المحصلة' : 'All income collected'}</tspan>
+//         </text>
+//         <text
+//           data-name="All expenses paid"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="11"
+//           font-weight="700"
+//           transform="translate(430 617)"
+//         >
+//           <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
+//         </text>
+//         <text
+//           data-name="All expenses paid"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="11"
+//           font-weight="700"
+//           transform="translate(169 617)"
+//         >
+//           <tspan x="-39.529" y="0">${lang === 'ar' ? 'جميع المصروفات المدفوعة' : 'All expenses paid'}</tspan>
+//         </text>
+//         <text
+//           data-name="-"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(430 609)"
+//         >
+//           <tspan x="-3.062" y="0">-</tspan>
+//         </text>
+//         <text
+//           data-name="-"
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(166 609)"
+//         >
+//           <tspan x="-3.062" y="0">-</tspan>
+//         </text>
+//         <path
+//           fill="#1771b7"
+//           d="M0 0h595v77H0z"
+//           data-name="Rectangle 5390"
+//         ></path>
+//         <path
+//           fill="#cb3c40"
+//           d="M0 76h595v15H0z"
+//           data-name="Rectangle 5391"
+//         ></path>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.workshopNameArabic}
+//           font-family="Arial-BoldMT, Arial"
+//           font-size="20"
+//           font-weight="700"
+//           transform="translate(205 41)"
+//         >
+//           <tspan x="0" y="0">${report.workshop.workshopNameArabic}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.workshopNameEnglish}
+//           font-family="ArialMT, Arial"
+//           font-size="15"
+//           transform="translate(233 69)"
+//         >
+//           <tspan x="0" y="0">${report.workshop.workshopNameEnglish}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.crn}
+//           font-family="ArialMT, Arial"
+//           font-size="10"
+//           transform="translate(447 87)"
+//         >
+//           <tspan x="0" y="0">{lang === 'ar' ? 'سجل تجاري' : 'CR'} - ${report.workshop.crn}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.taxVatNumber}
+//           font-family="ArialMT, Arial"
+//           font-size="10"
+//           transform="translate(50 87)"
+//         >
+//           <tspan x="0" y="0">{lang === 'ar' ? 'الرقم الضريبي' : 'VAT'} - ${report.workshop.taxVatNumber}</tspan>
+//         </text>
+//         <path
+//           fill="#cb3c40"
+//           d="M207 815h389v22H207z"
+//           data-name="Rectangle 5394"
+//         ></path>
+//         <path
+//           fill="#1771b7"
+//           d="M0 796h207v41H0z"
+//           data-name="Rectangle 5393"
+//         ></path>
+//         <path
+//           fill="#1771b7"
+//           d="m207 796 33.5 41h-67Z"
+//           data-name="Polygon 2"
+//         ></path>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.address}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="12"
+//           font-weight="700"
+//           transform="translate(488 830)"
+//         >
+//           <tspan x="-72.36" y="0">${report.workshop.address}</tspan>
+//         </text>
+//         <text
+//           fill="#fff"
+//           data-name=${report.workshop.contact}
+//           font-family="Calibri-Bold, Calibri"
+//           font-size="12"
+//           font-weight="700"
+//           letter-spacing=".07em"
+//           transform="translate(279 830)"
+//         >
+//           <tspan x="-41.096" y="0">${report.workshop.contact}</tspan>
+//         </text>
+//         <g data-name="Group 55921">
+//           <path
+//             fill="#fff"
+//             d="m352.708 826.662 1.637-1.637a.47.47 0 0 0 .082-.555l-1.053-1.962a.47.47 0 0 1 .01-.462l1.7-2.863a.47.47 0 0 1 .592-.191c.557.245 1.577.69 2.028.867a.6.6 0 0 1 .249.17c1.654 1.908-.361 5.7-3.267 8.609s-6.702 4.92-8.61 3.262a.6.6 0 0 1-.17-.244 78 78 0 0 0-.867-2.028.47.47 0 0 1 .191-.592l2.863-1.7a.47.47 0 0 1 .462-.01l1.962 1.055a.47.47 0 0 0 .555-.082Z"
+//             data-name="Path 28011"
+//           ></path>
+//           <path
+//             fill="#fff"
+//             d="M352.451 818.953v1.356a6.1 6.1 0 0 0-6.1 6.1H345a7.46 7.46 0 0 1 7.451-7.456"
+//             data-name="Path 28012"
+//           ></path>
+//           <path
+//             fill="#fff"
+//             d="M352.451 821.587v1.355a3.466 3.466 0 0 0-3.462 3.467h-1.355a4.82 4.82 0 0 1 4.817-4.822"
+//             data-name="Path 28013"
+//           ></path>
+//           <circle
+//             cx="6.608"
+//             cy="6.608"
+//             r="6.608"
+//             fill="#2ab540"
+//             data-name="Ellipse 3"
+//             transform="translate(328.858 819.285)"
+//           ></circle>
+//           <path
+//             fill="#fff"
+//             d="M331.227 825.854a4.25 4.25 0 0 0 .568 2.127l-.6 2.2 2.256-.592a4.25 4.25 0 0 0 2.034.518 4.256 4.256 0 1 0-4.258-4.253m1.344 2.016-.084-.134a3.537 3.537 0 1 1 3 1.657 3.54 3.54 0 0 1-1.8-.493l-.129-.077-1.339.351Zm2.912 2.242"
+//             data-name="Path 28009"
+//           ></path>
+//           <path
+//             fill="#fff"
+//             d="M334.42 824.079c-.08-.177-.163-.181-.239-.184s-.133 0-.2 0a.4.4 0 0 0-.284.133 1.2 1.2 0 0 0-.372.887 2.07 2.07 0 0 0 .434 1.1 4.37 4.37 0 0 0 1.816 1.605c.9.354 1.081.284 1.276.266a1.07 1.07 0 0 0 .718-.505.9.9 0 0 0 .062-.506c-.027-.044-.1-.071-.2-.124s-.629-.31-.727-.346-.168-.053-.239.053-.275.346-.337.417-.124.08-.23.027a2.9 2.9 0 0 1-.855-.528 3.2 3.2 0 0 1-.592-.736c-.062-.106-.007-.164.047-.217s.106-.124.16-.186a.7.7 0 0 0 .106-.177.2.2 0 0 0-.009-.186c-.027-.053-.233-.579-.328-.789"
+//             data-name="Path 28010"
+//           ></path>
+//         </g>
+//         <path fill="none" d="M412.082 793.031h24.6v24.6h-24.6Z"></path>
+//         <text
+//           fill="#fff"
+//           data-name="You can issue multiple reports via Senaeya App Daily - Weekly - Monthly - Annual Report - and more"
+//           font-family="Calibri"
+//           font-size="11"
+//           transform="translate(110 815)"
+//         >
+//           <tspan x="-104.411" y="0">
+//             ${lang === 'ar' ? 'بإمكانك إصدار تقارير متعددة عبر تطبيق الصناعية' : 'You can issue multiple reports via Senaeya App'}
+//           </tspan>
+//           <tspan font-size="10">
+//             <tspan x="-106.143" y="15">
+//               ${lang === 'ar' ? 'تقرير يومي - أسبوعي - شهري - سنوي - وأكثر' : 'Daily - Weekly - Monthly - Annual Report - and more'}
+//             </tspan>
+//           </tspan>
+//         </text>
+//       </g>
+//     </svg>
+//   </body>
+// </html>
+// `;
+// };
 
 const defaulterList = ({ status }: { status: string }) => {
      const message =
@@ -1186,6 +1842,430 @@ const defaulterList = ({ status }: { status: string }) => {
     إزالة اسمكم من قائمة المتعثرين عن السداد.
 `;
      return message;
+};
+
+const subscriptionDetailsPdf = async (subscription: ISubscription & { workshop: IworkShop; package: IPackage; coupon: ICoupon }) => {
+     const subscription_duration = subscription.package.duration !== PackageDuration.one_point_five_year ? subscription.package.duration : `12 months + <span class="free-period">6 months free</span>`;
+     const appLogo = await Image.findOne({ type: ImageType.WEBSITE_LOGO });
+     return `
+     <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فاتورة ضريبية مبسطة</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .invoice-container {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: white;
+      padding: 30px 20px 20px;
+      text-align: center;
+
+    }
+
+    .logo-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .logo-bg {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .imageIcons {
+      width: 50px;
+      height: 50px
+    }
+
+
+    .flag {
+      width: 50px;
+      height: 50px;
+      position: relative;
+    }
+
+    .flag-pole {
+      width: 4px;
+      height: 45px;
+      background: #8b7355;
+      position: absolute;
+      right: 10px;
+      top: 2px;
+    }
+
+    .flag-cloth {
+      width: 35px;
+      height: 25px;
+      background: linear-gradient(to bottom, #c8102e 0%, #c8102e 33%, white 33%, white 66%, #012169 66%, #012169 100%);
+      position: absolute;
+      right: 14px;
+      top: 2px;
+      clip-path: polygon(0 0, 100% 0, 85% 50%, 100% 100%, 0 100%);
+    }
+
+    .stars {
+      position: absolute;
+      right: 16px;
+      top: 4px;
+      width: 30px;
+      height: 20px;
+    }
+
+    .star {
+      color: white;
+      font-size: 4px;
+      position: absolute;
+    }
+
+    .gear {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      width: 35px;
+      height: 35px;
+      background: white;
+      border-radius: 50%;
+      border: 3px solid #4a90e2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      color: #4a90e2;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .company-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 10px;
+    }
+
+    .address {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .registration {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 3px;
+    }
+
+    .date-invoice {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .date {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .invoice-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4a90e2;
+    }
+
+    .invoice-label {
+      font-size: 14px;
+      color: #666;
+      margin-right: 10px;
+    }
+
+    .workshop-info {
+      padding: 15px 20px;
+      background: white;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .workshop-title {
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .workshop-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .vat-info {
+      color: #333;
+    }
+
+    .phone {
+      color: #333;
+    }
+
+    .subscription-box {
+      margin: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid #4a90e2;
+    }
+
+    .subscription-text {
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .subscription-period {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4a90e2;
+    }
+
+    .free-period {
+      font-size: 14px;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .details-header {
+      padding: 12px 20px;
+      background: #f8f9fa;
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      text-align: right;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .detail-label {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .detail-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency {
+      font-size: 20px;
+      margin-left: 8px;
+    }
+
+    .discount-value {
+      color: #c8102e;
+    }
+
+    .total-row {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border: 2px solid #4a90e2;
+      margin: 20px;
+      border-radius: 8px;
+    }
+
+    .total-value {
+      color: #4a90e2;
+      font-size: 22px;
+    }
+
+    .expiry-section {
+      padding: 15px 20px;
+      background: #ffebee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 30px;
+      border-radius: 20px;
+      text-align: center;
+      border-top: 2px solid #e9ecef;
+    }
+
+    .expiry-text {
+      font-size: 14px;
+      color: #c8102e;
+      font-weight: bold;
+    }
+
+    .qr-section {
+      padding: 20px;
+      text-align: center;
+      background: white;
+    }
+
+    .qr-code {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-placeholder {
+      width: 140px;
+      height: 140px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><path d="M10,10 h10 v10 h-10 z M30,10 h10 v10 h-10 z M50,10 h10 v10 h-10 z M70,10 h10 v10 h-10 z M10,30 h10 v10 h-10 z M30,30 h10 v10 h-10 z M50,30 h10 v10 h-10 z M70,30 h10 v10 h-10 z M10,50 h10 v10 h-10 z M30,50 h10 v10 h-10 z M50,50 h10 v10 h-10 z M70,50 h10 v10 h-10 z M10,70 h10 v10 h-10 z M30,70 h10 v10 h-10 z M50,70 h10 v10 h-10 z M70,70 h10 v10 h-10 z" fill="black"/></svg>') center/cover;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="invoice-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-section">
+        <div class="logo-bg">
+          <img class="imageIcons" src=${appLogo?.image} alt="">
+        </div>
+      </div>
+      <div class="title">فاتورة ضريبية مبسطة</div>
+      <div class="subtitle">تطبيق الصناعية .. مسجل لدى</div>
+      <div class="company-name">${subscription.workshop.workshopNameEnglish}</div>
+      <div class="address">${subscription.workshop.address}</div>
+      <div class="registration">CR: ${subscription.workshop.crn}</div>
+      <div class="registration">VAT: ${subscription.workshop.taxVatNumber}</div>
+    </div>
+
+    <!-- Date and Invoice Number -->
+    <div class="date-invoice">
+      <div class="date">${subscription.createdAt}</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="invoice-number">${subscription._id}</span>
+        <span class="invoice-label">رقم الفاتورة</span>
+      </div>
+    </div>
+
+    <!-- Workshop Info -->
+    <div class="workshop-info">
+      <div class="workshop-title">(${subscription.workshop.workshopNameArabic})</div>
+      <div class="workshop-details">
+        <span class="phone">${subscription.workshop.contact}</span>
+        <span class="vat-info">VAT: ${subscription.workshop.taxVatNumber}</span>
+      </div>
+    </div>
+
+    <!-- Subscription Box -->
+    <div class="subscription-box">
+      <div class="subscription-text">الاشتراك في تطبيق الصناعية</div>
+      <div class="subscription-period">${subscription_duration}</div>
+    </div>
+
+    <!-- Details Header -->
+    <div class="details-header">تفاصيل الفاتورة</div>
+
+    <!-- Detail Rows -->
+    <div class="detail-row">
+      <span class="detail-label">المبلغ قبل الضريبة</span>
+      <span class="detail-value">
+        ${subscription.package.price}
+        <span class="currency">﷼</span>
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">مبلغ الخصم</span>
+      <span class="detail-value discount-value">
+        ${subscription.flatDiscountedAmount}
+        <span class="currency">﷼</span>
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">ضريبة القيمة المضافة (TAX (${subscription.vatPercent})%)</span>
+      <span class="detail-value">
+        ${subscription.flatVatAmount}
+        <span class="currency">﷼</span>
+      </span>
+    </div>
+
+    <!-- Total Row -->
+    <div class="detail-row total-row">
+      <span class="detail-label">الإجمالي شامل الضريبة</span>
+      <span class="detail-value total-value">
+        ${subscription.amountPaid}
+        <span class="currency">﷼</span>
+      </span>
+    </div>
+
+    <!-- Expiry Section -->
+    <div class="expiry-section">
+      <div class="expiry-text">${subscription.currentPeriodEnd}</div>
+      <div>ينتهي اشتراك التطبيق بتاريخ</div>
+    </div>
+
+    <!-- QR Code Section -->
+    <div class="qr-section">
+      <div class="qr-code">
+        <img src=${subscription.subscription_qr_code} alt="">
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+     `;
 };
 
 const subscriptionExtended = (values: { daysCount: number }) => {
@@ -1216,6 +2296,7 @@ export const whatsAppTemplate = {
      subscriptionExtended,
      scheduleInvoiceWarningMessage,
      subscriptionDeleted,
+     subscriptionDetailsPdf,
      // resetPassword,
      // resetPasswordByUrl,
      // contactFormTemplate,

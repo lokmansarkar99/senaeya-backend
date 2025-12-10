@@ -15,6 +15,9 @@ import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { Coupon } from '../coupon/coupon.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { generateQRFromObject } from '../../../helpers/qrcode/generateQRFromObject';
+import { generatePDF } from '../payment/payment.utils';
+import { S3Helper } from '../../../helpers/aws/s3helper';
+import fs from 'fs';
 
 const subscriptionDetailsFromDB = async (id: string): Promise<{ subscription: ISubscription | {} }> => {
      const subscription = await Subscription.findOne({ userId: id }).populate('package', 'title credit duration').lean();
@@ -69,7 +72,16 @@ const subscriptionsFromDB = async (query: Record<string, unknown>) => {
      return { meta, result };
 };
 
-const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, packageId: string, amountPaid: string, couponCode: string, contact: string) => {
+const createSubscriptionByPackageIdForWorkshop = async (
+     workShopId: string,
+     packageId: string,
+     amountPaid: string,
+     couponCode: string,
+     contact: string,
+     vatPercent: number,
+     flatDiscountedAmount: number,
+     flatVatAmount: number,
+) => {
      const isExistPackage = await Package.findOne({
           _id: packageId,
           status: 'active',
@@ -115,6 +127,9 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
           currentPeriodStart,
           currentPeriodEnd,
           amountPaid: Number(amountPaid),
+          vatPercent,
+          flatDiscountedAmount,
+          flatVatAmount,
           coupon: couponCode,
           contact,
           status: 'active',
@@ -131,7 +146,7 @@ const createSubscriptionByPackageIdForWorkshop = async (workShopId: string, pack
 
           // Update workshop only if new subscription
           if (wasInserted) {
-               workshop.subscriptionId = subscription._id;
+               workshop.subscriptionId = new mongoose.Types.ObjectId(subscription._id);
                workshop.subscribedPackage = new Types.ObjectId(packageId);
                await workshop.save({ session });
 
@@ -278,21 +293,37 @@ const getSubscriptionByIdToDB = async (subscriptionId: string) => {
 };
 
 const mySubscriptionDetailsToDB = async (workshopId: string) => {
-     let subscription = await Subscription.findOne({ workshop: workshopId });
+     let subscription = await Subscription.findOne({ workshop: workshopId }).populate('workshop');
      if (!subscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
      }
-     // generate qr code if it doesn't exist
-     if (!subscription.subscription_qr_code) {
-          const qrCode = await generateQRFromObject(subscription);
-          // Update and get the updated document
-          subscription = await Subscription.findByIdAndUpdate(
-               subscription._id,
-               { subscription_qr_code: qrCode.qrImagePath },
-               { new: true }, // This returns the updated document
-          );
+     try {
+          // generate qr code if it doesn't exist
+          if (!subscription.subscription_qr_code) {
+               const qrCode = await generateQRFromObject(subscription);
+               // Update and get the updated document
+               subscription = await Subscription.findByIdAndUpdate(
+                    subscription._id,
+                    { subscription_qr_code: qrCode.qrImagePath },
+                    { new: true }, // This returns the updated document
+               );
+          }
+
+          if (subscription && !subscription.subscriptionInvoiceAwsLink) {
+               const createsubscriptionDetailsPdfTemplate = await whatsAppTemplate.subscriptionDetailsPdf(subscription as ISubscription as any);
+               const invoiceInpdfPath = await generatePDF(createsubscriptionDetailsPdfTemplate);
+               const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+               const subscriptionInvoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', subscription!._id?.toString(), 'application/pdf');
+
+               subscription.subscriptionInvoiceAwsLink = subscriptionInvoiceAwsLink;
+               await subscription.save();
+          }
+
+          return subscription;
+     } catch (error) {
+          console.log('🚀 ~ mySubscriptionDetailsToDB ~ error:', error);
+          throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to generate subscription details PDF');
      }
-     return subscription;
 };
 export const SubscriptionService = {
      subscriptionDetailsFromDB,

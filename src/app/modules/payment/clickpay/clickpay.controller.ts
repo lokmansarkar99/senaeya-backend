@@ -19,6 +19,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      }
      let isExistCoupon;
      let toBePaidAmount = isExistPackage.price;
+     let flatDiscountedAmount;
      if (req.query.couponCode) {
           isExistCoupon = await CouponService.getTryCouponByCode(req.params.packageId, req.query.couponCode as string);
           console.log('🚀 ~ isExistCoupon:', isExistCoupon);
@@ -26,6 +27,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
                throw new Error('Coupon not found for this package');
           }
           toBePaidAmount = isExistCoupon.discountedPrice;
+          flatDiscountedAmount = isExistCoupon.discountedPrice;
      }
      // checke already subscribed and not expired
      const isExistSubscription = await Subscription.findOne({
@@ -37,13 +39,13 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      if (isExistSubscription) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'You are already subscribed');
      }
-     let vat = default_vat;
+     let vatPercent = default_vat;
      const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
      if (appSettings && appSettings.defaultVat) {
-          vat = appSettings.defaultVat as number;
+          vatPercent = appSettings.defaultVat as number;
      }
-
-     toBePaidAmount = toBePaidAmount + (toBePaidAmount * vat) / 100;
+     const flatVatAmount = (toBePaidAmount * vatPercent) / 100;
+     toBePaidAmount = toBePaidAmount + flatVatAmount;
 
      const paymentRequest = {
           cart_amount: toBePaidAmount,
@@ -53,7 +55,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
 

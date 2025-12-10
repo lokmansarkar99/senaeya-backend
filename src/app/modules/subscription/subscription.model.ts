@@ -29,9 +29,21 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
           subscription_qr_code: {
                type: String,
           },
+          subscriptionInvoiceAwsLink: {
+               type: String,
+          },
           amountPaid: {
                type: Number,
                required: true,
+          },
+          vatPercent: {
+               type: Number,
+          },
+          flatVatAmount: {
+               type: Number,
+          },
+          flatDiscountedAmount: {
+               type: Number,
           },
           coupon: {
                type: String,

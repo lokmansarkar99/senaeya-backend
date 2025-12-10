@@ -30,6 +30,9 @@ router.get('/success', async (req, res) => {
                req.query.amountPaid as string,
                req.query.couponCode as string,
                req.query.contact as string,
+               Number(req.query.vatPercent),
+               Number(req.query.flatDiscountedAmount),
+               Number(req.query.flatVatAmount),
           );
      }
      res.send('<h1>Payment successful</h1>');
