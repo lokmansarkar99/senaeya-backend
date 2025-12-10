@@ -39,7 +39,7 @@ export interface IInvoice {
      paymentStatus: PaymentStatus;
      postPaymentDate?: Date | null;
      payment?: Types.ObjectId | null;
-     // totalCostExcludingTax: number;
+     totalCostExcludingTax?: number;
      taxAmount: number;
      totalCostIncludingTax: number;
      taxPercentage: number;

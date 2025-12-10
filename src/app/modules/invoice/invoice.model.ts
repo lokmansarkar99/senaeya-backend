@@ -36,7 +36,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           invoiceQRLink: { type: String, required: false, default: '' },
           worksList: { type: [InvoiceWorkSchema], required: true, default: [] },
           sparePartsList: { type: [InvoiceSparePartsSchema], required: false, default: [] },
-          // totalCostExcludingTax: { type: Number, required: true },
+          totalCostExcludingTax: { type: Number, required: false },
           taxPercentage: { type: Number, required: true },
           taxAmount: { type: Number, required: true },
           totalCostIncludingTax: { type: Number, required: true },
@@ -143,6 +143,7 @@ InvoiceSchema.pre('validate', async function (next) {
      // finalCost
      let finalCost = withTaxAndDiscoutAndIncludingPartsCosts;
 
+     payload.totalCostExcludingTax = noTaxOnlyPartsCosts + noTaxOnlyCostOfWorks;
      payload.taxAmount = onlyTaxInFlatAmount;
      payload.totalCostIncludingTax = withTaxAndDiscountWorkCosts;
      payload.finalDiscountInFlatAmount = onlyDiscoutFlatAmount;

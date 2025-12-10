@@ -809,7 +809,8 @@ const createInvoice = async (
       <div class="summary-section">
         <div class="summary-row red">
           <div class="summary-label">
-            <span class="summary-icon">﷼ </span>
+            <span class="summary-icon">﷼ ${data?.totalCostOfSparePartsExcludingTax || ''}
+</span>
             <div class="summary-content">
               <span>إجمالي مبلغ قطع الغيار (Total of spare parts)</span>
             </div>
@@ -817,7 +818,8 @@ const createInvoice = async (
         </div>
         <div class="summary-row gray">
           <div class="summary-label">
-            <span class="summary-icon">﷼ </span>
+            <span class="summary-icon">﷼ ${data?.totalCostExcludingTax || ''}
+</span>
             <div class="summary-content">
               <span> (Taxable amount)</span><span>المبلغ الخاضع للضريبة</span>
             </div>
@@ -825,7 +827,8 @@ const createInvoice = async (
         </div>
         <div class="summary-row gray">
           <div class="summary-label">
-            <span class="summary-icon">﷼ </span>
+            <span class="summary-icon">﷼ ${data?.finalDiscountInFlatAmount || ''}
+</span>
             <div class="summary-content">
               <span>(Discount)</span><span>الخصم قبل الضريبة</span>
             </div>
@@ -833,7 +836,8 @@ const createInvoice = async (
         </div>
         <div class="summary-row gray">
           <div class="summary-label">
-            <span class="summary-icon">﷼ </span>
+            <span class="summary-icon">﷼ ${data?.taxAmount || ''}
+</span>
             <div class="summary-content">
               <span> (VAT amount)</span> <span>(VAT 15%)الضريبة</span>
             </div>
@@ -931,7 +935,7 @@ const createInvoice = async (
 
         <!-- Contact Red Section -->
         <div class="contact-section">
-          <div class="phone-number">966-5xxxxxxxx</div>
+          <div class="phone-number">${data.providerWorkShopId.contact}</div>
           <div class="contact-icons">
             <!-- WhatsApp Icon -->
             <div class="icon-circle">
@@ -949,7 +953,7 @@ const createInvoice = async (
             </div>
           </div>
           <div class="address-section">
-            Riyadh - old Industrial - ali st.
+            ${data.providerWorkShopId.address}
           </div>
         </div>
       </div>
