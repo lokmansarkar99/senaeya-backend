@@ -22,7 +22,8 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
      cors({
-          origin: config.allowed_origins || '*',
+          // origin: config.allowed_origins || '*',
+          origin: ['http://158.252.71.185:5173', 'http://localhost:5173'],
           credentials: true,
      }),
 );
