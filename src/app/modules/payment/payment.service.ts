@@ -108,7 +108,7 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
                throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
           }
 
-          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult, payload.lang || TranslatedFieldEnum.en);
+          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, payload.lang || TranslatedFieldEnum.en);
           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
           const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
