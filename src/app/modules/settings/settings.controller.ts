@@ -98,6 +98,21 @@ const getAppExplain = catchAsync(async (req, res) => {
           data: result,
      });
 });
+
+const getContactInfoForApp = catchAsync(async (req, res): Promise<void> => {
+     const result = await settingsService.getContactInfoForApp();
+     return res.render('settings.ejs', { content: result });
+});
+
+const getAccountDeletePolicyForApp = catchAsync(async (req, res): Promise<void> => {
+     const result = await settingsService.getAccountDeletePolicyForApp();
+     return res.render('settings.ejs', { content: result });
+});
+
+const getPrivacyPolicyForApp = catchAsync(async (req, res): Promise<void> => {
+     const result = await settingsService.getPrivacyPolicyForApp();
+     return res.render('settings.ejs', { content: result });
+});
 export const settingsController = {
      addWorkshopSetting,
      getAppExplain,
@@ -108,4 +123,7 @@ export const settingsController = {
      getSupport,
      addSetting,
      getTermsOfService,
+     getPrivacyPolicyForApp,
+     getContactInfoForApp,
+     getAccountDeletePolicyForApp,
 };

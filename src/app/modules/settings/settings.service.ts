@@ -3,6 +3,7 @@ import { ISettings } from './settings.interface';
 import Settings from './settings.model';
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../../errors/AppError';
+import { accountDeletePolicy, contactInfo, privacyPolicy } from './settings.utils';
 
 const upsertSettings = async (data: Partial<ISettings>): Promise<ISettings> => {
      const existingSettings = await Settings.findOne({ providerWorkShopId: null });
@@ -120,6 +121,18 @@ const getAppExplain = async () => {
      return settings.appExplain;
 };
 
+const getContactInfoForApp = async () => {
+     return contactInfo;
+};
+
+const getAccountDeletePolicyForApp = async () => {
+     return accountDeletePolicy;
+};
+
+const getPrivacyPolicyForApp = async () => {
+     return privacyPolicy;
+};
+
 export const settingsService = {
      addWorkshopSetting,
      getWorkshopSetting,
@@ -130,5 +143,8 @@ export const settingsService = {
      getSupport,
      getTermsOfService,
      getAboutUs,
-     getAppExplain
+     getAppExplain,
+     getContactInfoForApp,
+     getAccountDeletePolicyForApp,
+     getPrivacyPolicyForApp,
 };
