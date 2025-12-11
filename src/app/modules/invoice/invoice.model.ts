@@ -80,7 +80,7 @@ InvoiceSchema.pre('validate', async function (next) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.7');
      }
 
-     payload.customerInvoiceName = payload.customerInvoiceName || (payload.client as any).clientId.name;
+     payload.customerInvoiceName = payload.customerInvoiceName || (payload.client as any).clientId?.name;
 
      if (payload.car) {
           const isExistCar = await Car.findOne({ _id: payload.car });

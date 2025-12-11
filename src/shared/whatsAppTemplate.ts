@@ -57,23 +57,29 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
-     const isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID;
-     const englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '';
-     const arabicAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[1] : '';
-     const englishPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberEnglish : '';
-     const arabicPlateNumber = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.numberArabic : '';
-     const interNationalCarNumber = data?.car?.carType == CLIENT_CAR_TYPE.INTERNATIONAL ? data?.car?.plateNumberForInternational : '';
-     const carSymbol = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.symbol?.image : '';
+     // Format the date to YYYY/MM/DD
+     const date = new Date(data.createdAt);
+     const invoiceCreatedAtt = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+
+     const base_route = config.backend_url || 'http://10.10.7.103:7010';
+     const carBrandImage = `${base_route}${data.car.brand.image}` || '';
+     console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
+     const providerWorkShopImage = `${base_route}${data.providerWorkShopId.image}` || '';
+     console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
+     const carSymbol = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? `${base_route}${data?.car?.plateNumberForSaudi?.symbol?.image}` : '';
+     console.log(carSymbol);
+     const invoiceQrLink = `${base_route}${data.invoiceQRLink}` || '';
+     console.log('🚀 ~ createInvoice ~ invoiceQrLink:', invoiceQrLink);
 
      const interNationalCarNumberComponent =
-          data.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
+          data?.car?.carType === CLIENT_CAR_TYPE.INTERNATIONAL
                ? `<div class="invoice-number-box">
         <div class="invoice-number">${data.car.plateNumberForInternational}</div>
       </div>`
                : `<div></div>`;
 
      const saudiCarPlateComponent =
-          data.car.carType === CLIENT_CAR_TYPE.SAUDI
+          data?.car?.carType === CLIENT_CAR_TYPE.SAUDI
                ? `<div class="stamps-box">
         <div class="stamp-row">
           <span class="stamp-label">${data.car.plateNumberForSaudi.alphabetsCombinations[0]}</span>
@@ -85,7 +91,7 @@ const createInvoice = async (
         </div>
            
       <div class="logo-section">
-        <img src=${data.car.plateNumberForSaudi?.symbol.image} class="logo" alt="">
+        <img src=${carSymbol} class="logo" alt="">
       </div>
       </div>`
                : `<div></div>`;
@@ -119,11 +125,11 @@ const createInvoice = async (
                 : `
                   <div class="table-row">
                     <div>1</div>
-                    <div>""</div>
-                    <div>""</div>
-                    <div>""</div>
-                    <div>""</div>
-                    <div>""</div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
                   </div>`
       }
     </div>`;
@@ -159,11 +165,11 @@ const createInvoice = async (
                 : `
       <div class="spare-row">
         <div>1</div>
-        <div>""</div>
-        <div>""</div>
-        <div>"</div>
-        <div>""</div>
-        <div>""</div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>`
       }
     </div>`;
@@ -717,11 +723,11 @@ const createInvoice = async (
     <!-- Header -->
     <div class="header">
       <div class="logo-section">
-        <img src=${data.providerWorkShopId.image} class="logo" alt="">
+        <img src=${providerWorkShopImage} class="logo" alt="">
       </div>
 
       <div class="qr-section">
-        <img src=${data.invoiceQRLink} class="qr-code" alt="">
+        <img src=${invoiceQrLink} class="qr-code" alt="">
       </div>
 
       <div class="company-info">
@@ -744,7 +750,7 @@ const createInvoice = async (
         </div>
         <div class="invoice-field">
           <div class="invoice-label">invoice date <b>تاريخ الفاتورة</b></div>
-          <div class="invoice-value">${data.createdAt}</div>
+          <div class="invoice-value">${invoiceCreatedAtt}</div>
         </div>
       </div>
 
@@ -761,21 +767,21 @@ const createInvoice = async (
     <div class="vehicle-info">
       <div class="vehicle-brand">      
       <div class="logo-section">
-        <img src=${data.car.brand.image} class="logo" alt="">
+        <img src=${carBrandImage} class="logo" alt="">
       </div>
-        <div class="vehicle-model">${data.car.brand.title}</div>
+        <div class="vehicle-model">${data?.car?.brand?.title}</div>
       </div>
 
-      <div class="vehicle-model">${data.car.model.title}</div>
+      <div class="vehicle-model">${data?.car?.model?.title}</div>
 
-      <div class="vehicle-year">${data.car.year}</div>
+      <div class="vehicle-year">${data?.car?.year}</div>
 
       ${saudiCarPlateComponent}
 
       <div style="text-align: center;">
-        <div class="tax-info">الرقم الضريبي: VAT -${data.providerWorkShopId.taxVatNumber}</div>
-        <div class="mobile-number">الجوال: ${data.providerWorkShopId.contact}</div>
-        <div class="customer-label">العميل: ${data.client.clientId.name}</div>
+        <div class="tax-info">الرقم الضريبي: VAT -${data?.providerWorkShopId?.taxVatNumber}</div>
+        <div class="mobile-number">الجوال: ${data?.providerWorkShopId?.contact}</div>
+        <div class="customer-label">العميل: ${data?.client?.clientId?.name}</div>
       </div>
     </div>
 
@@ -827,7 +833,7 @@ const createInvoice = async (
         </div>
         <div class="summary-row gray">
           <div class="summary-label">
-            <span class="summary-icon">﷼ ${data?.finalDiscountInFlatAmount || ''}
+            <span class="summary-icon">﷼ ${data?.finalDiscountInFlatAmount || 0}
 </span>
             <div class="summary-content">
               <span>(Discount)</span><span>الخصم قبل الضريبة</span>
@@ -836,7 +842,7 @@ const createInvoice = async (
         </div>
         <div class="summary-row gray">
           <div class="summary-label">
-            <span class="summary-icon">﷼ ${data?.taxAmount || ''}
+            <span class="summary-icon">﷼ ${data?.taxAmount || 0}
 </span>
             <div class="summary-content">
               <span> (VAT amount)</span> <span>(VAT 15%)الضريبة</span>
@@ -964,6 +970,7 @@ const createInvoice = async (
 </html>
      `;
 };
+
 const createInvoiceOld = async (data: IInvoice | any, lang: TranslatedFieldEnum) => {
      const isPostPaid = data?.paymentMethod === PaymentMethod.POSTPAID;
      const englishAlphabetCombination = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? data?.car?.plateNumberForSaudi?.alphabetsCombinations[0] : '';

@@ -23,7 +23,16 @@ app.use(Morgan.errorHandler);
 app.use(
      cors({
           // origin: config.allowed_origins || '*',
-          origin: ['http://158.252.71.185:5173', 'http://localhost:5173'],
+          origin: [
+               'http://158.252.71.185:5173',
+               'http://localhost:5173',
+               'api.senaeya.net',
+               'www.senaeya.net',
+               'http://api.senaeya.net',
+               'http://www.senaeya.net',
+               'https://api.senaeya.net',
+               'https://www.senaeya.net',
+          ],
           credentials: true,
      }),
 );

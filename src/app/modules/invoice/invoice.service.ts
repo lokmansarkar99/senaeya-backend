@@ -150,10 +150,20 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                .populate({
                     path: 'car',
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
-                    populate: {
-                         path: 'brand plateNumberForSaudi.symbol model',
-                         // select: 'title image',
-                    },
+                    // populate: {
+                    //      path: 'brand plateNumberForSaudi.symbol model',
+                    //      // select: 'title image',
+                    // },
+                    populate: [
+                         {
+                              path: 'brand model',
+                              select: 'title image',
+                         },
+                         {
+                              path: 'plateNumberForSaudi.symbol',
+                              select: 'image',
+                         },
+                    ],
                });
 
           if (!populatedResult) {
