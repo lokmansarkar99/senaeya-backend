@@ -14,6 +14,7 @@ import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils'
 import { WorkShop } from '../workShop/workShop.model';
 import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
 import { Invoice } from './invoice.model';
+import { createInvoiceNew } from '../../../shared/invoice-template';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
@@ -183,7 +184,8 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
           }
 
           // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
-          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
+          // const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
+          const createInvoiceTemplate = await createInvoiceNew(populatedResult as any, TranslatedFieldEnum.en as any);
           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
           const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
