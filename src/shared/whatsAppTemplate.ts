@@ -57,10 +57,11 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
+     console.log('*****************************');
      const date = new Date(mockData.createdAt);
 
      // 💡 Base URL (mock — adjust as needed)
-     const base_route = config?.backend_url || 'http://10.10.7.103:7010';
+     const base_route = config?.backend_url || 'http://172.31.6.128:7010';
 
      function pad(num: number | any) {
           return num.toString().padStart(2, '0');
