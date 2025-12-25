@@ -109,7 +109,7 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
           }
 
           const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, payload.lang || TranslatedFieldEnum.en);
-          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate!);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
           const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
 
