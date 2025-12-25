@@ -76,118 +76,123 @@ const createInvoice = async (
      const interNationalCarNumberComponent =
           mockData.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
                ? `<div class="invoice-number-box">
-              <div class="invoice-number">${mockData.car.plateNumberForInternational}</div>
-            </div>`
+     <div class="invoice-number">${mockData.car.plateNumberForInternational}</div>
+     </div>`
                : `<div></div>`;
 
      const result = `
-${
-     mockData.car.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
-          ? `
-    <div class="top-plate">${mockData._id}</div>
-  `
-          : `
-    <div class="bottom-plate">
-      <div class="left-col">
-        <div class="section arabic">${mockData.car.plateNumberForSaudi.numberArabic}</div>
-        <div class="section">${mockData.car.plateNumberForSaudi.numberEnglish}</div>
-      </div>
-
-      <div class="left-col">
-        <div class="section arabic">${mockData.car.plateNumberForSaudi.alphabetsCombinations[1]}</div>
-        <div class="section">${mockData.car.plateNumberForSaudi.alphabetsCombinations[0]}</div>
-      </div>
-
-      <div class="right-strip">
-        <img src="https://api.senaeya.net/image/${mockData.car.plateNumberForSaudi.symbol.image}" alt="" />
-      </div>
-    </div>
-  `
-}
-`;
+     ${
+          mockData.car.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
+               ? `
+       <div class="bottom-plate">
+       <div class="left-col">
+       <div class="section arabic">${mockData?.car?.plateNumberForSaudi?.numberArabic}</div>
+       <div class="section">${mockData?.car?.plateNumberForSaudi?.numberEnglish}</div>
+       </div>
+       
+       <div class="left-col">
+       <div class="section arabic">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[1]}</div>
+       <div class="section">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[0]}</div>
+       </div>
+       
+       <div class="right-strip">
+       <img src=${carSymbol}" alt="" />
+       </div>
+       </div>
+       `
+               : `
+       <div class="top-plate">${mockData?.car?.plateNumberForInternational}</div>
+       `
+     }
+      `;
 
      const saudiCarPlateComponent =
           mockData.car.carType === CLIENT_CAR_TYPE.SAUDI
                ? `<div class="stamps-box">
-              <div class="stamp-row">
-                <span class="stamp-label">${mockData.car.plateNumberForSaudi.alphabetsCombinations[0]}</span>
-                <span class="stamp-value">${mockData.car.plateNumberForSaudi.numberArabic}</span>
-              </div>
-              <div class="stamp-row">
-                <span class="stamp-label">${mockData.car.plateNumberForSaudi.alphabetsCombinations[1]}</span>
-                <span class="stamp-value">${mockData.car.plateNumberForSaudi.numberEnglish}</span>
-              </div>
-              <div class="logo-section">
-                <img src="${carSymbol}" class="logo" alt="Symbol">
+      <div class="stamp-row">
+      <span class="stamp-label">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[0]}</span>
+      <span class="stamp-value">${mockData?.car?.plateNumberForSaudi?.numberArabic}</span>
+      </div>
+      <div class="stamp-row">
+      <span class="stamp-label">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[1]}</span>
+      <span class="stamp-value">${mockData?.car?.plateNumberForSaudi?.numberEnglish}</span>
+      </div>
+      <div class="logo-section">
+      <img src="${carSymbol}" class="logo" alt="Symbol">
               </div>
             </div>`
                : `<div></div>`;
 
      const worksTableComponent = `
-        <div class="table-header">
-          <div>N</div>
-          <div>الرمز<br />Code</div>
-          <div>الأعمــــال Works</div>
-          <div>عدد<br />Qt.</div>
-          <div>السعر<br />Price</div>
-          <div>الإجمالي<br />Total</div>
-        </div>
-        <div class="table-body">
-          ${
-               mockData.worksList.length > 0
-                    ? mockData.worksList
-                           .map(
-                                (item, index) => `
-                    <div class="table-row">
-                      <div>${index + 1}</div>
-                      <div>${(item.work as any).code}</div>
-                      <div>${(item.work as any).title[lang]}</div>
-                      <div>${item.quantity}</div>
-                      <div>${item.cost}</div>
-                      <div>${item.finalCost}</div>
-                    </div>
-                  `,
-                           )
-                           .join('')
-                    : `<div class="table-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
-          }
-        </div>`;
+            <div class="table-header">
+            <div>N</div>
+            <div>الرمز<br />Code</div>
+            <div>الأعمــــال<br />Works</div>
+            <div>عدد<br />Qt.</div>
+            <div>السعر<br />Price</div>
+            <div>الإجمالي<br />Total</div>
+            </div>
+            <div class="table-body">
+            ${
+                 mockData?.worksList?.length > 0
+                      ? mockData?.worksList
+                             .map(
+                                  (item, index) => `
+                <div class="table-row">
+                <div>${index + 1}</div>
+                <div>${(item?.work as any).code}</div>
+                <div>${(item?.work as any).title[lang]}</div>
+                <div>${item?.quantity}</div>
+                <div>${item?.cost}</div>
+                <div>${item?.finalCost}</div>
+                </div>
+                `,
+                             )
+                             .join('')
+                      : `<div class="table-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
+            }
+            </div>`;
 
      const sparePartsTableComponent = `
-        <div class="spare-parts-header">
-          <div>N</div>
-          <div>الرمز<br />Code</div>
-          <div>قطع غيار Spare Parts</div>
-          <div>عدد<br />Qt.</div>
-          <div>السعر<br />Price</div>
-          <div>الإجمالي<br />Total</div>
-        </div>
-        <div class="spare-parts-body">
-          ${
-               mockData.sparePartsList.length > 0
-                    ? mockData.sparePartsList
-                           .map(
-                                (item, index) => `
-                    <div class="spare-row">
-                      <div>${index + 1}</div>
-                      <div>${item.code}</div>
+            <div class="table-header">
+            <div>N</div>
+            <div>الرمز<br />Code</div>
+            <div>قطع غيار <br />Spare Parts</div>
+            <div>عدد<br />Qt.</div>
+            <div>السعر<br />Price</div>
+            <div>الإجمالي<br />Total</div>
+            </div>
+            <div class="spare-parts-body">
+            ${
+                 mockData?.sparePartsList?.length > 0
+                      ? mockData?.sparePartsList
+                             .map(
+                                  (item, index) => `
+                             <div class="spare-row table-row">
+                             <div>${index + 1}</div>
+                             <div>${item.code}</div>
                       <div>${item.itemName}</div>
                       <div>${item.quantity}</div>
                       <div>${item.cost}</div>
                       <div>${item.finalCost}</div>
-                    </div>
-                  `,
-                           )
-                           .join('')
-                    : `<div class="spare-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
-          }
-        </div>`;
+                      </div>
+                      `,
+                             )
+                             .join('')
+                      : `<div class="spare-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
+            }
+                  </div>`;
 
+     console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
+     console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
+     console.log('🚀 ~ createInvoice ~ mockData?.providerWorkShopId?.workshopNameEnglish:', mockData?.providerWorkShopId?.workshopNameEnglish);
+     console.log('🚀 ~ createInvoice ~ carSymbol:', carSymbol);
+     console.log('🚀 ~ createInvoice ~ mockData.providerWorkShopId.contact:', mockData.providerWorkShopId.contact);
      return `
-      <!DOCTYPE html>
-<html lang="en">
-
-<head>
+                  <!DOCTYPE html>
+                  <html lang="en">
+                  
+                  <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>فاتورة ضريبية مبسطة</title>
@@ -380,61 +385,54 @@ ${
     }
 
     /* Tables */
-    .table-header,
-    .spare-parts-header {
+    .table-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      border: 1px solid #352c2cff;
+      margin-bottom: 20px;
+    }
+    .table-header{
       background: #1976d2;
-      color: white;
-      display: grid;
-      grid-template-columns: 40px 100px 1fr 60px 100px 100px;
-      font-weight: bold;
-      font-size: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 100%;
+      border-bottom: 1px solid #352c2cff;
+      
+    }
+
+    .table-header div {
+      padding: 5px;
       text-align: center;
     }
+    .table-body{
 
-    .table-header div,
-    .spare-parts-header div {
-      padding: 12px 5px;
-      border-left: 1px solid #fff;
     }
 
-    .table-header div:first-child,
-    .spare-parts-header div:first-child {
-      border-left: none;
+    .table-row{
+      border-bottom: 1px solid #000;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 100%;
     }
 
-    .table-body,
-    .spare-parts-body {
-      min-height: 150px;
-      background: #f5f5f5;
-    }
-
-    .table-row,
-    .spare-row {
-      display: grid;
-      grid-template-columns: 40px 100px 1fr 60px 100px 100px;
-      border-bottom: 1px solid #ddd;
+    .table-row div {
+      padding: 5px;
       text-align: center;
       font-size: 11px;
     }
 
-    .table-row div,
-    .spare-row div {
-      padding: 10px 5px;
-      border-left: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .spare-row{
 
-    .table-row div:first-child,
-    .spare-row div:first-child {
-      border-left: none;
     }
+    
 
     /* Bottom Section */
     .bottom-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      justify-content: space-between;
       border-top: 2px solid rgb(233, 233, 233);
     }
 
@@ -456,6 +454,7 @@ ${
       font-size: 13px;
       line-height: 1.8;
       color: #000;
+      padding:10px
     }
 
     .manager-section {
@@ -504,12 +503,13 @@ ${
 
     .summary-label {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
       gap: 10px;
+      width: 100%;
     }
 
     .summary-icon {
-      display: block;
+      display: flex;
       align-items: center;
       font-size: 24px;
       font-weight: bold;
@@ -518,7 +518,7 @@ ${
 
     .summary-content {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding: 10px;
       width: 310px;
     }
@@ -526,6 +526,7 @@ ${
     /* Footer Banner */
     .banner {
       display: flex;
+      justify-content: space-between;
       width: 100%;
       position: relative;
       overflow: hidden;
@@ -556,7 +557,7 @@ ${
     }
 
     .sectiontwo {
-      width: 70%;
+      width: 65%;
       /* padding-top: 50px; */
       margin-left: -5%;
     }
@@ -564,6 +565,7 @@ ${
     .logos-section {
       position: absolute;
       flex: 1;
+      padding-left: 20px;
       display: flex;
       align-items: center;
       justify-content: end;
@@ -767,7 +769,6 @@ ${
               <div class="invoice-type-title">فاتورة ضريبية مبسطة</div>
               <div class="payment-method">${mockData.paymentMethod}</div>
             </div>
-            ${interNationalCarNumberComponent}
           </div>
 
           
@@ -796,24 +797,41 @@ ${
               </div>
             </div>
 
-          
-          ${worksTableComponent}
+              <div class="table-container">
+                ${worksTableComponent}
+              </div>
 
           
+          <div class="table-container">
           ${sparePartsTableComponent}
+          </div>
 
           
           <div class="bottom-section">
             <div class="terms-section">
               <div class="terms-title">(Warranty and maintenance terms)<br />شروط الضمان والصيانة</div>
               <div class="terms-content">
-                المركز يضمن أعمال شغل اليد فقط إذا كانت القطع المستبدلة أصلية ومدة الضمان لا تتجاوز شهر من تاريخ
-                الفاتورة<br />
-                المركز غير مسئول عن قطع الغيار القديمة بعد استبدالها وعدم قيام العميل بطلبها وأخذها بعد الصيانة مباشرة ويعد
-                تصريح مباشر بالاستغناء عنها ولا يسأل عنها الورشة مطلقا<br />
-                المركز غير مسئول عن تركيب قطع الغيار المستعملة وفي حالة وجود خلل بها يتطلب الفك والتركيب أكثر من مرة يتحمل
-                العميل قيمة شغل اليد عن الفك والتركيب في كل مرة<br />
-                المركز غير مسئول عن رسوب السيارة بالفحص الدوري
+                المركز يضمن أعمال شغل اليد فقط إذا كانت القطع
+                <br />
+                المستبدلة أصلية ومدة الضمان لا تتجاوز شهر من
+                <br />
+                تاريخ الفاتورة المركز غير مسئول عن قطع الغيار 
+                <br />
+                القديمة بعد استبدالها وعدم قيام العميل بطلبها
+                <br />
+                وأخذها بعد الصيانة مباشرة ويعد تصريح مباشر
+                <br />
+                بالاستغناء عنها ولا يسأل عنها الورشة مطلقا
+                <br />
+                المركز غير مسئول عن تركيب قطع الغيار 
+                <br />
+                المستعملة وفي حالة وجود خلل بها يتطلب الفك 
+                <br />
+                والتركيب أكثر من مرة يتحمل العميل قيمة شغل
+                <br />
+                اليد عن الفك والتركيب في كل مرة المركز
+                <br />
+                غير مسئول عن رسوب السيارة بالفحص الدوري
               </div>
               <div class="manager-section">
                 (Workshop Manager)
@@ -823,41 +841,61 @@ ${
             <div class="summary-section">
               <div class="summary-row red">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.totalCostOfSparePartsExcludingTax}﷼ </span>
+                  <span class="summary-icon">${mockData.totalCostOfSparePartsExcludingTax} ${' '} ﷼ </span>
                   <div class="summary-content">
-                    <span>إجمالي مبلغ قطع الغيار (Total of spare parts)</span>
+                    <span>
+                    إجمالي مبلغ قطع الغيار 
+                    <br/>
+                    (Total of spare parts)
+                    </span>
                   </div>
                 </div>
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.totalCostExcludingTax}﷼ </span>
+                  <span class="summary-icon">${mockData.totalCostExcludingTax} ${' '} ﷼ </span>
                   <div class="summary-content">
-                    <span> (Taxable amount)</span><span>المبلغ الخاضع للضريبة</span>
+                    <span>
+                    المبلغ الخاضع للضريبة
+                    <br/>
+                    (Taxable amount)
+                    </span>
                   </div>
                 </div>
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.finalDiscountInFlatAmount || 0}﷼ </span>
+                  <span class="summary-icon">${mockData.finalDiscountInFlatAmount || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
-                    <span>(Discount)</span><span>الخصم قبل الضريبة</span>
+                    <span>
+                    الخصم قبل الضريبة
+                    <br/>
+                    (Discount)
+                    </span>
                   </div>
                 </div>
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.taxAmount || 0}﷼ </span>
+                  <span class="summary-icon">${mockData.taxAmount || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
-                    <span> (VAT amount)</span> <span>(VAT 15%)الضريبة</span>
+                    <span>
+                    الضريبة
+                    <br/>
+                    (VAT amount)
+                    </span>
                   </div>
                 </div>
               </div>
               <div class="summary-row blue">
                 <div class="summary-label">
-                  <span class="summary-icon">﷼ </span>
+                  <span class="summary-icon">${mockData.totalCostIncludingTax || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
-                    <span>(Total including tax)</span> <span>الإجمالي شامل الضريبة</span>
+                    <span>
+                    إجمالي شامل الضريبة
+                    <br/>
+                    (Total including tax)
+                    </span>
                   </div>
                 </div>
               </div>
