@@ -57,33 +57,25 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
-     try {
-          const date = new Date(mockData.createdAt);
+     const date = new Date(mockData.createdAt);
 
-          // 💡 Base URL (mock — adjust as needed)
-          const base_route = config.backend_url || 'http://10.10.7.103:7010';
+     // 💡 Base URL (mock — adjust as needed)
+     const base_route = config?.backend_url || 'http://10.10.7.103:7010';
 
-          function pad(num: number | any) {
-               return num.toString().padStart(2, '0');
-          }
+     function pad(num: number | any) {
+          return num.toString().padStart(2, '0');
+     }
 
-          const invoiceCreatedAtt = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+     const invoiceCreatedAtt = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
 
-          const carBrandImage = `${base_route}${mockData.car.brand.image}`;
-          const providerWorkShopImage = `${base_route}${mockData.providerWorkShopId.image}`;
-          const carSymbol = mockData.car.carType === CLIENT_CAR_TYPE.SAUDI ? `${base_route}${mockData.car.plateNumberForSaudi.symbol.image}` : '';
-          const invoiceQrLink = `${base_route}${mockData.invoiceQRLink}`;
+     const carBrandImage = `${base_route}${mockData?.car?.brand?.image}`;
+     const providerWorkShopImage = `${base_route}${mockData?.providerWorkShopId?.image}`;
+     const carSymbol = mockData?.car?.carType === CLIENT_CAR_TYPE.SAUDI ? `${base_route}${mockData?.car?.plateNumberForSaudi?.symbol?.image}` : '';
+     const invoiceQrLink = `${base_route}${mockData?.invoiceQRLink}`;
 
-          const interNationalCarNumberComponent =
-               mockData.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
-                    ? `<div class="invoice-number-box">
-     <div class="invoice-number">${mockData.car.plateNumberForInternational}</div>
-     </div>`
-                    : `<div></div>`;
-
-          const result = `
+     const result = `
      ${
-          mockData.car.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
+          mockData?.car?.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
                ? `
        <div class="bottom-plate">
        <div class="left-col">
@@ -107,9 +99,9 @@ const createInvoice = async (
      }
       `;
 
-          const saudiCarPlateComponent =
-               mockData.car.carType === CLIENT_CAR_TYPE.SAUDI
-                    ? `<div class="stamps-box">
+     const saudiCarPlateComponent =
+          mockData?.car?.carType === CLIENT_CAR_TYPE.SAUDI
+               ? `<div class="stamps-box">
       <div class="stamp-row">
       <span class="stamp-label">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[0]}</span>
       <span class="stamp-value">${mockData?.car?.plateNumberForSaudi?.numberArabic}</span>
@@ -122,9 +114,9 @@ const createInvoice = async (
       <img src="${carSymbol}" class="logo" alt="Symbol">
               </div>
             </div>`
-                    : `<div></div>`;
+               : `<div></div>`;
 
-          const worksTableComponent = `
+     const worksTableComponent = `
             <div class="table-header">
             <div>N</div>
             <div>الرمز<br />Code</div>
@@ -141,8 +133,8 @@ const createInvoice = async (
                                   (item, index) => `
                 <div class="table-row">
                 <div>${index + 1}</div>
-                <div>${(item?.work as any).code}</div>
-                <div>${(item?.work as any).title[lang]}</div>
+                <div>${(item?.work as any)?.code}</div>
+                <div>${(item?.work as any)?.title[lang]}</div>
                 <div>${item?.quantity}</div>
                 <div>${item?.cost}</div>
                 <div>${item?.finalCost}</div>
@@ -154,7 +146,7 @@ const createInvoice = async (
             }
             </div>`;
 
-          const sparePartsTableComponent = `
+     const sparePartsTableComponent = `
             <div class="table-header">
             <div>N</div>
             <div>الرمز<br />Code</div>
@@ -171,11 +163,11 @@ const createInvoice = async (
                                   (item, index) => `
                              <div class="spare-row table-row">
                              <div>${index + 1}</div>
-                             <div>${item.code}</div>
-                      <div>${item.itemName}</div>
-                      <div>${item.quantity}</div>
-                      <div>${item.cost}</div>
-                      <div>${item.finalCost}</div>
+                             <div>${item?.code}</div>
+                      <div>${item?.itemName}</div>
+                      <div>${item?.quantity}</div>
+                      <div>${item?.cost}</div>
+                      <div>${item?.finalCost}</div>
                       </div>
                       `,
                              )
@@ -184,12 +176,7 @@ const createInvoice = async (
             }
                   </div>`;
 
-          console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
-          console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
-          console.log('🚀 ~ createInvoice ~ mockData?.providerWorkShopId?.workshopNameEnglish:', mockData?.providerWorkShopId?.workshopNameEnglish);
-          console.log('🚀 ~ createInvoice ~ carSymbol:', carSymbol);
-          console.log('🚀 ~ createInvoice ~ mockData.providerWorkShopId.contact:', mockData.providerWorkShopId.contact);
-          return `
+     return `
                   <!DOCTYPE html>
                   <html lang="en">
                   
@@ -741,12 +728,12 @@ const createInvoice = async (
               <img src="${invoiceQrLink}" class="qr-code" alt="QR Code">
             </div>
             <div class="company-info">
-              <div class="company-name">${mockData.providerWorkShopId.workshopNameArabic}</div>
-              <div class="company-subtitle">${mockData.providerWorkShopId.workshopNameEnglish}</div>
+              <div class="company-name">${mockData?.providerWorkShopId?.workshopNameArabic}</div>
+              <div class="company-subtitle">${mockData?.providerWorkShopId?.workshopNameEnglish}</div>
               <div class="company-details">
-                <div>الرقم الضريبي: CR No. : ${mockData.providerWorkShopId.crn}</div>
-                <div>الرقم الضريبي: VAT No. : ${mockData.providerWorkShopId.taxVatNumber}</div>
-                <div>الحساب البنكي: IBan No. : ${mockData.providerWorkShopId.bankAccountNumber}</div>
+                <div>الرقم الضريبي: CR No. : ${mockData?.providerWorkShopId?.crn}</div>
+                <div>الرقم الضريبي: VAT No. : ${mockData?.providerWorkShopId?.taxVatNumber}</div>
+                <div>الحساب البنكي: IBan No. : ${mockData?.providerWorkShopId?.bankAccountNumber}</div>
               </div>
             </div>
           </div>
@@ -758,7 +745,7 @@ const createInvoice = async (
             <div class="invoice-left">
               <div class="invoice-field">
                 <div class="invoice-label">invoice no. <b>رقم الفاتورة</b></div>
-                <div class="invoice-value">${mockData._id}</div>
+                <div class="invoice-value">${mockData?._id}</div>
               </div>
               <div class="invoice-field">
                 <div class="invoice-label">invoice date <b>تاريخ الفاتورة</b></div>
@@ -768,7 +755,7 @@ const createInvoice = async (
             <div class="invoice-type">
               <div class="invoice-type-label">(Simplified tax invoice)</div>
               <div class="invoice-type-title">فاتورة ضريبية مبسطة</div>
-              <div class="payment-method">${mockData.paymentMethod}</div>
+              <div class="payment-method">${mockData?.paymentMethod}</div>
             </div>
           </div>
 
@@ -778,14 +765,14 @@ const createInvoice = async (
               <div class="logo-section">
                 <img src="${carBrandImage}" class="logo" alt="Car Brand Logo">
               </div>
-              <div class="vehicle-model">${mockData.car.brand.title}</div>
+              <div class="vehicle-model">${mockData?.car?.brand?.title}</div>
             </div>
-            <div class="vehicle-model">${mockData.car.model.title}</div>
-            <div class="vehicle-year">${mockData.car.year}</div>
+            <div class="vehicle-model">${mockData?.car?.model?.title}</div>
+            <div class="vehicle-year">${mockData?.car?.year}</div>
             <div style="text-align: center;">
-              <div class="tax-info">الرقم الضريبي: VAT -${mockData.providerWorkShopId.taxVatNumber}</div>
-              <div class="mobile-number">الجوال: ${mockData.providerWorkShopId.contact}</div>
-              <div class="customer-label">العميل: ${mockData.client.clientId.name}</div>
+              <div class="tax-info">الرقم الضريبي: VAT -${mockData?.providerWorkShopId?.taxVatNumber}</div>
+              <div class="mobile-number">الجوال: ${mockData?.providerWorkShopId?.contact}</div>
+              <div class="customer-label">العميل: ${mockData?.client?.clientId?.name}</div>
             </div>
           </div>
             </div>
@@ -842,7 +829,7 @@ const createInvoice = async (
             <div class="summary-section">
               <div class="summary-row red">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.totalCostOfSparePartsExcludingTax} ${' '} ﷼ </span>
+                  <span class="summary-icon">${mockData?.totalCostOfSparePartsExcludingTax} ${' '} ﷼ </span>
                   <div class="summary-content">
                     <span>
                     إجمالي مبلغ قطع الغيار 
@@ -854,7 +841,7 @@ const createInvoice = async (
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.totalCostExcludingTax} ${' '} ﷼ </span>
+                  <span class="summary-icon">${mockData?.totalCostExcludingTax} ${' '} ﷼ </span>
                   <div class="summary-content">
                     <span>
                     المبلغ الخاضع للضريبة
@@ -866,7 +853,7 @@ const createInvoice = async (
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.finalDiscountInFlatAmount || 0} ${' '} ﷼ </span>
+                  <span class="summary-icon">${mockData?.finalDiscountInFlatAmount || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
                     <span>
                     الخصم قبل الضريبة
@@ -878,7 +865,7 @@ const createInvoice = async (
               </div>
               <div class="summary-row gray">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.taxAmount || 0} ${' '} ﷼ </span>
+                  <span class="summary-icon">${mockData?.taxAmount || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
                     <span>
                     الضريبة
@@ -890,7 +877,7 @@ const createInvoice = async (
               </div>
               <div class="summary-row blue">
                 <div class="summary-label">
-                  <span class="summary-icon">${mockData.totalCostIncludingTax || 0} ${' '} ﷼ </span>
+                  <span class="summary-icon">${mockData?.totalCostIncludingTax || 0} ${' '} ﷼ </span>
                   <div class="summary-content">
                     <span>
                     إجمالي شامل الضريبة
@@ -963,7 +950,7 @@ const createInvoice = async (
                 </svg>
               </div>
               <div class="contact-section">
-                <div class="phone-number">${mockData.providerWorkShopId.contact}</div>
+                <div class="phone-number">${mockData?.providerWorkShopId?.contact}</div>
                 <div class="contact-icons">
                   <div class="icon-circle">
                     <svg viewBox="0 0 24 24" fill="#25D366">
@@ -977,7 +964,7 @@ const createInvoice = async (
                   </div>
                 </div>
                 <div class="address-section">
-                  ${mockData.providerWorkShopId.address}
+                  ${mockData?.providerWorkShopId?.address}
                 </div>
               </div>
             </div>
@@ -987,9 +974,6 @@ const createInvoice = async (
 
 </html>
      `;
-     } catch (error) {
-          console.log('🚀 ~ createInvoice ~ error:', error);
-     }
 };
 
 const createInvoiceOld2 = async (
