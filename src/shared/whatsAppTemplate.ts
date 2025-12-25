@@ -57,30 +57,31 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
-     const date = new Date(mockData.createdAt);
+     try {
+          const date = new Date(mockData.createdAt);
 
-     // 💡 Base URL (mock — adjust as needed)
-     const base_route = config.backend_url || 'http://10.10.7.103:7010';
+          // 💡 Base URL (mock — adjust as needed)
+          const base_route = config.backend_url || 'http://10.10.7.103:7010';
 
-     function pad(num: number | any) {
-          return num.toString().padStart(2, '0');
-     }
+          function pad(num: number | any) {
+               return num.toString().padStart(2, '0');
+          }
 
-     const invoiceCreatedAtt = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+          const invoiceCreatedAtt = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
 
-     const carBrandImage = `${base_route}${mockData.car.brand.image}`;
-     const providerWorkShopImage = `${base_route}${mockData.providerWorkShopId.image}`;
-     const carSymbol = mockData.car.carType === CLIENT_CAR_TYPE.SAUDI ? `${base_route}${mockData.car.plateNumberForSaudi.symbol.image}` : '';
-     const invoiceQrLink = `${base_route}${mockData.invoiceQRLink}`;
+          const carBrandImage = `${base_route}${mockData.car.brand.image}`;
+          const providerWorkShopImage = `${base_route}${mockData.providerWorkShopId.image}`;
+          const carSymbol = mockData.car.carType === CLIENT_CAR_TYPE.SAUDI ? `${base_route}${mockData.car.plateNumberForSaudi.symbol.image}` : '';
+          const invoiceQrLink = `${base_route}${mockData.invoiceQRLink}`;
 
-     const interNationalCarNumberComponent =
-          mockData.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
-               ? `<div class="invoice-number-box">
+          const interNationalCarNumberComponent =
+               mockData.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
+                    ? `<div class="invoice-number-box">
      <div class="invoice-number">${mockData.car.plateNumberForInternational}</div>
      </div>`
-               : `<div></div>`;
+                    : `<div></div>`;
 
-     const result = `
+          const result = `
      ${
           mockData.car.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
                ? `
@@ -106,9 +107,9 @@ const createInvoice = async (
      }
       `;
 
-     const saudiCarPlateComponent =
-          mockData.car.carType === CLIENT_CAR_TYPE.SAUDI
-               ? `<div class="stamps-box">
+          const saudiCarPlateComponent =
+               mockData.car.carType === CLIENT_CAR_TYPE.SAUDI
+                    ? `<div class="stamps-box">
       <div class="stamp-row">
       <span class="stamp-label">${mockData?.car?.plateNumberForSaudi?.alphabetsCombinations[0]}</span>
       <span class="stamp-value">${mockData?.car?.plateNumberForSaudi?.numberArabic}</span>
@@ -121,9 +122,9 @@ const createInvoice = async (
       <img src="${carSymbol}" class="logo" alt="Symbol">
               </div>
             </div>`
-               : `<div></div>`;
+                    : `<div></div>`;
 
-     const worksTableComponent = `
+          const worksTableComponent = `
             <div class="table-header">
             <div>N</div>
             <div>الرمز<br />Code</div>
@@ -153,7 +154,7 @@ const createInvoice = async (
             }
             </div>`;
 
-     const sparePartsTableComponent = `
+          const sparePartsTableComponent = `
             <div class="table-header">
             <div>N</div>
             <div>الرمز<br />Code</div>
@@ -183,12 +184,12 @@ const createInvoice = async (
             }
                   </div>`;
 
-     console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
-     console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
-     console.log('🚀 ~ createInvoice ~ mockData?.providerWorkShopId?.workshopNameEnglish:', mockData?.providerWorkShopId?.workshopNameEnglish);
-     console.log('🚀 ~ createInvoice ~ carSymbol:', carSymbol);
-     console.log('🚀 ~ createInvoice ~ mockData.providerWorkShopId.contact:', mockData.providerWorkShopId.contact);
-     return `
+          console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
+          console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
+          console.log('🚀 ~ createInvoice ~ mockData?.providerWorkShopId?.workshopNameEnglish:', mockData?.providerWorkShopId?.workshopNameEnglish);
+          console.log('🚀 ~ createInvoice ~ carSymbol:', carSymbol);
+          console.log('🚀 ~ createInvoice ~ mockData.providerWorkShopId.contact:', mockData.providerWorkShopId.contact);
+          return `
                   <!DOCTYPE html>
                   <html lang="en">
                   
@@ -986,6 +987,9 @@ const createInvoice = async (
 
 </html>
      `;
+     } catch (error) {
+          console.log('🚀 ~ createInvoice ~ error:', error);
+     }
 };
 
 const createInvoiceOld2 = async (
