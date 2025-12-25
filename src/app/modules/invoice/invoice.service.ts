@@ -184,6 +184,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
           // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
           const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
+          console.log('🚀 ~ createInvoice ~ createInvoiceTemplate:', createInvoiceTemplate);
           // const createInvoiceTemplate = await createInvoiceNew(populatedResult as any, TranslatedFieldEnum.en as any);
           const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
           const fileBuffer = fs.readFileSync(invoiceInpdfPath);
