@@ -37,7 +37,7 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
 };
 
 const createInvoice = async (
-     data: IInvoice & {
+     mockData: IInvoice & {
           client: IClient & { clientId: IUser };
           worksList: IInvoiceWork[];
           providerWorkShopId: IworkShop & { ownerId: IUser };
@@ -57,60 +57,87 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
-     // Format the date to YYYY/MM/DD
-     const date = new Date(data.createdAt);
-     const invoiceCreatedAtt = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+     const date = new Date(mockData.createdAt);
 
+     // 💡 Base URL (mock — adjust as needed)
      const base_route = config.backend_url || 'http://10.10.7.103:7010';
-     const carBrandImage = `${base_route}${data.car.brand.image}` || '';
-     console.log('🚀 ~ createInvoice ~ carBrandImage:', carBrandImage);
-     const providerWorkShopImage = `${base_route}${data.providerWorkShopId.image}` || '';
-     console.log('🚀 ~ createInvoice ~ providerWorkShopImage:', providerWorkShopImage);
-     const carSymbol = data?.car?.carType == CLIENT_CAR_TYPE.SAUDI ? `${base_route}${data?.car?.plateNumberForSaudi?.symbol?.image}` : '';
-     console.log(carSymbol);
-     const invoiceQrLink = `${base_route}${data.invoiceQRLink}` || '';
-     console.log('🚀 ~ createInvoice ~ invoiceQrLink:', invoiceQrLink);
+
+     function pad(num: number | any) {
+          return num.toString().padStart(2, '0');
+     }
+
+     const invoiceCreatedAtt = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}`;
+
+     const carBrandImage = `${base_route}${mockData.car.brand.image}`;
+     const providerWorkShopImage = `${base_route}${mockData.providerWorkShopId.image}`;
+     const carSymbol = mockData.car.carType === CLIENT_CAR_TYPE.SAUDI ? `${base_route}${mockData.car.plateNumberForSaudi.symbol.image}` : '';
+     const invoiceQrLink = `${base_route}${mockData.invoiceQRLink}`;
 
      const interNationalCarNumberComponent =
-          data?.car?.carType === CLIENT_CAR_TYPE.INTERNATIONAL
+          mockData.car.carType === CLIENT_CAR_TYPE.INTERNATIONAL
                ? `<div class="invoice-number-box">
-        <div class="invoice-number">${data.car.plateNumberForInternational}</div>
-      </div>`
+              <div class="invoice-number">${mockData.car.plateNumberForInternational}</div>
+            </div>`
                : `<div></div>`;
+
+     const result = `
+${
+     mockData.car.carType !== CLIENT_CAR_TYPE.INTERNATIONAL
+          ? `
+    <div class="top-plate">${mockData._id}</div>
+  `
+          : `
+    <div class="bottom-plate">
+      <div class="left-col">
+        <div class="section arabic">${mockData.car.plateNumberForSaudi.numberArabic}</div>
+        <div class="section">${mockData.car.plateNumberForSaudi.numberEnglish}</div>
+      </div>
+
+      <div class="left-col">
+        <div class="section arabic">${mockData.car.plateNumberForSaudi.alphabetsCombinations[1]}</div>
+        <div class="section">${mockData.car.plateNumberForSaudi.alphabetsCombinations[0]}</div>
+      </div>
+
+      <div class="right-strip">
+        <img src="https://api.senaeya.net/image/${mockData.car.plateNumberForSaudi.symbol.image}" alt="" />
+      </div>
+    </div>
+  `
+}
+`;
 
      const saudiCarPlateComponent =
-          data?.car?.carType === CLIENT_CAR_TYPE.SAUDI
+          mockData.car.carType === CLIENT_CAR_TYPE.SAUDI
                ? `<div class="stamps-box">
-        <div class="stamp-row">
-          <span class="stamp-label">${data.car.plateNumberForSaudi.alphabetsCombinations[0]}</span>
-          <span class="stamp-value">${data.car.plateNumberForSaudi.numberArabic}</span>
-        </div>
-        <div class="stamp-row">
-          <span class="stamp-label">${data.car.plateNumberForSaudi.alphabetsCombinations[1]}</span>
-          <span class="stamp-value">${data.car.plateNumberForSaudi.numberEnglish}</span>
-        </div>
-           
-      <div class="logo-section">
-        <img src=${carSymbol} class="logo" alt="">
-      </div>
-      </div>`
+              <div class="stamp-row">
+                <span class="stamp-label">${mockData.car.plateNumberForSaudi.alphabetsCombinations[0]}</span>
+                <span class="stamp-value">${mockData.car.plateNumberForSaudi.numberArabic}</span>
+              </div>
+              <div class="stamp-row">
+                <span class="stamp-label">${mockData.car.plateNumberForSaudi.alphabetsCombinations[1]}</span>
+                <span class="stamp-value">${mockData.car.plateNumberForSaudi.numberEnglish}</span>
+              </div>
+              <div class="logo-section">
+                <img src="${carSymbol}" class="logo" alt="Symbol">
+              </div>
+            </div>`
                : `<div></div>`;
 
-     const worksTableComponent = `<div class="table-header">
-      <div>N</div>
-      <div>الرمز<br />Code</div>
-      <div>الأعمــــال Works</div>
-      <div>عدد<br />Qt.</div>
-      <div>السعر<br />Price</div>
-      <div>الإجمالي<br />Total</div>
-    </div>
-    <div class="table-body">
-      ${
-           data.worksList.length > 0
-                ? `
-                ${data.worksList
-                     .map(
-                          (item, index) => `
+     const worksTableComponent = `
+        <div class="table-header">
+          <div>N</div>
+          <div>الرمز<br />Code</div>
+          <div>الأعمــــال Works</div>
+          <div>عدد<br />Qt.</div>
+          <div>السعر<br />Price</div>
+          <div>الإجمالي<br />Total</div>
+        </div>
+        <div class="table-body">
+          ${
+               mockData.worksList.length > 0
+                    ? mockData.worksList
+                           .map(
+                                (item, index) => `
                     <div class="table-row">
                       <div>${index + 1}</div>
                       <div>${(item.work as any).code}</div>
@@ -120,70 +147,51 @@ const createInvoice = async (
                       <div>${item.finalCost}</div>
                     </div>
                   `,
-                     )
-                     .join('')}`
-                : `
-                  <div class="table-row">
-                    <div>1</div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                  </div>`
-      }
-    </div>`;
+                           )
+                           .join('')
+                    : `<div class="table-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
+          }
+        </div>`;
 
-     const sparePartsTableComponent = `<div class="spare-parts-header">
-      <div>N</div>
-      <div>الرمز<br />Code</div>
-      <div>قطع غيار Spare Parts</div>
-      <div>عدد<br />Qt.</div>
-      <div>السعر<br />Price</div>
-      <div>الإجمالي<br />Total</div>
-    </div>
-    <div class="spare-parts-body">    
-
-      ${
-           data.sparePartsList.length > 0
-                ? `
-        ${data.sparePartsList
-             .map(
-                  (item, index) => `
-          <div class="spare-row">
-            <div>${index + 1}</div>
-            <div>${item.code}</div>
-            <div>${item.itemName}</div>
-            <div>${item.quantity}</div>
-            <div>${item.cost}</div>
-            <div>${item.finalCost}</div>
-          </div>
-        `,
-             )
-             .join('')}
-        `
-                : `
-      <div class="spare-row">
-        <div>1</div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>`
-      }
-    </div>`;
+     const sparePartsTableComponent = `
+        <div class="spare-parts-header">
+          <div>N</div>
+          <div>الرمز<br />Code</div>
+          <div>قطع غيار Spare Parts</div>
+          <div>عدد<br />Qt.</div>
+          <div>السعر<br />Price</div>
+          <div>الإجمالي<br />Total</div>
+        </div>
+        <div class="spare-parts-body">
+          ${
+               mockData.sparePartsList.length > 0
+                    ? mockData.sparePartsList
+                           .map(
+                                (item, index) => `
+                    <div class="spare-row">
+                      <div>${index + 1}</div>
+                      <div>${item.code}</div>
+                      <div>${item.itemName}</div>
+                      <div>${item.quantity}</div>
+                      <div>${item.cost}</div>
+                      <div>${item.finalCost}</div>
+                    </div>
+                  `,
+                           )
+                           .join('')
+                    : `<div class="spare-row"><div>1</div><div></div><div></div><div></div><div></div><div></div></div>`
+          }
+        </div>`;
 
      return `
-     <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+      <!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>فاتورة ضريبية مبسطة</title>
   <style>
-    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
@@ -192,23 +200,15 @@ const createInvoice = async (
 
     body {
       font-family: 'Arial', 'Segoe UI', Tahoma, sans-serif;
-      font-size: 10pt;
-      line-height: 1.4;
-      margin: 0;
-      padding: 0;
-      background: #fff;
+      background-color: #f5f5f5;
+      padding: 20px;
     }
 
-    /* A4 Page Container */
-    .page {
-      width: 210mm;
-      min-height: 297mm;
+    .invoice-container {
+      max-width: 210mm;
       margin: 0 auto;
-      padding: 10mm;
       background: white;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      position: relative;
-      overflow: hidden;
     }
 
     /* Header Section */
@@ -216,126 +216,110 @@ const createInvoice = async (
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #000;
+      padding: 20px;
+      border-bottom: 1px solid gray;
     }
 
     .logo-section {
-      width: 60px;
-      flex-shrink: 0;
+      width: 100px;
     }
 
     .logo {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
     }
 
     .qr-section {
-      width: 60px;
-      flex-shrink: 0;
+      width: 30px;
       text-align: center;
     }
 
     .qr-code {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
     }
 
     .company-info {
+      text-align: right;
       flex: 1;
-      text-align: center;
-      padding: 0 10px;
+      padding: 0 20px;
     }
 
     .company-name {
-      font-size: 12pt;
+      font-size: 18px;
       font-weight: bold;
-      margin-bottom: 2px;
-      color: #000;
+      margin-bottom: 5px;
     }
 
     .company-subtitle {
-      font-size: 9pt;
-      margin-bottom: 4px;
-      color: #666;
+      font-size: 12px;
+      margin-bottom: 10px;
     }
 
     .company-details {
-      font-size: 8pt;
-      line-height: 1.3;
-      color: #444;
-    }
-
-    .company-details div {
-      margin: 1px 0;
+      font-size: 11px;
+      line-height: 1.6;
     }
 
     /* Invoice Info Section */
     .invoice-info {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      margin-bottom: 8px;
+      padding: 15px 20px;
+      background: #ffff;
       border-bottom: 1px solid #ddd;
     }
 
     .invoice-left {
       display: flex;
-      gap: 30px;
+      gap: 40px;
     }
 
     .invoice-field {
-      min-width: 80px;
+      font-size: 11px;
     }
 
     .invoice-label {
-      font-size: 7pt;
       color: #666;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .invoice-value {
-      font-size: 9pt;
-      font-weight: bold;
       color: #d32f2f;
+      font-weight: bold;
     }
 
     .invoice-type {
       text-align: center;
-      flex-shrink: 0;
     }
 
     .invoice-type-label {
-      font-size: 7pt;
+      font-size: 10px;
       color: #666;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .invoice-type-title {
-      font-size: 10pt;
+      font-size: 14px;
       font-weight: bold;
-      color: #000;
-      margin-bottom: 2px;
+      margin-bottom: 5px;
     }
 
     .payment-method {
-      font-size: 8pt;
+      font-size: 12px;
       color: #d32f2f;
       font-weight: bold;
     }
 
     .invoice-number-box {
-      border: 2px solid #000;
-      padding: 4px 12px;
-      min-width: 80px;
+      border: 1px solid gray;
+      padding: 5px 15px;
     }
 
     .invoice-number {
-      font-size: 10pt;
+      font-size: 16px;
       font-weight: bold;
       text-align: center;
     }
@@ -345,177 +329,160 @@ const createInvoice = async (
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      margin-bottom: 8px;
-      border-bottom: 2px solid #000;
-      flex-wrap: wrap;
-      gap: 10px;
+      padding: 15px 20px;
+      /* border-bottom: 1px solid gray; */
     }
 
     .vehicle-brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex: 1;
-      min-width: 150px;
+      gap: 15px;
     }
 
-    .brand-logo {
-      width: 30px;
-      height: 30px;
-      object-fit: contain;
-    }
-
-    .vehicle-details {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .vehicle-model {
-      font-size: 10pt;
+    .vehicle-model,
+    .vehicle-year {
+      font-size: 20px;
       font-weight: bold;
     }
 
-    .vehicle-year {
-      font-size: 9pt;
+    .tax-info,
+    .customer-label {
+      font-size: 11px;
       color: #666;
-    }
-
-    .tax-info {
-      font-size: 7pt;
-      color: #666;
-      text-align: center;
-      min-width: 120px;
     }
 
     .mobile-number {
-      font-size: 8pt;
+      font-size: 13px;
       direction: ltr;
-      text-align: center;
-      margin: 2px 0;
-    }
-
-    .customer-label {
-      font-size: 8pt;
-      color: #666;
-      text-align: center;
     }
 
     .stamps-box {
       border: 2px solid #000;
-      padding: 6px 10px;
-      min-width: 100px;
-      text-align: center;
+      padding: 8px 12px;
     }
 
     .stamp-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2px;
-      font-size: 8pt;
-    }
-
-    .stamp-row:last-child {
-      margin-bottom: 0;
+      gap: 20px;
+      margin-bottom: 3px;
+      font-size: 11px;
     }
 
     .stamp-label {
       font-weight: bold;
-      margin-left: 8px;
     }
 
     .stamp-value {
-      font-weight: bold;
       direction: ltr;
-    }
-
-    /* Tables Section */
-    .table-container {
-      margin-bottom: 8px;
-    }
-
-    .table-title {
-      font-size: 9pt;
       font-weight: bold;
+    }
+
+    /* Tables */
+    .table-header,
+    .spare-parts-header {
       background: #1976d2;
       color: white;
-      padding: 4px 8px;
-      text-align: center;
-      margin-bottom: 2px;
-    }
-
-    .table-header {
       display: grid;
-      grid-template-columns: 30px 60px 1fr 40px 60px 60px;
-      background: #1976d2;
-      color: white;
-      font-size: 7pt;
+      grid-template-columns: 40px 100px 1fr 60px 100px 100px;
       font-weight: bold;
+      font-size: 12px;
       text-align: center;
     }
 
-    .table-header div {
-      padding: 4px 2px;
-      border-left: 1px solid white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .table-header div,
+    .spare-parts-header div {
+      padding: 12px 5px;
+      border-left: 1px solid #fff;
     }
 
-    .table-header div:first-child {
+    .table-header div:first-child,
+    .spare-parts-header div:first-child {
       border-left: none;
     }
 
-    .table-body {
-      min-height: 100px;
-      max-height: 150px;
-      overflow: hidden;
+    .table-body,
+    .spare-parts-body {
+      min-height: 150px;
+      background: #f5f5f5;
     }
 
-    .table-row {
+    .table-row,
+    .spare-row {
       display: grid;
-      grid-template-columns: 30px 60px 1fr 40px 60px 60px;
+      grid-template-columns: 40px 100px 1fr 60px 100px 100px;
       border-bottom: 1px solid #ddd;
-      font-size: 7pt;
       text-align: center;
+      font-size: 11px;
     }
 
-    .table-row div {
-      padding: 3px 2px;
+    .table-row div,
+    .spare-row div {
+      padding: 10px 5px;
       border-left: 1px solid #ddd;
       display: flex;
       align-items: center;
       justify-content: center;
-      word-break: break-word;
     }
 
-    .table-row div:first-child {
+    .table-row div:first-child,
+    .spare-row div:first-child {
       border-left: none;
     }
 
-    .table-row:last-child {
-      border-bottom: none;
+    /* Bottom Section */
+    .bottom-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 2px solid rgb(233, 233, 233);
     }
 
-    .empty-row {
-      height: 20px;
-      background: #f5f5f5;
+    .terms-section {
+      padding: 20px;
+      border-left: 1px solid #ddd;
+      background: #fff;
     }
 
-    /* Summary Section */
+    .terms-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .terms-content {
+      text-align: justify;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #000;
+    }
+
+    .manager-section {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 12px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    }
+
     .summary-section {
-      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
     }
 
     .summary-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 10px;
-      margin-bottom: 2px;
-      font-size: 8pt;
+      padding: 15px 20px;
+      border-bottom: 1px solid #ddd;
+      font-size: 13px;
+      background: #f9f9f9;
     }
 
     .summary-row.red {
@@ -524,114 +491,122 @@ const createInvoice = async (
     }
 
     .summary-row.gray {
-      background: #f5f5f5;
+      background: #e8e8e8;
     }
 
     .summary-row.blue {
       background: #1976d2;
       color: white;
       font-weight: bold;
+      font-size: 14px;
+      border-bottom: none;
     }
 
     .summary-label {
-      flex: 1;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .summary-icon {
-      font-size: 9pt;
-      font-weight: bold;
-      min-width: 30px;
-    }
-
-    .summary-content {
-      flex: 1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Terms Section */
-    .terms-section {
-      margin-top: 8px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      background: #fff;
-    }
-
-    .terms-title {
-      font-size: 9pt;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-
-    .terms-content {
-      font-size: 7pt;
-      line-height: 1.4;
-      text-align: justify;
-      color: #000;
-      margin-bottom: 8px;
-    }
-
-    .manager-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      font-size: 7pt;
-      font-weight: bold;
-      padding-top: 6px;
-      border-top: 1px solid #ddd;
-    }
-
-    /* Footer Section */
-    .footer {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 2px solid #ddd;
-    }
-
-    .contact-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      flex-wrap: wrap;
       gap: 10px;
     }
 
-    .phone-section {
-      background: #c41e3a;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 8pt;
+    .summary-icon {
+      display: block;
+      align-items: center;
+      font-size: 24px;
       font-weight: bold;
-      direction: ltr;
+
     }
 
-    .address-section {
-      background: #c41e3a;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 8pt;
-      font-weight: bold;
-      flex: 1;
-      text-align: center;
-    }
-
-    .social-icons {
+    .summary-content {
       display: flex;
-      gap: 6px;
+      justify-content: space-between;
+      padding: 10px;
+      width: 310px;
+    }
+
+    /* Footer Banner */
+    .banner {
+      display: flex;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-section {
+      background: #1e5a96;
+      width: 35%;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      clip-path: polygon(0 0, 75% 0, 100% 100%, 0 100%);
+    }
+
+    .left-section h1,
+    .left-section p {
+      color: white;
+      margin: 0;
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .left-section p {
+      font-size: 15px;
+      font-weight: normal;
+    }
+
+    .sectiontwo {
+      width: 70%;
+      /* padding-top: 50px; */
+      margin-left: -5%;
+    }
+
+    .logos-section {
+      position: absolute;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      top: 15px;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .logo-img {
+      height: 28px;
+      width: auto;
+      opacity: 0.8;
+    }
+
+    .contact-section {
+      background: #c41e3a;
+      /* padding: 1.5px 0; */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      margin-top: 60px;
+      gap: 12px;
+      z-index: 3;
+    }
+
+    .phone-number {
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      padding: 5px 10px;
+      margin-left: 130px;
+    }
+
+    .contact-icons {
+      display: flex;
+      gap: 8px;
     }
 
     .icon-circle {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       background: white;
       border-radius: 50%;
       display: flex;
@@ -640,353 +615,335 @@ const createInvoice = async (
     }
 
     .icon-circle svg {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
     }
 
-    /* Car Brands Section */
-    .car-brands {
+    .address-section {
+      background: #c41e3a;
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      flex: 0 0 420px;
+    }
+
+    .pronable-section {
+      display: flex;
+
+    }
+
+    .childrenOne {
+      width: 70%;
+
+    }
+
+    .childrenTwo {
+      width: 30%;
+
+    }
+
+    .perent {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .top-plate {
+      width: 100%;
+      height: auto;
+      margin-top: 3px;
+      background: white;
+      border: 2px solid #999;
+      border-radius: 5px;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 8px 0;
-      padding: 6px;
-      background: #f5f5f5;
-      border-radius: 4px;
+      font-size: 25px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: #000;
     }
 
-    .brand-icon {
-      width: 24px;
-      height: 24px;
+    /* Bottom Plate Container */
+    .bottom-plate {
+      width: 100%;
+      height: auto;
+      background: white;
+      margin-top: 4px;
+      border: 2px solid #000;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 60px;
+      /* Two main columns and a narrow vertical strip */
+      overflow: hidden;
     }
 
-    /* Thank You Message */
-    .thank-you {
-      text-align: center;
-      padding: 8px;
-      background: #1e5a96;
-      color: white;
-      border-radius: 4px;
-      margin-top: 8px;
+    /* Grid Sections */
+    .section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #000;
+      font-size: 20px;
+      font-weight: normal;
     }
 
-    .thank-you h1 {
-      font-size: 9pt;
-      font-weight: bold;
-      margin-bottom: 2px;
+    .left-col {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
     }
 
-    .thank-you p {
-      font-size: 8pt;
+    .arabic {
+      font-size: 30px;
     }
 
-    /* Print Styles */
+    .right-strip {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-left: 3px solid #000;
+      width: 100%;
+    }
+
+
+
     @media print {
       body {
-        margin: 0;
-        padding: 0;
         background: white;
+        padding: 0;
       }
 
-      .page {
-        width: 210mm;
-        min-height: 297mm;
-        margin: 0;
-        padding: 10mm;
+      .invoice-container {
         box-shadow: none;
-        page-break-after: always;
-        page-break-inside: avoid;
-      }
-
-      @page {
-        size: A4;
-        margin: 0;
-      }
-
-      .no-print {
-        display: none;
-      }
-    }
-
-    /* Responsive Adjustments */
-    @media screen and (max-width: 210mm) {
-      body {
-        padding: 5mm;
-      }
-
-      .page {
-        width: 100%;
-        min-height: auto;
-        padding: 5mm;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo-section">
-        <img src="${providerWorkShopImage}" class="logo" alt="Workshop Logo">
-      </div>
+  <div id="invoice-root"></div>
 
-      <div class="company-info">
-        <div class="company-name"><%= data?.providerWorkShopId?.workshopNameArabic || '' %></div>
-        <div class="company-subtitle"><%= data?.providerWorkShopId?.workshopNameEnglish || '' %></div>
-        <div class="company-details">
-          <div>الرقم الضريبي: CR No. : <%= data?.providerWorkShopId?.crn || '' %></div>
-          <div>الرقم الضريبي: VAT No. : <%= data?.providerWorkShopId?.taxVatNumber || '' %></div>
-          <div>الحساب البنكي: IBan No. : <%= data?.providerWorkShopId?.bankAccountNumber || '' %></div>
-        </div>
-      </div>
-
-      <div class="qr-section">
-        <img src="${invoiceQrLink}" class="qr-code" alt="Invoice QR Code">
-      </div>
-    </div>
-
-    <!-- Invoice Info -->
-    <div class="invoice-info">
-      <div class="invoice-left">
-        <div class="invoice-field">
-          <div class="invoice-label">invoice no. <b>رقم الفاتورة</b></div>
-          <div class="invoice-value"><%= data._id %></div>
-        </div>
-        <div class="invoice-field">
-          <div class="invoice-label">invoice date <b>تاريخ الفاتورة</b></div>
-          <div class="invoice-value"><%= invoiceCreatedAtt %></div>
-        </div>
-      </div>
-
-      <div class="invoice-type">
-        <div class="invoice-type-label">(Simplified tax invoice)</div>
-        <div class="invoice-type-title">فاتورة ضريبية مبسطة</div>
-        <div class="payment-method"><%= data?.paymentMethod || '' %></div>
-      </div>
-
-      <% if (data?.car?.carType === CLIENT_CAR_TYPE.INTERNATIONAL) { %>
-        <div class="invoice-number-box">
-          <div class="invoice-number"><%= data.car.plateNumberForInternational %></div>
-        </div>
-      <% } else { %>
-        <div></div>
-      <% } %>
-    </div>
-
-    <!-- Vehicle Info -->
-    <div class="vehicle-info">
-      <div class="vehicle-brand">
-        <img src="${carBrandImage}" class="brand-logo" alt="Car Brand">
-        <div class="vehicle-details">
-          <div class="vehicle-model"><%= data?.car?.brand?.title %></div>
-          <div class="vehicle-year"><%= data?.car?.model?.title %> - <%= data?.car?.year %></div>
-        </div>
-      </div>
-
-      <% if (data?.car?.carType === CLIENT_CAR_TYPE.SAUDI) { %>
-        <div class="stamps-box">
-          <div class="stamp-row">
-            <span class="stamp-value"><%= data.car.plateNumberForSaudi.numberArabic %></span>
-            <span class="stamp-label"><%= data.car.plateNumberForSaudi.alphabetsCombinations[0] %></span>
-          </div>
-          <div class="stamp-row">
-            <span class="stamp-value"><%= data.car.plateNumberForSaudi.numberEnglish %></span>
-            <span class="stamp-label"><%= data.car.plateNumberForSaudi.alphabetsCombinations[1] %></span>
-          </div>
-          <% if (carSymbol) { %>
-            <img src="<%= carSymbol %>" style="width: 20px; height: 20px; margin-top: 4px;" alt="Car Symbol">
-          <% } %>
-        </div>
-      <% } %>
-
-      <div class="tax-info">
-        <div>الرقم الضريبي: VAT -<%= data?.providerWorkShopId?.taxVatNumber %></div>
-        <div class="mobile-number"><%= data?.providerWorkShopId?.contact %></div>
-        <div class="customer-label">العميل: <%= data?.client?.clientId?.name %></div>
-      </div>
-    </div>
-
-    <!-- Works Table -->
-    <div class="table-container">
-      <div class="table-title">الأعمال / Works</div>
-      <div class="table-header">
-        <div>N</div>
-        <div>الرمز<br />Code</div>
-        <div>الأعمــــال Works</div>
-        <div>عدد<br />Qt.</div>
-        <div>السعر<br />Price</div>
-        <div>الإجمالي<br />Total</div>
-      </div>
-      <div class="table-body">
-        <% if (data.worksList && data.worksList.length > 0) { %>
-          <% data.worksList.forEach((item, index) => { %>
-            <div class="table-row">
-              <div><%= index + 1 %></div>
-              <div><%= item.work?.code || '' %></div>
-              <div><%= item.work?.title?.[lang] || '' %></div>
-              <div><%= item.quantity %></div>
-              <div><%= item.cost %></div>
-              <div><%= item.finalCost %></div>
+  
+        <div class="invoice-container">
+          
+          <div class="header">
+            <div class="logo-section">
+              <img src="${providerWorkShopImage}" class="logo" alt="Workshop Logo">
             </div>
-          <% }); %>
-        <% } else { %>
-          <div class="table-row">
-            <div>1</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-          </div>
-        <% } %>
-      </div>
-    </div>
-
-    <!-- Spare Parts Table -->
-    <div class="table-container">
-      <div class="table-title">قطع الغيار / Spare Parts</div>
-      <div class="table-header">
-        <div>N</div>
-        <div>الرمز<br />Code</div>
-        <div>قطع غيار Spare Parts</div>
-        <div>عدد<br />Qt.</div>
-        <div>السعر<br />Price</div>
-        <div>الإجمالي<br />Total</div>
-      </div>
-      <div class="table-body">
-        <% if (data.sparePartsList && data.sparePartsList.length > 0) { %>
-          <% data.sparePartsList.forEach((item, index) => { %>
-            <div class="table-row">
-              <div><%= index + 1 %></div>
-              <div><%= item.code %></div>
-              <div><%= item.itemName %></div>
-              <div><%= item.quantity %></div>
-              <div><%= item.cost %></div>
-              <div><%= item.finalCost %></div>
+            <div class="qr-section">
+              <img src="${invoiceQrLink}" class="qr-code" alt="QR Code">
             </div>
-          <% }); %>
-        <% } else { %>
-          <div class="table-row">
-            <div>1</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-          </div>
-        <% } %>
-      </div>
-    </div>
-
-    <!-- Terms and Summary Section -->
-    <div style="display: flex; gap: 10px; margin-top: 8px;">
-      <!-- Terms Section -->
-      <div class="terms-section" style="flex: 1;">
-        <div class="terms-title">(Warranty and maintenance terms)<br />شروط الضمان والصيانة</div>
-        <div class="terms-content">
-          1. المركز يضمن أعمال شغل اليد فقط إذا كانت القطع المستبدلة أصلية ومدة الضمان لا تتجاوز شهر من تاريخ الفاتورة<br />
-          2. المركز غير مسئول عن قطع الغيار القديمة بعد استبدالها وعدم قيام العميل بطلبها وأخذها بعد الصيانة مباشرة<br />
-          3. المركز غير مسئول عن تركيب قطع الغيار المستعملة وفي حالة وجود خلل بها يتطلب الفك والتركيب أكثر من مرة<br />
-          4. المركز غير مسئول عن رسوب السيارة بالفحص الدوري
-        </div>
-        <div class="manager-section">
-          (Workshop Manager)
-          <div class="manager-name">اسامة الطاهر</div>
-        </div>
-      </div>
-
-      <!-- Summary Section -->
-      <div class="summary-section" style="flex: 1;">
-        <div class="summary-row red">
-          <div class="summary-label">
-            <span class="summary-icon">﷼</span>
-            <div class="summary-content">
-              <span>إجمالي مبلغ قطع الغيار</span>
-              <span><%= data?.totalCostOfSparePartsExcludingTax || 0 %></span>
+            <div class="company-info">
+              <div class="company-name">${mockData.providerWorkShopId.workshopNameArabic}</div>
+              <div class="company-subtitle">${mockData.providerWorkShopId.workshopNameEnglish}</div>
+              <div class="company-details">
+                <div>الرقم الضريبي: CR No. : ${mockData.providerWorkShopId.crn}</div>
+                <div>الرقم الضريبي: VAT No. : ${mockData.providerWorkShopId.taxVatNumber}</div>
+                <div>الحساب البنكي: IBan No. : ${mockData.providerWorkShopId.bankAccountNumber}</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="summary-row gray">
-          <div class="summary-label">
-            <span class="summary-icon">﷼</span>
-            <div class="summary-content">
-              <span>المبلغ الخاضع للضريبة</span>
-              <span><%= data?.totalCostExcludingTax || 0 %></span>
+
+          
+          <div class="pronable-section">
+            <div class="childrenOne">
+              <div class="invoice-info">
+            <div class="invoice-left">
+              <div class="invoice-field">
+                <div class="invoice-label">invoice no. <b>رقم الفاتورة</b></div>
+                <div class="invoice-value">${mockData._id}</div>
+              </div>
+              <div class="invoice-field">
+                <div class="invoice-label">invoice date <b>تاريخ الفاتورة</b></div>
+                <div class="invoice-value">${invoiceCreatedAtt}</div>
+              </div>
+            </div>
+            <div class="invoice-type">
+              <div class="invoice-type-label">(Simplified tax invoice)</div>
+              <div class="invoice-type-title">فاتورة ضريبية مبسطة</div>
+              <div class="payment-method">${mockData.paymentMethod}</div>
+            </div>
+            ${interNationalCarNumberComponent}
+          </div>
+
+          
+          <div class="vehicle-info">
+            <div class="vehicle-brand">
+              <div class="logo-section">
+                <img src="${carBrandImage}" class="logo" alt="Car Brand Logo">
+              </div>
+              <div class="vehicle-model">${mockData.car.brand.title}</div>
+            </div>
+            <div class="vehicle-model">${mockData.car.model.title}</div>
+            <div class="vehicle-year">${mockData.car.year}</div>
+            <div style="text-align: center;">
+              <div class="tax-info">الرقم الضريبي: VAT -${mockData.providerWorkShopId.taxVatNumber}</div>
+              <div class="mobile-number">الجوال: ${mockData.providerWorkShopId.contact}</div>
+              <div class="customer-label">العميل: ${mockData.client.clientId.name}</div>
+            </div>
+          </div>
+            </div>
+            <div class="childrenTwo">
+              
+
+            <div class="perent">
+                ${result}
+              </div>
+              </div>
+            </div>
+
+          
+          ${worksTableComponent}
+
+          
+          ${sparePartsTableComponent}
+
+          
+          <div class="bottom-section">
+            <div class="terms-section">
+              <div class="terms-title">(Warranty and maintenance terms)<br />شروط الضمان والصيانة</div>
+              <div class="terms-content">
+                المركز يضمن أعمال شغل اليد فقط إذا كانت القطع المستبدلة أصلية ومدة الضمان لا تتجاوز شهر من تاريخ
+                الفاتورة<br />
+                المركز غير مسئول عن قطع الغيار القديمة بعد استبدالها وعدم قيام العميل بطلبها وأخذها بعد الصيانة مباشرة ويعد
+                تصريح مباشر بالاستغناء عنها ولا يسأل عنها الورشة مطلقا<br />
+                المركز غير مسئول عن تركيب قطع الغيار المستعملة وفي حالة وجود خلل بها يتطلب الفك والتركيب أكثر من مرة يتحمل
+                العميل قيمة شغل اليد عن الفك والتركيب في كل مرة<br />
+                المركز غير مسئول عن رسوب السيارة بالفحص الدوري
+              </div>
+              <div class="manager-section">
+                (Workshop Manager)
+                <div class="manager-name">اسامة الطاهر</div>
+              </div>
+            </div>
+            <div class="summary-section">
+              <div class="summary-row red">
+                <div class="summary-label">
+                  <span class="summary-icon">${mockData.totalCostOfSparePartsExcludingTax}﷼ </span>
+                  <div class="summary-content">
+                    <span>إجمالي مبلغ قطع الغيار (Total of spare parts)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="summary-row gray">
+                <div class="summary-label">
+                  <span class="summary-icon">${mockData.totalCostExcludingTax}﷼ </span>
+                  <div class="summary-content">
+                    <span> (Taxable amount)</span><span>المبلغ الخاضع للضريبة</span>
+                  </div>
+                </div>
+              </div>
+              <div class="summary-row gray">
+                <div class="summary-label">
+                  <span class="summary-icon">${mockData.finalDiscountInFlatAmount || 0}﷼ </span>
+                  <div class="summary-content">
+                    <span>(Discount)</span><span>الخصم قبل الضريبة</span>
+                  </div>
+                </div>
+              </div>
+              <div class="summary-row gray">
+                <div class="summary-label">
+                  <span class="summary-icon">${mockData.taxAmount || 0}﷼ </span>
+                  <div class="summary-content">
+                    <span> (VAT amount)</span> <span>(VAT 15%)الضريبة</span>
+                  </div>
+                </div>
+              </div>
+              <div class="summary-row blue">
+                <div class="summary-label">
+                  <span class="summary-icon">﷼ </span>
+                  <div class="summary-content">
+                    <span>(Total including tax)</span> <span>الإجمالي شامل الضريبة</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="banner">
+            <div class="left-section">
+              <h1>Thank you for your visit and</h1>
+              <p>we are always at your service</p>
+            </div>
+            <div class="sectiontwo">
+              <div class="logos-section">
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="30" rx="42" ry="26" fill="none" stroke="#002c5f" stroke-width="3" />
+                  <path d="M 20 30 Q 20 20, 35 20 L 35 40 Q 20 40, 20 30 M 80 30 Q 80 20, 65 20 L 65 40 Q 80 40, 80 30" fill="#002c5f" />
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="30" rx="45" ry="26" fill="#0c2d6b" />
+                  <text x="50" y="37" text-anchor="middle" font-family="Arial" font-size="20" font-style="italic" font-weight="bold" fill="white">Ford</text>
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="18" y="12" width="64" height="36" rx="4" fill="none" stroke="#e40521" stroke-width="4" />
+                  <text x="50" y="40" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold" fill="#e40521">H</text>
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="30" rx="45" ry="25" fill="#bb162b" />
+                  <text x="50" y="38" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="white">KIA</text>
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="30" r="26" fill="none" stroke="#000" stroke-width="3" />
+                  <path d="M 33 30 Q 50 15, 67 30 Q 50 40, 33 30" fill="#000" />
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="50" cy="30" rx="26" ry="26" fill="none" stroke="#eb0a1e" stroke-width="3" />
+                  <ellipse cx="50" cy="30" rx="17" ry="24" fill="none" stroke="#eb0a1e" stroke-width="3" />
+                  <ellipse cx="50" cy="30" rx="36" ry="15" fill="none" stroke="#eb0a1e" stroke-width="3" />
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <text x="50" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#c8102e">GMC</text>
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="30" r="26" fill="none" stroke="#000" stroke-width="3" />
+                  <rect x="25" y="26" width="50" height="8" fill="#000" />
+                  <text x="50" y="34" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="#fff">NISSAN</text>
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 30 18 L 50 30 L 70 18 L 70 42 L 50 30 L 30 42 Z" fill="#d4af37" stroke="#000" stroke-width="1" />
+                </svg>
+                
+                <svg class="logo-img" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="30" r="26" fill="none" stroke="#00adef" stroke-width="3" />
+                  <path d="M 50 8 L 50 30 M 50 30 L 68 43 M 50 30 L 32 43" stroke="#00adef" stroke-width="3" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="contact-section">
+                <div class="phone-number">${mockData.providerWorkShopId.contact}</div>
+                <div class="contact-icons">
+                  <div class="icon-circle">
+                    <svg viewBox="0 0 24 24" fill="#25D366">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                  </div>
+                  <div class="icon-circle">
+                    <svg viewBox="0 0 24 24" fill="#c41e3a">
+                      <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="address-section">
+                  ${mockData.providerWorkShopId.address}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="summary-row gray">
-          <div class="summary-label">
-            <span class="summary-icon">﷼</span>
-            <div class="summary-content">
-              <span>الخصم قبل الضريبة</span>
-              <span><%= data?.finalDiscountInFlatAmount || 0 %></span>
-            </div>
-          </div>
-        </div>
-        <div class="summary-row gray">
-          <div class="summary-label">
-            <span class="summary-icon">﷼</span>
-            <div class="summary-content">
-              <span>الضريبة (VAT 15%)</span>
-              <span><%= data?.taxAmount || 0 %></span>
-            </div>
-          </div>
-        </div>
-        <div class="summary-row blue">
-          <div class="summary-label">
-            <span class="summary-icon">﷼</span>
-            <div class="summary-content">
-              <span>الإجمالي شامل الضريبة</span>
-              <span><%= (data?.totalCostExcludingTax || 0) + (data?.taxAmount || 0) %></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <!-- Thank You Message -->
-      <div class="thank-you">
-        <h1>Thank you for your visit</h1>
-        <p>we are always at your service</p>
-      </div>
-
-      <!-- Car Brands -->
-      <div class="car-brands">
-        <!-- Add car brand icons/svgs here -->
-        <span style="font-size: 7pt; font-weight: bold;">نخدم جميع ماركات السيارات</span>
-      </div>
-
-      <!-- Contact Info -->
-      <div class="contact-info">
-        <div class="phone-section">
-          <%= data.providerWorkShopId.contact %>
-        </div>
-
-        <div class="social-icons">
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24" fill="#25D366">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-          </div>
-          <div class="icon-circle">
-            <svg viewBox="0 0 24 24" fill="#c41e3a">
-              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
-            </svg>
-          </div>
-        </div>
-
-        <div class="address-section">
-          <%= data.providerWorkShopId.address %>
-        </div>
-      </div>
-    </div>
-  </div>
 </body>
 
 </html>
