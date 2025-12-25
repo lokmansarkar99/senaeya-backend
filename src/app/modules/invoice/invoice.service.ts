@@ -14,7 +14,6 @@ import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils'
 import { WorkShop } from '../workShop/workShop.model';
 import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
 import { Invoice } from './invoice.model';
-import { createInvoiceNew } from '../../../shared/invoice-template';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
