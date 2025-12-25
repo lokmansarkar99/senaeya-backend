@@ -34,6 +34,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                payload.postPaymentDate = new Date(payload.postPaymentDate);
                // check its not in the past
                if (payload.postPaymentDate < new Date()) {
+                    console.log("🚀 ~ createInvoice ~ 'Post Payment Date cannot be in the past':", 'Post Payment Date cannot be in the past');
                     throw new AppError(StatusCodes.BAD_REQUEST, 'Post Payment Date cannot be in the past');
                }
           }
@@ -78,6 +79,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
           const [resultInvoice] = await Invoice.create([payload], { session });
 
           if (!resultInvoice) {
+               console.log("🚀 ~ createInvoice ~ 'Failed to create invoice.':", 'Failed to create invoice.');
                throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create invoice.');
           }
 
@@ -94,6 +96,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
                const [payment] = await Payment.create([paymentPayload], { session });
                if (!payment) {
+                    console.log("🚀 ~ createInvoice ~ 'Failed to create payment.':", 'Failed to create payment.');
                     throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to create payment.');
                }
 
@@ -167,6 +170,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                });
 
           if (!populatedResult) {
+               console.log("🚀 ~ createInvoice ~ 'Populated invoice data not found.':", 'Populated invoice data not found.');
                throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
           }
 

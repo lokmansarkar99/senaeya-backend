@@ -57,7 +57,6 @@ const createInvoice = async (
      },
      lang: TranslatedFieldEnum,
 ) => {
-     console.log('*****************************');
      const date = new Date(mockData.createdAt);
 
      // 💡 Base URL (mock — adjust as needed)
