@@ -1,19 +1,19 @@
-import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import mongoose from 'mongoose';
 import AppError from '../../../errors/AppError';
-import { S3Helper } from '../../../helpers/aws/s3helper';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { generateFatooraQR } from '../../../helpers/qrcode/generateFatooraQr';
 import { addToBullQueueToCheckInvoicePaymentStatus, sparePartsQueue } from '../../../helpers/redis/queues';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { Payment } from '../payment/payment.model';
-import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils';
+import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
 import { WorkShop } from '../workShop/workShop.model';
-import { IInvoice, TranslatedFieldEnum } from './invoice.interface';
+import { IInvoice } from './invoice.interface';
 import { Invoice } from './invoice.model';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
+import config from '../../../config';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
@@ -186,14 +186,14 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                populatedResult.invoiceQRLink = qrPath;
           }
 
-          // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
-          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
-          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
-          const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
+          // // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
+          // const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
+          // const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+          // const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+          // const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
 
-          // Update invoice with AWS link (after commit, no session)
-          populatedResult.invoiceAwsLink = invoiceAwsLink;
+          // // Update invoice with AWS link (after commit, no session)
+          // populatedResult.invoiceAwsLink = invoiceAwsLink;
           await populatedResult.save();
 
           // Post-commit operations: notifications and WhatsApp release (non-transactional)
@@ -204,7 +204,9 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                     message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
                     type: 'ALERT',
                });
-               await releaseInvoiceToWhatsApp(populatedResult);
+               // await releaseInvoiceToWhatsApp(populatedResult);
+               const message = whatsAppTemplate.getInvoiceDetails({ url: `${config?.frontend_invoice_url}/${populatedResult._id}` });
+               await whatsAppHelper.sendWhatsAppTextMessage({ to: (populatedResult.client as any)?.contact, body: message });
           }
 
           return populatedResult;
@@ -302,11 +304,19 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                },
           })
           .populate({
-               path: 'worksList sparePartsList',
+               path: 'worksList',
                select: 'work quantity finalCost',
                populate: {
                     path: 'work',
-                    select: 'title cost',
+                    select: 'title cost code',
+               },
+          })
+          .populate({
+               path: 'providerWorkShopId',
+               select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
+               populate: {
+                    path: 'ownerId',
+                    select: 'name',
                },
           })
           .populate({
@@ -319,11 +329,21 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           })
           .populate({
                path: 'car',
-               select: 'model brand year plateNumberForInternational plateNumberForSaudi',
-               populate: {
-                    path: 'brand plateNumberForSaudi.symbol model',
-                    // select: 'title image',
-               },
+               select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
+               // populate: {
+               //      path: 'brand plateNumberForSaudi.symbol model',
+               //      // select: 'title image',
+               // },
+               populate: [
+                    {
+                         path: 'brand model',
+                         select: 'title image',
+                    },
+                    {
+                         path: 'plateNumberForSaudi.symbol',
+                         select: 'image',
+                    },
+               ],
           });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*-.**');

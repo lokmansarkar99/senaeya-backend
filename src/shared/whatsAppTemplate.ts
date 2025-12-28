@@ -4168,9 +4168,22 @@ const subscriptionDeleted = () => {
     `;
 };
 
+const getInvoiceDetails = ({ url }: { url: string }) => {
+     return `Please find the details of your invoice with the link: ${url}.
+يرجى العثور على تفاصيل فاتورتكم برقم التعريف: ${url}.
+`;
+};
+
+const getReportDetails = ({ url }: { url: string }) => {
+     return `Please find the details of your report with the link: ${url}.
+يرجى العثور على تفاصيل تقريركم برقم التعريف: ${url}.
+`;
+};
+
 export const whatsAppTemplate = {
      createAccount,
      forgetPassword,
+     getInvoiceDetails,
      createInvoice,
      createReport,
      getRecieveCar,
@@ -4183,4 +4196,5 @@ export const whatsAppTemplate = {
      // resetPasswordByUrl,
      // contactFormTemplate,
      // contact,
+     getReportDetails,
 };

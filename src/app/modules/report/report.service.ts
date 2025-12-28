@@ -138,21 +138,18 @@
 /* **************new ***************** */
 
 import { Types } from 'mongoose';
-import { Invoice } from '../invoice/invoice.model';
-import { Expense } from '../expense/expense.model';
-import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import { generatePDF, releaseInvoiceToWhatsApp } from '../payment/payment.utils';
-import { S3Helper } from '../../../helpers/aws/s3helper';
-import fs from 'fs';
-import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import config from '../../../config';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
-import { translateTextToTargetLang } from '../../../utils/translateTextToTargetLang';
-import { WorkShop } from '../workShop/workShop.model';
-import { IworkShop } from '../workShop/workShop.interface';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import { Car } from '../car/car.model';
+import { Expense } from '../expense/expense.model';
+import { Invoice } from '../invoice/invoice.model';
+import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
+import { IworkShop } from '../workShop/workShop.interface';
+import { WorkShop } from '../workShop/workShop.model';
 
-const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any) => {
+const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, frontendUrl: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
      income == 'false' ? (income = false) : (income = true);
      outlay == 'false' ? (outlay = false) : (outlay = true);
@@ -273,22 +270,28 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      };
 
      if (isReleased) {
-          const createReportTemplate = whatsAppTemplate.createReport(report, lang);
-          const reportInpdfPath = await generatePDF(createReportTemplate);
-          const fileBuffer = fs.readFileSync(reportInpdfPath);
-          const fileName = `Report file pdf_${startDate}_to_${endDate}`;
-          const reportAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', fileName, 'application/pdf');
-          await whatsAppHelper.sendWhatsAppPDFMessage({
-               to: user.contact,
-               priority: 10,
-               referenceId: '',
-               msgId: '',
-               mentions: '',
-               filename: `${fileName}_report.pdf`,
-               document: reportAwsLink,
-               caption: `Report file pdf from ${startDate} to ${endDate}
-               ملف التقرير pdf من ${startDate} إلى ${endDate}`,
-          });
+          // const createReportTemplate = whatsAppTemplate.createReport(report, lang);
+          // const reportInpdfPath = await generatePDF(createReportTemplate);
+          // const fileBuffer = fs.readFileSync(reportInpdfPath);
+          // const fileName = `Report file pdf_${startDate}_to_${endDate}`;
+          // const reportAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', fileName, 'application/pdf');
+          // await whatsAppHelper.sendWhatsAppPDFMessage({
+          //      to: user.contact,
+          //      priority: 10,
+          //      referenceId: '',
+          //      msgId: '',
+          //      mentions: '',
+          //      filename: `${fileName}_report.pdf`,
+          //      document: reportAwsLink,
+          //      caption: `Report file pdf from ${startDate} to ${endDate}
+          //      ملف التقرير pdf من ${startDate} إلى ${endDate}`,
+          // });
+
+          // await releaseInvoiceToWhatsApp(populatedResult);
+          const message = whatsAppTemplate.getReportDetails({ url: frontendUrl });
+
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop?.contact, body: message });
+
           await sendNotifications({
                title: `${user.name}`,
                receiver: user.id,

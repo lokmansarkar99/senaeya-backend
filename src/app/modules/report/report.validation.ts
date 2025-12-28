@@ -3,6 +3,7 @@ import { z } from 'zod';
 const getAllReportsByCreatedDateRangeZodSchema = z.object({
      body: z.object({
           providerWorkShopId: z.string().optional(),
+          frontendUrl: z.string(),
      }),
      query: z
           .object({

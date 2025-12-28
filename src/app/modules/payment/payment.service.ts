@@ -12,6 +12,8 @@ import { PaymentMethod, PaymentStatus } from './payment.enum';
 import { Ipayment } from './payment.interface';
 import { Payment } from './payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
+import config from '../../../config';
+import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 
 const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedFieldEnum; postPaymentDate: Date | string; isCashRecieved: boolean; cardApprovalCode: string }>) => {
      const isExistPayment = await Payment.findOne({ invoice: payload.invoice, providerWorkShopId: payload.providerWorkShopId, paymentStatus: PaymentStatus.PAID });
@@ -72,7 +74,7 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
                     },
                })
                .populate({
-                    path: 'worksList sparePartsList',
+                    path: 'worksList',
                     select: 'work quantity finalCost',
                     populate: {
                          path: 'work',
@@ -98,22 +100,32 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
                .populate({
                     path: 'car',
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi carType',
-                    populate: {
-                         path: 'brand plateNumberForSaudi.symbol model',
-                         // select: 'title image',
-                    },
+                    // populate: {
+                    //      path: 'brand plateNumberForSaudi.symbol model',
+                    //      // select: 'title image',
+                    // },
+                    populate: [
+                         {
+                              path: 'brand model',
+                              select: 'title image',
+                         },
+                         {
+                              path: 'plateNumberForSaudi.symbol',
+                              select: 'image',
+                         },
+                    ],
                });
 
           if (!populatedResult) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Populated invoice data not found.');
           }
 
-          const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, payload.lang || TranslatedFieldEnum.en);
-          const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
-          const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-          const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
+          // const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, payload.lang || TranslatedFieldEnum.en);
+          // const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
+          // const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+          // const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
 
-          populatedResult.invoiceAwsLink = invoiceAwsLink;
+          // populatedResult.invoiceAwsLink = invoiceAwsLink;
           await populatedResult.save();
 
           // // send invoiceSheet to client
@@ -123,7 +135,10 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
                message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
                type: 'ALERT',
           });
-          await releaseInvoiceToWhatsApp(populatedResult);
+          // await releaseInvoiceToWhatsApp(populatedResult);
+
+          const message = whatsAppTemplate.getInvoiceDetails({ url: `${config?.frontend_invoice_url}/${populatedResult._id}` });
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: (populatedResult.client as any)?.contact, body: message });
 
           return payment;
      } catch (error) {

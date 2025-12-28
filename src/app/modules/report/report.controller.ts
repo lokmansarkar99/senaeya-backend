@@ -4,8 +4,8 @@ import sendResponse from '../../../shared/sendResponse';
 import { reportService } from './report.service';
 
 const getAllReportsByCreatedDateRange = catchAsync(async (req: Request, res: Response) => {
-     const { providerWorkShopId } = req.body;
-     const result = await reportService.getAllReportsByCreatedDateRange(req.query, providerWorkShopId, req.user);
+     const { providerWorkShopId, frontendUrl } = req.body;
+     const result = await reportService.getAllReportsByCreatedDateRange(req.query, providerWorkShopId, req.user, frontendUrl);
 
      sendResponse(res, {
           statusCode: 200,
