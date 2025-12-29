@@ -3,18 +3,16 @@ import { z } from 'zod';
 const getAllReportsByCreatedDateRangeZodSchema = z.object({
      body: z.object({
           providerWorkShopId: z.string().optional(),
-          frontendUrl: z.string(),
      }),
-     query: z
-          .object({
-               startDate: z.string(),
-               endDate: z.string(),
-               income: z.union([z.string(), z.boolean()]).optional(),
-               outlay: z.union([z.string(), z.boolean()]).optional(),
-               noOfCars: z.union([z.string(), z.boolean()]).optional(),
-               lang: z.enum(['ar', 'en']).optional(),
-               isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
-          }),
+     query: z.object({
+          startDate: z.string(),
+          endDate: z.string(),
+          income: z.union([z.string(), z.boolean()]).optional(),
+          outlay: z.union([z.string(), z.boolean()]).optional(),
+          noOfCars: z.union([z.string(), z.boolean()]).optional(),
+          lang: z.enum(['ar', 'en']).optional(),
+          isReleased: z.enum(['true', 'false'], { required_error: 'Is Released is required' }),
+     }),
 });
 
 export const reportValidation = {

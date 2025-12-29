@@ -149,7 +149,7 @@ import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { IworkShop } from '../workShop/workShop.interface';
 import { WorkShop } from '../workShop/workShop.model';
 
-const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, frontendUrl: string) => {
+const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
      income == 'false' ? (income = false) : (income = true);
      outlay == 'false' ? (outlay = false) : (outlay = true);
@@ -288,7 +288,9 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           // });
 
           // await releaseInvoiceToWhatsApp(populatedResult);
-          const message = whatsAppTemplate.getReportDetails({ url: frontendUrl });
+          const message = whatsAppTemplate.getReportDetails({
+               url: `${config.frontend_url}/reports?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income}&outlay=${query.outlay}&noOfCars=${query.noOfCars}&lang=${query.lang}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
+          });
 
           await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop?.contact, body: message });
 
