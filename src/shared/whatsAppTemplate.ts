@@ -4180,6 +4180,7 @@ const getReportDetails = ({ url }: { url: string }) => {
     ====================== Arabic ============================
     يرجى العثور على تفاصيل تقريركم برقم التعريف: <a href="${url}">${url}</a>
     `;
+};
 // const getReportDetails = ({ url }: { url: string }) => url;
 
 export const whatsAppTemplate = {
