@@ -289,7 +289,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
 
           // await releaseInvoiceToWhatsApp(populatedResult);
           const message = whatsAppTemplate.getReportDetails({
-               url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income}&outlay=${query.outlay}&noOfCars=${query.noOfCars}&lang=${query.lang}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
+               url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
           });
 
           await whatsAppHelper.sendWhatsAppTextMessage({ to: (workshop?.ownerId as any)?.contact, body: message });
