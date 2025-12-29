@@ -4175,12 +4175,12 @@ const getInvoiceDetails = ({ url }: { url: string }) => {
 `;
 };
 
-const getReportDetails = ({ url }: { url: string }) => {
-     return `Please find the details of your report with the link: <a href="${url}">${url}</a>
-    ====================== Arabic ============================
-    يرجى العثور على تفاصيل تقريركم برقم التعريف: <a href="${url}">${url}</a>
-    `;
-};
+// const getReportDetails = ({ url }: { url: string }) => {
+//      return `Please find the details of your report with the link: <a href="${url}">${url}</a>
+//     ====================== Arabic ============================
+//     يرجى العثور على تفاصيل تقريركم برقم التعريف: <a href="${url}">${url}</a>
+//     `;
+const getReportDetails = ({ url }: { url: string }) => url;
 
 export const whatsAppTemplate = {
      createAccount,
