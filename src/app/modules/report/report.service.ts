@@ -222,7 +222,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           Invoice.aggregate([{ $match: { ...invoiceMatchBase, car: { $ne: null } } }, { $group: { _id: '$car' } }, { $count: 'count' }]),
 
           // workshop name
-          WorkShop.findById(providerWorkShopId),
+          WorkShop.findById(providerWorkShopId).populate('ownerId', 'contact'),
      ]);
 
      const numberOfPaidInvoices = paidInvoicesAgg[0]?.count || 0;
@@ -292,7 +292,8 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                url: `${config.frontend_url}/reports?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income}&outlay=${query.outlay}&noOfCars=${query.noOfCars}&lang=${query.lang}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
           });
 
-          await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop?.contact, body: message });
+          console.log('🚀 ~ getAllReportsByCreatedDateRange ~ to: (workshop?.ownerId as any)?.contac:', { to: (workshop?.ownerId as any)?.contac });
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: (workshop?.ownerId as any)?.contact, body: message });
 
           await sendNotifications({
                title: `${user.name}`,
