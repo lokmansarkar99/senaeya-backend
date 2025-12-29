@@ -292,7 +292,6 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                url: `${config.frontend_url}/reports?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income}&outlay=${query.outlay}&noOfCars=${query.noOfCars}&lang=${query.lang}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
           });
 
-          console.log('🚀 ~ getAllReportsByCreatedDateRange ~ to: (workshop?.ownerId as any)?.contac:', { to: (workshop?.ownerId as any)?.contac });
           await whatsAppHelper.sendWhatsAppTextMessage({ to: (workshop?.ownerId as any)?.contact, body: message });
 
           await sendNotifications({

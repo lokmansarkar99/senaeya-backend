@@ -4169,15 +4169,17 @@ const subscriptionDeleted = () => {
 };
 
 const getInvoiceDetails = ({ url }: { url: string }) => {
-     return `Please find the details of your invoice with the link: ${url}.
-يرجى العثور على تفاصيل فاتورتكم برقم التعريف: ${url}.
+     return `Please find the details of your invoice with the <a href="${url}">link</a>.
+    ====================== Arabic ============================
+يرجى العثور على تفاصيل فاتورتكم برقم التعريف: <a href="${url}">الرابط</a>.
 `;
 };
 
 const getReportDetails = ({ url }: { url: string }) => {
-     return `Please find the details of your report with the link: ${url}.
-يرجى العثور على تفاصيل تقريركم برقم التعريف: ${url}.
-`;
+     return `Please find the details of your report with the link: <a href="${url}">${url}</a>
+    ====================== Arabic ============================
+    يرجى العثور على تفاصيل تقريركم برقم التعريف: <a href="${url}">${url}</a>
+    `;
 };
 
 export const whatsAppTemplate = {
