@@ -45,6 +45,8 @@ const loginUserFromDB = async (payload: ILoginData) => {
                          receiver: isExistUser._id,
                          message: `Updated FCM token for user ${isExistUser._id}, presentDevice ${deviceId} | oldDevice ${existingToken.deviceId}`,
                          type: 'ALERT',
+                         presentDevice: deviceId,
+                         oldDevice: existingToken.deviceId,
                     };
 
                     existingToken.deviceId = deviceId;
