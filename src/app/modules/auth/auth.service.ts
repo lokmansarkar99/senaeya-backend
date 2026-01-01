@@ -424,8 +424,6 @@ const checkUserAuthority = async (providerWorkShopId: string) => {
           if (workShopRules && workShopRules.value) {
                maxFreeInvoiceCount = workShopRules.value;
           }
-          console.log('🚀 ~ checkUserAuthority ~ workShop.generatedInvoiceCount:', workShop.generatedInvoiceCount);
-          console.log('🚀 ~ checkUserAuthority ~ maxFreeInvoiceCount:', maxFreeInvoiceCount);
           if (workShop.generatedInvoiceCount >= maxFreeInvoiceCount) {
                throw new Error('Plz do subscribe');
           }
