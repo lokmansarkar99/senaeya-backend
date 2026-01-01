@@ -44,7 +44,8 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      if (appSettings && appSettings.defaultVat) {
           vatPercent = appSettings.defaultVat as number;
      }
-     const flatVatAmount = (toBePaidAmount * vatPercent) / 100;
+     // const flatVatAmount = (toBePaidAmount * vatPercent) / 100;
+     const flatVatAmount = 0;
      toBePaidAmount = toBePaidAmount + flatVatAmount;
 
      const paymentRequest = {
