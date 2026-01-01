@@ -22,6 +22,7 @@ const createPackageZodSchema = z.object({
                required_error: 'Subscription type is required',
           }),
           discountPercentage: z.number(),
+          cutOffprice: z.number(),
      }),
 });
 

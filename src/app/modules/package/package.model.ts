@@ -70,9 +70,9 @@ packageSchema.pre('save', function (next) {
      if (this.monthlyBasePrice) {
           this.yearlyBasePrice = this.monthlyBasePrice * 12;
      }
-     if (this.price) {
-          this.cutOffprice = this.price + (this.price * this.discountPercentage) / 100;
-     }
+     // if (this.price) {
+     //      this.cutOffprice = this.price + (this.price * this.discountPercentage) / 100;
+     // }
      next();
 });
 
