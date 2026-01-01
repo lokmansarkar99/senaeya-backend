@@ -85,7 +85,7 @@ const WorkShopSchema = new Schema<IworkShop>(
           description: { type: String, required: false },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
-          generatedInvoiceCount: { type: Number, default: 0, max: MAX_FREE_INVOICE_COUNT },
+          generatedInvoiceCount: { type: Number, default: 0 },
           subscribedPackage: {
                type: Types.ObjectId,
                ref: 'Package',

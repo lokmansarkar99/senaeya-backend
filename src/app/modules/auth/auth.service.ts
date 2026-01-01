@@ -414,7 +414,7 @@ const refreshToken = async (token: string) => {
 
 const checkUserAuthority = async (providerWorkShopId: string) => {
      const workShop = await WorkShop.findById(providerWorkShopId).select('ownerId helperUserId subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
-     console.log('🚀 ~ checkUserAuthority ~ workShop:', workShop);
+     // console.log('🚀 ~ checkUserAuthority ~ workShop:', workShop);
      if (!workShop) {
           throw new Error('Workshop not found');
      }
