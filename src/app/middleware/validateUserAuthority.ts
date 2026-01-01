@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../enums/user';
 import { MAX_FREE_INVOICE_COUNT } from '../modules/workShop/workshop.enum';
 import { sendNotifications } from '../../helpers/notificationsHelper';
 import Settings from '../modules/settings/settings.model';
+import { Rule } from '../modules/rule/rule.model';
 
 const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
@@ -24,9 +25,9 @@ const validateUserAuthority = () => {
                     if (req.body.sparePartsList || req.body.worksList) {
                          if (!workShop.subscribedPackage) {
                               let maxFreeInvoiceCount = MAX_FREE_INVOICE_COUNT;
-                              const workShopSettings = await Settings.findOne({ providerWorkShopId }).select('allowedInvoicesCountForFreeUsers');
-                              if (workShopSettings) {
-                                   maxFreeInvoiceCount = workShopSettings.allowedInvoicesCountForFreeUsers;
+                              const workShopRules = await Rule.findOne({ valuesTypes: 'allowedInvoicesCountForFreeUsers' }).select('value');
+                              if (workShopRules && workShopRules.value) {
+                                   maxFreeInvoiceCount = workShopRules.value;
                               }
                               if (workShop.generatedInvoiceCount >= maxFreeInvoiceCount) {
                                    throw new Error('Plz do subscribe');

@@ -18,6 +18,10 @@ import DeviceToken from '../DeviceToken/DeviceToken.model';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { workShopService } from '../workShop/workShop.service';
+import { WorkShop } from '../workShop/workShop.model';
+import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
+import { Rule } from '../rule/rule.model';
+import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -408,6 +412,38 @@ const refreshToken = async (token: string) => {
      return { accessToken };
 };
 
+const checkUserAuthority = async (providerWorkShopId: string) => {
+     const workShop = await WorkShop.findById(providerWorkShopId).select('ownerId helperUserId subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
+     if (!workShop) {
+          throw new Error('Workshop not found');
+     }
+
+     if (!workShop.subscribedPackage) {
+          let maxFreeInvoiceCount = MAX_FREE_INVOICE_COUNT;
+          const workShopRules = await Rule.findOne({ valuesTypes: 'allowedInvoicesCountForFreeUsers' }).select('value');
+          if (workShopRules && workShopRules.value) {
+               maxFreeInvoiceCount = workShopRules.value;
+          }
+          if (workShop.generatedInvoiceCount >= maxFreeInvoiceCount) {
+               throw new Error('Plz do subscribe');
+          }
+     } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {
+          const currentDate = new Date();
+          const currentPeriodEnd = new Date((workShop as any).subscriptionId.currentPeriodEnd);
+
+          if (currentDate >= currentPeriodEnd) {
+               await sendNotifications({
+                    title: `${(workShop as any)?.workshopNameEnglish}`,
+                    receiver: (workShop as any).ownerId._id,
+                    message: `Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.`,
+                    type: 'ALERT',
+               });
+               throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
+                                   انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
+          }
+     }
+};
+
 export const AuthService = {
      verifyEmailToDB,
      loginUserFromDB,
@@ -419,4 +455,5 @@ export const AuthService = {
      resetPasswordByUrl,
      resendOtpFromDb,
      refreshToken,
+     checkUserAuthority,
 };
