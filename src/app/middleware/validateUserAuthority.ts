@@ -24,13 +24,15 @@ const validateUserAuthority = () => {
                     // prevent trail limit expired or suscription expired
                     if (req.body.sparePartsList || req.body.worksList) {
                          if (!workShop.subscribedPackage) {
-                              let maxFreeInvoiceCount = MAX_FREE_INVOICE_COUNT;
+                              let maxFreeInvoiceCount;
                               const workShopRules = await Rule.findOne({ valuesTypes: 'allowedInvoicesCountForFreeUsers' }).select('value');
-                              if (workShopRules && workShopRules.value) {
-                                   maxFreeInvoiceCount = workShopRules.value;
+                              console.log('🚀 ~ validateUserAuthority ~ workShopRules:', workShopRules);
+                              if (!workShopRules || !workShopRules.value) {
+                                   throw new Error('Free invoice limit exceeded. Please subscribe to continue.');
                               }
+                              maxFreeInvoiceCount = workShopRules.value;
                               if (workShop.generatedInvoiceCount >= maxFreeInvoiceCount) {
-                                   throw new Error('Plz do subscribe');
+                                   throw new Error('Free invoice limit exceeded. Please subscribe to continue.');
                               }
                          } else if (workShop.subscribedPackage && workShop.subscriptionId && (workShop as any).subscriptionId.status === 'active') {
                               const currentDate = new Date();
