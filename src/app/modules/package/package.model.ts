@@ -7,7 +7,7 @@ const packageSchema = new Schema<IPackage, PackageModel>(
           title: {
                type: String,
                required: true,
-               unique: true,
+               unique: false,
           },
           description: {
                type: String,
