@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import config from '../../../config';
 import { USER_ROLES } from '../../../enums/user';
 import AppError from '../../../errors/AppError';
@@ -157,12 +157,62 @@ const getAllUnpaginatedClients = async (): Promise<IClient[]> => {
      return result;
 };
 
-const updateClient = async (id: string, payload: Partial<IClient>): Promise<IClient | null> => {
-     const isExist = await Client.findOne({ _id: id });
-     if (!isExist) {
+const updateClient = async (
+     id: string,
+     payload: {
+          providerWorkShopId: string;
+          carId: string;
+          brand: Types.ObjectId;
+          model: Types.ObjectId | any;
+          year: string;
+          vin: string;
+          documentNumber: string;
+          name: string;
+          contact: string;
+     },
+) => {
+     const isExistClient = await Client.findOne({ _id: id, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+     if (!isExistClient) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.1');
      }
-     return await Client.findByIdAndUpdate(id, payload, { new: true });
+     const isExistCar = await Car.findOne({ _id: payload.carId, providerWorkShopId: payload.providerWorkShopId });
+     if (!isExistCar) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.2');
+     }
+
+     const isExistClientInUser = await User.findOne({ _id: isExistClient.clientId });
+     if (!isExistClientInUser) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.3');
+     }
+
+     const session = await mongoose.startSession();
+     try {
+          session.startTransaction();
+          // ---- Updates ----
+          payload.name && (isExistClientInUser.name = payload.name);
+          payload.contact && (isExistClientInUser.contact = payload.contact);
+
+          payload.contact && (isExistClient.contact = payload.contact);
+          payload.documentNumber && (isExistClient.documentNumber = payload.documentNumber);
+
+          payload.brand && (isExistCar.brand = payload.brand);
+          payload.model && (isExistCar.model = payload.model);
+          payload.year && (isExistCar.year = payload.year);
+          payload.vin && (isExistCar.vin = payload.vin);
+
+          // ---- Saves (IMPORTANT: pass session) ----
+          await isExistClientInUser.save({ session });
+          await isExistClient.save({ session });
+          await isExistCar.save({ session });
+
+          await session.commitTransaction();
+          session.endSession();
+          return isExistClient;
+     } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+          throw error;
+     }
 };
 
 const deleteClient = async (id: string): Promise<IClient | null> => {

@@ -53,31 +53,19 @@ const createClientZodSchema = z.object({
 });
 
 const updateClientZodSchema = z.object({
+     params: z.object({
+          id: z.string({ required_error: 'Id is required' }),
+     }),
      body: z.object({
           providerWorkShopId: z.string({ required_error: 'WorkShopId is required' }),
-          clientType: z.nativeEnum(CLIENT_TYPE).optional(),
-          // for worksop type ⬇️⬇️
-          workShopNameAsClient: z.string().optional(),
-          // for worksop type ⬆️⬆️
-          // for user type ⬇️⬇️
-          brand: z.string({ required_error: 'Brand is required' }).optional(),
-          model: z.string({ required_error: 'Model is required' }).optional(),
-          year: z.string({ required_error: 'Year is required' }).optional(),
-          vin: z.string({ required_error: 'VIN is required' }).optional(),
-          client: z.string({ required_error: 'Client is required' }).optional(),
-          image: z.string().optional(),
-          description: z.string().optional(),
-          carType: z.boolean().optional(),
-          plateNumberForInternational: z.string().optional(),
-          plateNumberForSaudi: z
-               .object({
-                    symbol: z.string().optional(),
-                    numberEnglish: z.string().optional(),
-                    numberArabic: z.string().optional(),
-                    alphabetsCombinations: z.array(z.string()).optional(),
-               })
-               .optional(),
-          // for user type ⬆️⬆️
+          name: z.string({ required_error: 'Name is required' }),
+          contact: z.string({ required_error: 'Contact is required' }),
+          carId: z.string({ required_error: 'carId is required' }),
+          brand: z.string({ required_error: 'Brand is required' }),
+          model: z.string({ required_error: 'Model is required' }),
+          year: z.string({ required_error: 'Year is required' }),
+          vin: z.string({ required_error: 'VIN is required' }),
+          documentNumber: z.string({ required_error: 'DocumentNumber is required' }),
      }),
 });
 
@@ -93,5 +81,5 @@ const toggleClientStatusZodSchema = z.object({
 export const clientValidation = {
      createClientZodSchema,
      updateClientZodSchema,
-     toggleClientStatusZodSchema
+     toggleClientStatusZodSchema,
 };
