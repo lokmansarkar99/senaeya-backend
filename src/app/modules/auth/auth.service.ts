@@ -25,7 +25,7 @@ import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
-     const { contact, password, fcmToken, deviceId, deviceType = 'android' } = payload;
+     const { contact, password, fcmToken, deviceId, deviceType = 'android',role } = payload;
      if (fcmToken && !deviceId) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'deviceId is required when providing fcmToken');
      }
@@ -33,6 +33,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
      const isExistUser = await User.findOne({ contact }).select('+password');
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+     }
+
+     if (isExistUser.role !== role) {          
+          throw new AppError(StatusCodes.BAD_REQUEST, `you are not authorised`);
      }
 
      let info = {};
