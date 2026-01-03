@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { USER_ROLES } from '../../../enums/user';
 
 const createVerifyEmailZodSchema = z.object({
      body: z.object({
@@ -17,6 +18,14 @@ const createLoginZodSchema = z.object({
                fingerPrintId: z.string({ required_error: 'Finger print id is required' }),
           }),
      ]),
+});
+
+const createAdminLoginZodSchema = z.object({
+     body: z.object({
+          contact: z.string({ required_error: 'Contact is required' }),
+          password: z.string({ required_error: 'Password is required' }),
+          role: z.enum([USER_ROLES.ADMIN]),
+     }),
 });
 
 const createForgetPasswordZodSchema = z.object({
@@ -50,6 +59,7 @@ export const AuthValidation = {
      createVerifyEmailZodSchema,
      createForgetPasswordZodSchema,
      createLoginZodSchema,
+     createAdminLoginZodSchema,
      createResetPasswordZodSchema,
      createChangePasswordZodSchema,
 };
