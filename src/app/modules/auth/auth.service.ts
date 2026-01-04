@@ -35,7 +35,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
 
-     if (isExistUser.role !== role) {          
+     if (role && isExistUser.role !== role) {          
           throw new AppError(StatusCodes.BAD_REQUEST, `you are not authorised`);
      }
 
