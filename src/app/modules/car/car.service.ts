@@ -163,8 +163,8 @@ const getAllUnpaginatedCars = async (): Promise<ICar[]> => {
 };
 
 const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | null> => {
-     const isExistCars = await Car.findById(id);
-     if (!isExistCars) {
+     const isExistCar = await Car.findById(id);
+     if (!isExistCar) {
           if (payload.image) {
                unlinkFile(payload.image);
           }
@@ -172,7 +172,7 @@ const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | nul
      }
 
      let isExistClient;
-     if (payload.client && payload.client.toString().trim() !== isExistCars.client?.toString()) {
+     if (payload.client && payload.client.toString().trim() !== isExistCar.client?.toString()) {
           isExistClient = await Client.findOne({ _id: payload.client, cars: { $nin: [id] } });
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found for this car. Or client is already assigned to this car.');
@@ -180,28 +180,28 @@ const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | nul
           payload.client = isExistClient._id;
 
           // pull the id from isExistCars
-          if (isExistCars.client) {
-               await Client.findByIdAndUpdate(isExistCars.client, { $pull: { cars: new mongoose.Types.ObjectId(id) } });
+          if (isExistCar.client) {
+               await Client.findByIdAndUpdate(isExistCar.client, { $push: { cars: new mongoose.Types.ObjectId(id) } });
           }
      }
 
-     if (isExistCars.image) {
-          unlinkFile(isExistCars.image);
+     if (isExistCar.image) {
+          unlinkFile(isExistCar.image);
      }
      if (payload.plateNumberForSaudi) {
           payload.slugForSaudiCarPlateNumber = generateSlug({
-               symbol: (payload.plateNumberForSaudi.symbol ? payload.plateNumberForSaudi.symbol : isExistCars?.plateNumberForSaudi?.symbol) || '',
-               numberEnglish: (payload.plateNumberForSaudi.numberEnglish ? payload.plateNumberForSaudi.numberEnglish : isExistCars?.plateNumberForSaudi?.numberEnglish) || '',
-               numberArabic: (payload.plateNumberForSaudi.numberArabic ? payload.plateNumberForSaudi.numberArabic : isExistCars?.plateNumberForSaudi?.numberArabic) || '',
+               symbol: (payload.plateNumberForSaudi.symbol ? payload.plateNumberForSaudi.symbol : isExistCar?.plateNumberForSaudi?.symbol) || '',
+               numberEnglish: (payload.plateNumberForSaudi.numberEnglish ? payload.plateNumberForSaudi.numberEnglish : isExistCar?.plateNumberForSaudi?.numberEnglish) || '',
+               numberArabic: (payload.plateNumberForSaudi.numberArabic ? payload.plateNumberForSaudi.numberArabic : isExistCar?.plateNumberForSaudi?.numberArabic) || '',
                alphabetsCombinations:
-                    (payload.plateNumberForSaudi.alphabetsCombinations ? payload.plateNumberForSaudi.alphabetsCombinations : isExistCars?.plateNumberForSaudi?.alphabetsCombinations) || [],
+                    (payload.plateNumberForSaudi.alphabetsCombinations ? payload.plateNumberForSaudi.alphabetsCombinations : isExistCar?.plateNumberForSaudi?.alphabetsCombinations) || [],
           });
 
           payload.plateNumberForSaudi = {
-               symbol: payload.plateNumberForSaudi.symbol || isExistCars?.plateNumberForSaudi?.symbol || '',
-               numberEnglish: payload.plateNumberForSaudi.numberEnglish || isExistCars?.plateNumberForSaudi?.numberEnglish || '',
-               numberArabic: payload.plateNumberForSaudi.numberArabic || isExistCars?.plateNumberForSaudi?.numberArabic || '',
-               alphabetsCombinations: payload.plateNumberForSaudi.alphabetsCombinations || isExistCars?.plateNumberForSaudi?.alphabetsCombinations || [],
+               symbol: payload.plateNumberForSaudi.symbol || isExistCar?.plateNumberForSaudi?.symbol || '',
+               numberEnglish: payload.plateNumberForSaudi.numberEnglish || isExistCar?.plateNumberForSaudi?.numberEnglish || '',
+               numberArabic: payload.plateNumberForSaudi.numberArabic || isExistCar?.plateNumberForSaudi?.numberArabic || '',
+               alphabetsCombinations: payload.plateNumberForSaudi.alphabetsCombinations || isExistCar?.plateNumberForSaudi?.alphabetsCombinations || [],
           };
      }
 
