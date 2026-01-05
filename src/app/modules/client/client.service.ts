@@ -235,13 +235,13 @@ const updateClientDuringCreate = async (payload: {
                if (payload.name && payload.name.trim() !== userDetails?.name?.trim()) {
                     userDetails.name = payload.name;
                }
+               console.log('🚀 ~ updateClientDuringCreate ~ payload.contact:', payload.contact);
+               console.log('🚀 ~ updateClientDuringCreate ~ userDetails.contact:', userDetails.contact);
                if (payload.contact && payload.contact.trim() !== userDetails?.contact?.trim()) {
                     userDetails.contact = payload.contact;
                }
                await userDetails.save({ session });
                // update client name
-               console.log('🚀 ~ updateClientDuringCreate ~ payload.contact:', payload.contact);
-               console.log('🚀 ~ updateClientDuringCreate ~ isExistClient.contact:', isExistClient.contact);
                if (payload.contact && payload.contact.trim() !== isExistClient.contact.trim()) {
                     isExistClient.contact = payload.contact;
                }
