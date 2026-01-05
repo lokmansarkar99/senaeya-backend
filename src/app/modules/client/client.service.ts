@@ -89,7 +89,6 @@ const createClient = async (payload: any) => {
                          throw new AppError(StatusCodes.NOT_FOUND, 'User creation failed.');
                     }
                }
-               console.log('🚀 ~ createClient ~ isExistUser:', isExistUser);
                let isExistClient = await Client.findOne({ clientId: isExistUser._id, clientType: CLIENT_TYPE.USER });
                if (!isExistClient) {
                     [isExistClient] = await Client.create(
@@ -138,7 +137,6 @@ const createClient = async (payload: any) => {
                session.endSession();
                return isExistClient;
           } catch (error) {
-               console.log('🚀 ~ createClient ~ error:', error);
                // Abort the transaction on error
                await session.abortTransaction();
                session.endSession();
@@ -235,8 +233,6 @@ const updateClientDuringCreate = async (payload: {
                if (payload.name && payload.name.trim() !== userDetails?.name?.trim()) {
                     userDetails.name = payload.name;
                }
-               console.log('🚀 ~ updateClientDuringCreate ~ payload.contact:', payload.contact);
-               console.log('🚀 ~ updateClientDuringCreate ~ userDetails.contact:', userDetails.contact);
                if (payload.contact && payload.contact.trim() !== userDetails?.contact?.trim()) {
                     userDetails.contact = payload.contact;
                }
@@ -250,15 +246,23 @@ const updateClientDuringCreate = async (payload: {
                }
                await isExistClient.save({ session });
                // link the client vs user and client vs car relation
-               isExistCar.brand = new Types.ObjectId(payload.brand!);
-               (isExistCar as ICar).model = new Types.ObjectId(payload.model!);
-               isExistCar.year = payload.year!.toString();
+               if (payload.brand) {
+                    isExistCar.brand = new Types.ObjectId(payload.brand!);
+               }
+               if (payload.model) {
+                    (isExistCar as ICar).model = new Types.ObjectId(payload.model!);
+               }
+               if (payload.year) {
+                    isExistCar.year = payload.year!.toString();
+               }
+               if (payload.vin) {
+                    (isExistCar as ICar).vin = payload.vin;
+               }
                await isExistCar.save({ session });
                await session.commitTransaction();
                session.endSession();
                return isExistClient;
           } catch (error) {
-               console.log('🚀 ~ createClient ~ error:', error);
                // Abort the transaction on error
                await session.abortTransaction();
                session.endSession();
