@@ -273,6 +273,10 @@ const getAllClients = async (query: Record<string, any>): Promise<{ meta: { tota
      const result = await queryBuilder.filter().sort().paginate().fields().search(['contact']).modelQuery;
 
      result.forEach(async (client) => {
+          const user = await User.findById(client.clientId);
+          if (user) {
+               client.contact = user.contact;
+          }
           await client.save();
      });
      const meta = await queryBuilder.countTotal();
