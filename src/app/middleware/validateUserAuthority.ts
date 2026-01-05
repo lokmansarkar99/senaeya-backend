@@ -12,6 +12,7 @@ const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
           try {
                const user = req.user as IUser & { id: string };
+               console.log('🚀 ~ validateUserAuthority ~ user:', user);
                if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
                     const { providerWorkShopId } = req.body;
                     const workShop = await WorkShop.findById(providerWorkShopId).select('ownerId helperUserId subscribedPackage generatedInvoiceCount subscriptionId').populate('subscriptionId');
