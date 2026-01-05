@@ -1,6 +1,10 @@
 import { Schema, model } from 'mongoose';
 import { IClient } from './client.interface';
 import { CLIENT_TYPE, CLIENT_STATUS } from './client.enum';
+import { User } from '../user/user.model';
+import AppError from '../../../errors/AppError';
+import { StatusCodes } from 'http-status-codes';
+import { USER_ROLES } from '../../../enums/user';
 
 const ClientSchema = new Schema<IClient>(
      {
@@ -19,6 +23,17 @@ const ClientSchema = new Schema<IClient>(
      },
      { timestamps: true },
 );
+
+ClientSchema.pre('save', async function (next) {
+     const userDetails = await User.findOne({ _id: this.clientId, role: USER_ROLES.CLIENT });
+
+     if (userDetails?.contact !== this.contact) {
+          userDetails?.contact === this.contact;
+          await userDetails?.save();
+     }
+
+     next();
+});
 
 ClientSchema.pre('find', function (next) {
      this.find({ isDeleted: false });

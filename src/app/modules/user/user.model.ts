@@ -5,6 +5,7 @@ import config from '../../../config';
 import { USER_ROLES } from '../../../enums/user';
 import AppError from '../../../errors/AppError';
 import { IUser, UserModel } from './user.interface';
+import { Client } from '../client/client.model';
 
 const userSchema = new Schema<IUser, UserModel>(
      {
@@ -151,6 +152,17 @@ userSchema.pre('save', async function (next) {
      // Auto-verify OAuth users
      if (this.oauthProvider && !this.verified) {
           this.verified = true;
+     }
+
+     next();
+});
+
+userSchema.pre('save', async function (next) {
+     const clientDetails = await Client.findOne({ clientId: this._id });
+
+     if (clientDetails?.contact !== this.contact) {
+          clientDetails?.contact === this.contact;
+          await clientDetails?.save();
      }
 
      next();

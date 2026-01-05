@@ -271,6 +271,10 @@ const updateClientDuringCreate = async (payload: {
 const getAllClients = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IClient[] }> => {
      const queryBuilder = new QueryBuilder(Client.find().populate('clientId').populate('cars'), query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['contact']).modelQuery;
+
+     result.forEach(async (client) => {
+          await client.save();
+     });
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
