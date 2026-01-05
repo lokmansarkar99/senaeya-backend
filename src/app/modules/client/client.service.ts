@@ -274,10 +274,12 @@ const getAllClients = async (query: Record<string, any>): Promise<{ meta: { tota
 
      result.forEach(async (client) => {
           const user = await User.findById(client.clientId);
+          console.log('🚀 ~ getAllClients ~ user:', user?.contact);
           if (user) {
                client.contact = user.contact;
           }
           await client.save();
+          console.log('🚀 ~ getAllClients ~ client:', client.contact);
      });
      const meta = await queryBuilder.countTotal();
      return { meta, result };
