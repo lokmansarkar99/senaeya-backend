@@ -183,9 +183,10 @@ const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | nul
           payload.client = isExistClient._id;
 
           // pull the id from isExistCars
-          if (isExistCar.client) {
-               await Client.findByIdAndUpdate(isExistCar.client, { $push: { cars: new mongoose.Types.ObjectId(id) } });
-          }
+          await Client.findByIdAndUpdate(isExistCar.client, { $pull: { cars: new mongoose.Types.ObjectId(id) } });
+
+          // push the id to isExistClient
+          await Client.findByIdAndUpdate(isExistClient._id, { $push: { cars: new mongoose.Types.ObjectId(id) } });
      }
 
      if (isExistCar.image) {
