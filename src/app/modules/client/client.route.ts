@@ -26,8 +26,17 @@ router.post(
      validateRequest(clientValidation.createClientZodSchema),
      clientController.createClient,
 );
+router.post(
+     '/update-during-create',
+     auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
+     // fileUploadHandler(),
+     // parseFileData(FOLDER_NAMES.DOCUMENT),
+     validateUserAuthority(),
+     validateRequest(clientValidation.updateClientDuringCreateZodSchema),
+     clientController.updateClientDuringCreate,
+);
 
-router.get('/', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getAllClients);
+router.get('/', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), clientController.getAllClients);
 
 router.get('/unpaginated', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getAllUnpaginatedClients);
 
@@ -43,12 +52,7 @@ router.patch(
      clientController.toggleClientStatus,
 );
 // send message to recieve car
-router.post(
-     '/send-message-to-recieve-car/:id',
-     auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
-     validateUserAuthority(),
-     clientController.sendMessageToRecieveCar,
-);
+router.post('/send-message-to-recieve-car/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.sendMessageToRecieveCar);
 
 router.get('/clients-by-carNumber/:carNumber', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getClienstByCarNumber);
 router.patch(

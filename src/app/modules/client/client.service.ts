@@ -12,10 +12,13 @@ import { Invoice } from '../invoice/invoice.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { User } from '../user/user.model';
 import { WorkShop } from '../workShop/workShop.model';
-import { CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
+import { CLIENT_CAR_TYPE, CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
 import { IClient } from './client.interface';
 import { Client } from './client.model';
 import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
+import { CarBrand } from '../carBrand/carBrand.model';
+import { CarModel } from '../carModel/carModel.model';
+import { ICar } from '../car/car.interface';
 
 /** steps
  * client type check user or workshop
@@ -145,8 +148,118 @@ const createClient = async (payload: any) => {
      }
 };
 
+const updateClientDuringCreate = async (payload: {
+     providerWorkShopId: string;
+     carId: string;
+     clientId: string;
+     clientType: CLIENT_TYPE;
+     workShopNameAsClient?: string;
+     brand?: string;
+     model?: string;
+     year?: string;
+     vin?: string;
+     name?: string;
+     contact?: string;
+     description?: string;
+     documentNumber?: string;
+     carType?: CLIENT_CAR_TYPE;
+     plateNumberForInternational?: string;
+     plateNumberForSaudi?: {
+          symbol?: string;
+          numberEnglish?: string;
+          numberArabic?: string;
+          alphabetsCombinations?: string[];
+     };
+}) => {
+     // check is payload.contact is verified or not
+     if (payload.contact) {
+          const isVerifiedContact = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
+          if (!isVerifiedContact) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'User contact is not verified.');
+          }
+     }
+     if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
+          let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
+          if (!isExistClient) {
+               isExistClient = await Client.create({
+                    clientType: payload.clientType,
+                    workShopNameAsClient: payload.workShopNameAsClient,
+                    documentNumber: payload.documentNumber || null,
+                    providerWorkShopId: payload.providerWorkShopId,
+                    contact: payload.contact,
+               });
+               if (!isExistClient) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
+               }
+               return isExistClient;
+          }
+
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
+     } else if (payload.clientType === CLIENT_TYPE.USER) {
+          // use mongoose transaction
+          const session = await mongoose.startSession();
+          session.startTransaction();
+          try {
+               const isExistClient = await Client.findById(payload.clientId);
+               if (!isExistClient) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'Client not found with provided ID: ' + payload.clientId);
+               }
+
+               const userDetails = await User.findById(isExistClient.clientId);
+               if (!userDetails) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'User not found with provided ID: ' + isExistClient.clientId);
+               }
+
+               const isExistCar = await Car.findById(payload.carId);
+               if (!isExistCar) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'Car not found with provided ID: ' + payload.carId);
+               }
+
+               const isExistBrand = await CarBrand.findById(payload.brand);
+               if (!isExistBrand) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'Brand not found with provided ID: ' + payload.brand);
+               }
+
+               const isExistModel = await CarModel.findOne({
+                    _id: new mongoose.Types.ObjectId(payload.model),
+                    brand: new mongoose.Types.ObjectId(payload.brand),
+               });
+               if (!isExistModel) {
+                    throw new AppError(
+                         StatusCodes.NOT_FOUND,
+                         `Model not found with provided ID: '${payload.model}' for brand: '${payload.brand}' (${isExistBrand.title}) - Model ID: ${payload.model} - Brand ID: ${payload.brand}`,
+                    );
+               }
+
+               // update user name
+               userDetails.name = payload.name;
+               userDetails.contact = payload.contact!;
+               await userDetails.save({ session });
+               // update client name
+               isExistClient.contact = payload.contact!;
+               isExistClient.documentNumber = payload.documentNumber!;
+               await isExistClient.save({ session });
+               // link the client vs user and client vs car relation
+               isExistCar.brand = new Types.ObjectId(payload.brand!);
+               (isExistCar as ICar).model = new Types.ObjectId(payload.model!);
+               isExistCar.year = payload.year!.toString();
+               await isExistCar.save({ session });
+               await session.commitTransaction();
+               session.endSession();
+               return isExistClient;
+          } catch (error) {
+               console.log('🚀 ~ createClient ~ error:', error);
+               // Abort the transaction on error
+               await session.abortTransaction();
+               session.endSession();
+
+               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Client not created..');
+          }
+     }
+};
+
 const getAllClients = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IClient[] }> => {
-     const queryBuilder = new QueryBuilder(Client.find(), query);
+     const queryBuilder = new QueryBuilder(Client.find().populate('clientId').populate('car'), query);
      const result = await queryBuilder.filter().sort().paginate().fields().search(['contact']).modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
@@ -376,6 +489,7 @@ const getClienstByCarNumber = async (carNumber: string) => {
 
 export const clientService = {
      createClient,
+     updateClientDuringCreate,
      getAllClients,
      getAllUnpaginatedClients,
      updateClient,

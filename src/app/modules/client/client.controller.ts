@@ -14,6 +14,17 @@ const createClient = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const updateClientDuringCreate = catchAsync(async (req: Request, res: Response) => {
+     const result = await clientService.updateClientDuringCreate(req.body);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Client created successfully',
+          data: result,
+     });
+});
+
 const getAllClients = catchAsync(async (req: Request, res: Response) => {
      const result = await clientService.getAllClients(req.query);
 
@@ -111,7 +122,7 @@ const toggleClientStatus = catchAsync(async (req: Request, res: Response) => {
 
 const sendMessageToRecieveCar = catchAsync(async (req: Request, res: Response) => {
      const { id } = req.params;
-     await clientService.sendMessageToRecieveCar(id,req.body.providerWorkShopId);
+     await clientService.sendMessageToRecieveCar(id, req.body.providerWorkShopId);
 
      sendResponse(res, {
           statusCode: 200,
@@ -134,6 +145,7 @@ const getClienstByCarNumber = catchAsync(async (req: Request, res: Response) => 
 
 export const clientController = {
      createClient,
+     updateClientDuringCreate,
      getAllClients,
      getAllUnpaginatedClients,
      updateClient,
@@ -143,5 +155,5 @@ export const clientController = {
      getClientByClientContact,
      toggleClientStatus,
      sendMessageToRecieveCar,
-     getClienstByCarNumber
+     getClienstByCarNumber,
 };
