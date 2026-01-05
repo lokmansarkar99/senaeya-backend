@@ -8,6 +8,8 @@ import { CLIENT_CAR_TYPE } from '../client/client.enum';
 import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
 import { CarModel } from '../carModel/carModel.model';
+import { Client } from '../client/client.model';
+import mongoose from 'mongoose';
 
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
      console.log('🚀 ~ createCar ~ payload:', payload);
@@ -161,31 +163,45 @@ const getAllUnpaginatedCars = async (): Promise<ICar[]> => {
 };
 
 const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | null> => {
-     const isExist = await Car.findById(id);
-     if (!isExist) {
+     const isExistCars = await Car.findById(id);
+     if (!isExistCars) {
           if (payload.image) {
                unlinkFile(payload.image);
           }
           throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
      }
 
-     if (isExist.image) {
-          unlinkFile(isExist.image);
+     let isExistClient;
+     if (payload.client && payload.client.toString().trim() !== isExistCars.client?.toString()) {
+          isExistClient = await Client.findOne({ _id: payload.client, cars: { $nin: [id] } });
+          if (!isExistClient) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Client not found for this car. Or client is already assigned to this car.');
+          }
+          payload.client = isExistClient._id;
+
+          // pull the id from isExistCars
+          if (isExistCars.client) {
+               await Client.findByIdAndUpdate(isExistCars.client, { $pull: { cars: new mongoose.Types.ObjectId(id) } });
+          }
+     }
+
+     if (isExistCars.image) {
+          unlinkFile(isExistCars.image);
      }
      if (payload.plateNumberForSaudi) {
           payload.slugForSaudiCarPlateNumber = generateSlug({
-               symbol: (payload.plateNumberForSaudi.symbol ? payload.plateNumberForSaudi.symbol : isExist?.plateNumberForSaudi?.symbol) || '',
-               numberEnglish: (payload.plateNumberForSaudi.numberEnglish ? payload.plateNumberForSaudi.numberEnglish : isExist?.plateNumberForSaudi?.numberEnglish) || '',
-               numberArabic: (payload.plateNumberForSaudi.numberArabic ? payload.plateNumberForSaudi.numberArabic : isExist?.plateNumberForSaudi?.numberArabic) || '',
+               symbol: (payload.plateNumberForSaudi.symbol ? payload.plateNumberForSaudi.symbol : isExistCars?.plateNumberForSaudi?.symbol) || '',
+               numberEnglish: (payload.plateNumberForSaudi.numberEnglish ? payload.plateNumberForSaudi.numberEnglish : isExistCars?.plateNumberForSaudi?.numberEnglish) || '',
+               numberArabic: (payload.plateNumberForSaudi.numberArabic ? payload.plateNumberForSaudi.numberArabic : isExistCars?.plateNumberForSaudi?.numberArabic) || '',
                alphabetsCombinations:
-                    (payload.plateNumberForSaudi.alphabetsCombinations ? payload.plateNumberForSaudi.alphabetsCombinations : isExist?.plateNumberForSaudi?.alphabetsCombinations) || [],
+                    (payload.plateNumberForSaudi.alphabetsCombinations ? payload.plateNumberForSaudi.alphabetsCombinations : isExistCars?.plateNumberForSaudi?.alphabetsCombinations) || [],
           });
 
           payload.plateNumberForSaudi = {
-               symbol: payload.plateNumberForSaudi.symbol || isExist?.plateNumberForSaudi?.symbol || '',
-               numberEnglish: payload.plateNumberForSaudi.numberEnglish || isExist?.plateNumberForSaudi?.numberEnglish || '',
-               numberArabic: payload.plateNumberForSaudi.numberArabic || isExist?.plateNumberForSaudi?.numberArabic || '',
-               alphabetsCombinations: payload.plateNumberForSaudi.alphabetsCombinations || isExist?.plateNumberForSaudi?.alphabetsCombinations || [],
+               symbol: payload.plateNumberForSaudi.symbol || isExistCars?.plateNumberForSaudi?.symbol || '',
+               numberEnglish: payload.plateNumberForSaudi.numberEnglish || isExistCars?.plateNumberForSaudi?.numberEnglish || '',
+               numberArabic: payload.plateNumberForSaudi.numberArabic || isExistCars?.plateNumberForSaudi?.numberArabic || '',
+               alphabetsCombinations: payload.plateNumberForSaudi.alphabetsCombinations || isExistCars?.plateNumberForSaudi?.alphabetsCombinations || [],
           };
      }
 
@@ -222,14 +238,18 @@ const hardDeleteCar = async (id: string): Promise<ICar | null> => {
 };
 
 const getCarById = async (id: string): Promise<ICar | null> => {
-     const result = await Car.findById(id).populate('model', 'title').populate('brand', 'title').populate('plateNumberForSaudi.symbol', 'title image').populate({
-          path: 'client',
-          select: 'clientId workShopNameAsClient clientType',
-          populate: {
-               path: 'clientId',
-               select: 'name',
-          },
-     });
+     const result = await Car.findById(id)
+          .populate('model', 'title')
+          .populate('brand', 'title')
+          .populate('plateNumberForSaudi.symbol', 'title image')
+          .populate({
+               path: 'client',
+               select: 'clientId workShopNameAsClient clientType',
+               populate: {
+                    path: 'clientId',
+                    select: 'name',
+               },
+          });
      return result;
 };
 
