@@ -263,6 +263,7 @@ const updateClientDuringCreate = async (payload: {
                session.endSession();
                return isExistClient;
           } catch (error) {
+               console.log('🚀 ~ updateClientDuringCreate ~ error:', error);
                // Abort the transaction on error
                await session.abortTransaction();
                session.endSession();
