@@ -174,7 +174,10 @@ const updateCar = async (id: string, payload: Partial<ICar>): Promise<ICar | nul
      let isExistClient;
      if (payload.client && payload.client.toString().trim() !== isExistCar.client?.toString()) {
           console.log('🚀 ~ updateCar ~ payload.client:', payload.client);
-          isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.client), cars: { $nin: [id] } });
+          isExistClient = await Client.findOne({
+               _id: new mongoose.Types.ObjectId(payload.client),
+               // cars: { $nin: [id] }
+          });
           console.log('🚀 ~ updateCar ~ isExistClient:', isExistClient);
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found for this car. Or client is already assigned to this car.');
