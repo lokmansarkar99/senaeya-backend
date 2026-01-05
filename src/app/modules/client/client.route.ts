@@ -26,7 +26,7 @@ router.post(
      validateRequest(clientValidation.createClientZodSchema),
      clientController.createClient,
 );
-router.post(
+router.patch(
      '/update-during-create',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
      // fileUploadHandler(),
