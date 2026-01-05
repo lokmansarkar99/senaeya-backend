@@ -196,48 +196,56 @@ const updateClientDuringCreate = async (payload: {
 
           throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
      } else if (payload.clientType === CLIENT_TYPE.USER) {
+          const isExistClient = await Client.findById(payload.clientId);
+          if (!isExistClient) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Client not found with provided ID: ' + payload.clientId);
+          }
+
+          const userDetails = await User.findById(isExistClient.clientId);
+          if (!userDetails) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'User not found with provided ID: ' + isExistClient.clientId);
+          }
+
+          const isExistCar = await Car.findById(payload.carId);
+          if (!isExistCar) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found with provided ID: ' + payload.carId);
+          }
+
+          const isExistBrand = await CarBrand.findById(payload.brand);
+          if (!isExistBrand) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Brand not found with provided ID: ' + payload.brand);
+          }
+
+          const isExistModel = await CarModel.findOne({
+               _id: new mongoose.Types.ObjectId(payload.model),
+               brand: new mongoose.Types.ObjectId(payload.brand),
+          });
+          if (!isExistModel) {
+               throw new AppError(
+                    StatusCodes.NOT_FOUND,
+                    `Model not found with provided ID: '${payload.model}' for brand: '${payload.brand}' (${isExistBrand.title}) - Model ID: ${payload.model} - Brand ID: ${payload.brand}`,
+               );
+          }
+
           // use mongoose transaction
           const session = await mongoose.startSession();
           session.startTransaction();
           try {
-               const isExistClient = await Client.findById(payload.clientId);
-               if (!isExistClient) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Client not found with provided ID: ' + payload.clientId);
-               }
-
-               const userDetails = await User.findById(isExistClient.clientId);
-               if (!userDetails) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'User not found with provided ID: ' + isExistClient.clientId);
-               }
-
-               const isExistCar = await Car.findById(payload.carId);
-               if (!isExistCar) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Car not found with provided ID: ' + payload.carId);
-               }
-
-               const isExistBrand = await CarBrand.findById(payload.brand);
-               if (!isExistBrand) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Brand not found with provided ID: ' + payload.brand);
-               }
-
-               const isExistModel = await CarModel.findOne({
-                    _id: new mongoose.Types.ObjectId(payload.model),
-                    brand: new mongoose.Types.ObjectId(payload.brand),
-               });
-               if (!isExistModel) {
-                    throw new AppError(
-                         StatusCodes.NOT_FOUND,
-                         `Model not found with provided ID: '${payload.model}' for brand: '${payload.brand}' (${isExistBrand.title}) - Model ID: ${payload.model} - Brand ID: ${payload.brand}`,
-                    );
-               }
-
                // update user name
-               userDetails.name = payload.name;
-               userDetails.contact = payload.contact!;
+               if (payload.name && payload.name.trim() !== userDetails?.name?.trim()) {
+                    userDetails.name = payload.name;
+               }
+               if (payload.contact && payload.contact.trim() !== userDetails?.contact?.trim()) {
+                    userDetails.contact = payload.contact;
+               }
                await userDetails.save({ session });
                // update client name
-               isExistClient.contact = payload.contact!;
-               isExistClient.documentNumber = payload.documentNumber!;
+               if (payload.contact && payload.contact.trim() !== isExistClient.contact.trim()) {
+                    isExistClient.contact = payload.contact;
+               }
+               if (payload.documentNumber && payload.documentNumber.trim() !== isExistClient.documentNumber?.trim()) {
+                    isExistClient.documentNumber = payload.documentNumber;
+               }
                await isExistClient.save({ session });
                // link the client vs user and client vs car relation
                isExistCar.brand = new Types.ObjectId(payload.brand!);
@@ -253,7 +261,7 @@ const updateClientDuringCreate = async (payload: {
                await session.abortTransaction();
                session.endSession();
 
-               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Client not created..');
+               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Operation failed..');
           }
      }
 };
