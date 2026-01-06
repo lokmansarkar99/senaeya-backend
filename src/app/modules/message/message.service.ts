@@ -14,6 +14,8 @@ const createMessage = async (payload: Imessage, user: any): Promise<Imessage> =>
      if (foundUser) {
           payload.name = foundUser.name;
      }
+     throw new Error("test");
+     
      const result = await Message.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Message not found.');
