@@ -10,6 +10,7 @@ import { User } from '../user/user.model';
 const createMessage = async (payload: Imessage, user: any): Promise<Imessage> => {
      payload.contact = user.contact;
      const foundUser = await User.findOne({ _id: user._id, role: user.role }).select('name');
+     console.log({foundUser})
      if (foundUser) {
           payload.name = foundUser.name;
      }
