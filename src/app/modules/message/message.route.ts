@@ -8,7 +8,11 @@ import validateUserAuthority from '../../middleware/validateUserAuthority';
 
 const router = express.Router();
 
-router.post('/', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), validateRequest(messageValidation.createMessageZodSchema), messageController.createMessage);
+router.post('/', 
+    // auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), 
+    // validateUserAuthority(), 
+    validateRequest(messageValidation.createMessageZodSchema), 
+    messageController.createMessage);
 
 router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), messageController.getAllMessages);
 
