@@ -233,18 +233,10 @@ const updateClientDuringCreate = async (payload: {
                if (payload.name && payload.name.trim() !== userDetails?.name?.trim()) {
                     userDetails.name = payload.name;
                }
-               console.log("payload.contact",payload.contact)
-               console.log("userDetails.contact",userDetails.contact)
-               console.log(payload.contact && payload.contact.trim() !== userDetails?.contact?.trim())
-               console.log("isExistClient.contact",isExistClient.contact)
-               console.log(payload.contact && payload.contact.trim() !== isExistClient.contact.trim())
-               
-               
                if (payload.contact && payload.contact.trim() !== userDetails?.contact?.trim()) {
                     userDetails.contact = payload.contact;
                }
                await userDetails.save({ session });
-               console.log({userDetails})
                // update client name
                if (payload.contact && payload.contact.trim() !== isExistClient.contact.trim()) {
                     isExistClient.contact = payload.contact;
@@ -253,8 +245,6 @@ const updateClientDuringCreate = async (payload: {
                     isExistClient.documentNumber = payload.documentNumber;
                }
                await isExistClient.save({ session });
-               console.log({isExistClient})
-               throw new Error("test");
                // link the client vs user and client vs car relation
                if (payload.brand) {
                     isExistCar.brand = new Types.ObjectId(payload.brand!);
