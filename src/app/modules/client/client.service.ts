@@ -147,35 +147,40 @@ const createClient = async (payload: any) => {
      }
 };
 
-const updateClientDuringCreate = async (payload: {
-     providerWorkShopId: string;
-     carId: string;
-     clientId: string;
-     clientType: CLIENT_TYPE;
-     workShopNameAsClient?: string;
-     brand?: string;
-     model?: string;
-     year?: string;
-     vin?: string;
-     name?: string;
-     contact?: string;
-     description?: string;
-     documentNumber?: string;
-     carType?: CLIENT_CAR_TYPE; // *
-     plateNumberForInternational?: string; // *
-     plateNumberForSaudi?: {
-          // *
-          symbol?: string;
-          numberEnglish?: string;
-          numberArabic?: string;
-          alphabetsCombinations?: string[];
-     };
-}) => {
+const updateClientDuringCreate = async (
+     user: any,
+     payload: {
+          providerWorkShopId: string;
+          carId: string;
+          clientId: string;
+          clientType: CLIENT_TYPE;
+          workShopNameAsClient?: string;
+          brand?: string;
+          model?: string;
+          year?: string;
+          vin?: string;
+          name?: string;
+          contact?: string;
+          description?: string;
+          documentNumber?: string;
+          carType?: CLIENT_CAR_TYPE; // *
+          plateNumberForInternational?: string; // *
+          plateNumberForSaudi?: {
+               // *
+               symbol?: string;
+               numberEnglish?: string;
+               numberArabic?: string;
+               alphabetsCombinations?: string[];
+          };
+     },
+) => {
      // check is payload.contact is verified or not
      if (payload.contact) {
-          const isVerifiedContact = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
-          if (!isVerifiedContact) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'User contact is not verified.');
+          if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
+               const isVerifiedContact = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
+               if (!isVerifiedContact) {
+                    throw new AppError(StatusCodes.NOT_FOUND, 'User contact is not verified.');
+               }
           }
 
           // check is exist user or as client

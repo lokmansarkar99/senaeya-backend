@@ -15,7 +15,7 @@ const createClient = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateClientDuringCreate = catchAsync(async (req: Request, res: Response) => {
-     const result = await clientService.updateClientDuringCreate(req.body);
+     const result = await clientService.updateClientDuringCreate(req.user, req.body);
 
      sendResponse(res, {
           statusCode: 200,
