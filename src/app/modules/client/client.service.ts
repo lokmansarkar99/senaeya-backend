@@ -212,6 +212,10 @@ const updateClientDuringCreate = async (
 
           throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
      } else if (payload.clientType === CLIENT_TYPE.USER) {
+          const isExistPhoneUsedBythisWorkshopClient = await User.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+          if (isExistPhoneUsedBythisWorkshopClient) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in use, enter another mobile number.');
+          }
           const isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.USER, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
