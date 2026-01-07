@@ -161,9 +161,10 @@ const updateClientDuringCreate = async (payload: {
      contact?: string;
      description?: string;
      documentNumber?: string;
-     carType?: CLIENT_CAR_TYPE;
-     plateNumberForInternational?: string;
+     carType?: CLIENT_CAR_TYPE; // *
+     plateNumberForInternational?: string; // *
      plateNumberForSaudi?: {
+          // *
           symbol?: string;
           numberEnglish?: string;
           numberArabic?: string;
@@ -269,6 +270,17 @@ const updateClientDuringCreate = async (payload: {
                }
                if (payload.vin) {
                     (isExistCar as ICar).vin = payload.vin;
+               }
+               if (payload.carType) {
+                    if (payload.carType === CLIENT_CAR_TYPE.SAUDI && !payload.plateNumberForSaudi) {
+                         (isExistCar as ICar).plateNumberForSaudi = payload.plateNumberForSaudi;
+                         throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for Saudi is required');
+                    }
+                    if (payload.carType === CLIENT_CAR_TYPE.INTERNATIONAL && !payload.plateNumberForInternational) {
+                         (isExistCar as ICar).plateNumberForInternational = payload.plateNumberForInternational;
+                         throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for International is required');
+                    }
+                    (isExistCar as ICar).carType = payload.carType;
                }
                await isExistCar.save({ session });
                await session.commitTransaction();
