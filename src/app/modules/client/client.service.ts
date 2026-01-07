@@ -177,7 +177,7 @@ const updateClientDuringCreate = async (
      console.log('🚀 ~ updateClientDuringCreate ~ payload:', payload);
      const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
           contact: payload.contact,
-          // providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
+          providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
      });
      console.log('🚀 ~ updateClientDuringCreate ~ isPhoneNumberTakenByOtherClientOfThisWorkshop:', isPhoneNumberTakenByOtherClientOfThisWorkshop);
      if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
