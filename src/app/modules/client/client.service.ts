@@ -87,7 +87,7 @@ const createClient = async (payload: any) => {
                          { session },
                     );
                     if (!isExistUser) {
-                         throw new AppError(StatusCodes.NOT_FOUND, 'User creation failed.');
+                         throw new AppError(StatusCodes.NOT_FOUND, 'This number is already taken.');
                     }
                }
                let isExistClient = await Client.findOne({ clientId: isExistUser._id, clientType: CLIENT_TYPE.USER, providerWorkShopId: payload.providerWorkShopId });
@@ -105,7 +105,7 @@ const createClient = async (payload: any) => {
                          { session },
                     );
                     if (!isExistClient) {
-                         throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
+                         throw new AppError(StatusCodes.NOT_FOUND, 'This number is already taken.');
                     }
                }
                if (payload.vin) {
@@ -176,6 +176,17 @@ const updateClientDuringCreate = async (payload: {
           if (!isVerifiedContact) {
                throw new AppError(StatusCodes.NOT_FOUND, 'User contact is not verified.');
           }
+
+          // check is exist user or as client
+          const isExistUser = await User.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+          if (isExistUser) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'User already exists with this contact number.');
+          }
+
+          const isExistClient = await Client.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId });
+          if (isExistClient) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Client already exists with this contact number.');
+          }
      }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
           let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
@@ -197,17 +208,17 @@ const updateClientDuringCreate = async (payload: {
      } else if (payload.clientType === CLIENT_TYPE.USER) {
           const isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.USER, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Client not found with provided ID: ' + payload.clientId);
+               throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
           }
 
-          const userDetails = await User.findById(isExistClient.clientId);
+          const userDetails = await User.findOne({ _id: isExistClient.clientId, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
           if (!userDetails) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'User not found with provided ID: ' + isExistClient.clientId);
+               throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
           }
 
           const isExistCar = await Car.findById(payload.carId);
           if (!isExistCar) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found with provided ID: ' + payload.carId);
+               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
           }
 
           const isExistBrand = await CarBrand.findById(payload.brand);

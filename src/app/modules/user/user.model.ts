@@ -34,6 +34,7 @@ const userSchema = new Schema<IUser, UserModel>(
           contact: {
                type: String,
                required: true,
+               index: true,
                // unique: true,
           },
           nationality: {
