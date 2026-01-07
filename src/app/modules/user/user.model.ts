@@ -182,10 +182,10 @@ userSchema.pre('find', function (next) {
      next();
 });
 
-userSchema.pre('findOne', function (next) {
-     this.find({ isDeleted: { $ne: true } });
-     next();
-});
+// userSchema.pre('findOne', function (next) {
+//      this.find({ isDeleted: { $ne: true } });
+//      next();
+// });
 
 userSchema.pre('aggregate', function (next) {
      this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
