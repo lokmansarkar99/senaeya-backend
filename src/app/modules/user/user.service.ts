@@ -16,8 +16,8 @@ import { sendNotifications } from '../../../helpers/notificationsHelper';
 import session from 'express-session';
 import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
 // create user
-const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string } }) => {
-     const user = await User.isExistUserByContact(payload.contact);
+const createUserToDB = async (payload: IUser & { helperUserId: { contact: string; password: string }; role: USER_ROLES }) => {
+     const user = await User.findOne({ contact: payload.contact, role: payload.role });
      if (user) {
           throw new AppError(StatusCodes.CONFLICT, 'Contact already exists');
      }

@@ -18,6 +18,13 @@ const userSchema = new Schema<IUser, UserModel>(
                enum: Object.values(USER_ROLES),
                default: USER_ROLES.WORKSHOP_OWNER,
           },
+          providerWorkShopId: {
+               type: Types.ObjectId,
+               ref: 'Workshop',
+               required: function (this: IUser) {
+                    return this.role === USER_ROLES.CLIENT;
+               },
+          },
           email: {
                type: String,
                required: false,

@@ -6,9 +6,10 @@ import validateRequest from '../../middleware/validateRequest';
 import auth from '../../middleware/auth';
 const router = express.Router();
 
-router.post('/login', validateRequest(AuthValidation.createLoginZodSchema), AuthController.loginUser);
+router.post('/login', validateRequest(AuthValidation.createLoginWorkshopZodSchema), AuthController.loginUser);
+router.post('/workshop/login', validateRequest(AuthValidation.createLoginWorkshopZodSchema), AuthController.loginUser);
 router.post('/admin/login', validateRequest(AuthValidation.createAdminLoginZodSchema), AuthController.loginUser);
-router.post('/login-with-finger-print', validateRequest(AuthValidation.createLoginZodSchema), AuthController.loginUserWithFingerPrint);
+router.post('/login-with-finger-print', validateRequest(AuthValidation.createLoginWorkshopZodSchema), AuthController.loginUserWithFingerPrint);
 // router.post('/refresh-token', AuthController.refreshToken);
 router.post('/forget-password', validateRequest(AuthValidation.createForgetPasswordZodSchema), AuthController.forgetPassword);
 router.get('/check-user-authority/:providerWorkShopId', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), AuthController.checkUserAuthority);

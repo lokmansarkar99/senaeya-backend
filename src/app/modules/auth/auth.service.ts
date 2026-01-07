@@ -25,7 +25,7 @@ import { sendNotifications } from '../../../helpers/notificationsHelper';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
-     const { contact, password, fcmToken, deviceId, deviceType = 'android',role } = payload;
+     const { contact, password, fcmToken, deviceId, deviceType = 'android', role } = payload;
      if (fcmToken && !deviceId) {
           throw new AppError(StatusCodes.BAD_REQUEST, 'deviceId is required when providing fcmToken');
      }
@@ -35,8 +35,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
 
-     if (role && isExistUser.role !== role) {          
-          throw new AppError(StatusCodes.BAD_REQUEST, `you are not authorised`);
+     if (role && role !== USER_ROLES.WORKSHOP_OWNER && role !== USER_ROLES.WORKSHOP_MEMBER) {
+          if (isExistUser.role !== role) {
+               throw new AppError(StatusCodes.BAD_REQUEST, `you are not authorised`);
+          }
      }
 
      let info = {};
@@ -116,11 +118,17 @@ const loginUserFromDB = async (payload: ILoginData) => {
 };
 
 const loginUserWithFingerPrint = async (payload: ILoginData) => {
-     const { fingerPrintId, fcmToken, deviceId, deviceType = 'android' } = payload;
+     const { fingerPrintId, fcmToken, deviceId, deviceType = 'android', role } = payload;
 
      const isExistUser = await User.findOne({ fingerPrintId });
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+     }
+
+     if (role && role !== USER_ROLES.WORKSHOP_OWNER && role !== USER_ROLES.WORKSHOP_MEMBER) {
+          if (isExistUser.role !== role) {
+               throw new AppError(StatusCodes.BAD_REQUEST, `you are not authorised`);
+          }
      }
 
      //check user status

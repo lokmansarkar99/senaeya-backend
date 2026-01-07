@@ -8,14 +8,16 @@ const createVerifyEmailZodSchema = z.object({
      }),
 });
 
-const createLoginZodSchema = z.object({
+const createLoginWorkshopZodSchema = z.object({
      body: z.union([
           z.object({
                contact: z.string({ required_error: 'Contact is required' }),
                password: z.string({ required_error: 'Password is required' }),
+               role: z.enum([USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER]),
           }),
           z.object({
                fingerPrintId: z.string({ required_error: 'Finger print id is required' }),
+               role: z.enum([USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER]),
           }),
      ]),
 });
@@ -24,7 +26,7 @@ const createAdminLoginZodSchema = z.object({
      body: z.object({
           contact: z.string({ required_error: 'Contact is required' }),
           password: z.string({ required_error: 'Password is required' }),
-          role: z.enum([USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN]),
+          role: z.enum([USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN]),
      }),
 });
 
@@ -58,7 +60,7 @@ const createChangePasswordZodSchema = z.object({
 export const AuthValidation = {
      createVerifyEmailZodSchema,
      createForgetPasswordZodSchema,
-     createLoginZodSchema,
+     createLoginWorkshopZodSchema,
      createAdminLoginZodSchema,
      createResetPasswordZodSchema,
      createChangePasswordZodSchema,

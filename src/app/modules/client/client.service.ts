@@ -72,7 +72,7 @@ const createClient = async (payload: any) => {
           const session = await mongoose.startSession();
           session.startTransaction();
           try {
-               let isExistUser = await User.isExistUserByContact(payload.contact);
+               let isExistUser = await User.findOne({ contact: payload.contact, role: USER_ROLES.CLIENT, providerWorkShopId: payload.providerWorkShopId });
                if (!isExistUser) {
                     [isExistUser] = await User.create(
                          [
@@ -81,6 +81,7 @@ const createClient = async (payload: any) => {
                                    contact: payload.contact,
                                    role: USER_ROLES.CLIENT,
                                    password: config.user.password,
+                                   providerWorkShopId: payload.providerWorkShopId,
                               },
                          ],
                          { session },
@@ -89,7 +90,7 @@ const createClient = async (payload: any) => {
                          throw new AppError(StatusCodes.NOT_FOUND, 'User creation failed.');
                     }
                }
-               let isExistClient = await Client.findOne({ clientId: isExistUser._id, clientType: CLIENT_TYPE.USER });
+               let isExistClient = await Client.findOne({ clientId: isExistUser._id, clientType: CLIENT_TYPE.USER, providerWorkShopId: payload.providerWorkShopId });
                if (!isExistClient) {
                     [isExistClient] = await Client.create(
                          [
@@ -194,7 +195,7 @@ const updateClientDuringCreate = async (payload: {
 
           throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
      } else if (payload.clientType === CLIENT_TYPE.USER) {
-          const isExistClient = await Client.findById(payload.clientId);
+          const isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.USER, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found with provided ID: ' + payload.clientId);
           }

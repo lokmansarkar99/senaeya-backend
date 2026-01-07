@@ -26,6 +26,7 @@ export type IUser = {
      fingerPrintId?: string;
      deviceToken?: string;
      fcmToken?: string;
+     providerWorkShopId?: Types.ObjectId | null;
 };
 
 export type UserModel = {
