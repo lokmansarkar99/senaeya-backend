@@ -248,7 +248,7 @@ const getCarById = async (id: string): Promise<ICar | null> => {
           .populate('plateNumberForSaudi.symbol', 'title image')
           .populate({
                path: 'client',
-               select: 'clientId workShopNameAsClient clientType',
+               select: 'clientId workShopNameAsClient clientType contact',
                populate: {
                     path: 'clientId',
                     select: 'name',
