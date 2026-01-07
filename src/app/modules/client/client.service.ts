@@ -174,10 +174,14 @@ const updateClientDuringCreate = async (
           };
      },
 ) => {
+     console.log('🚀 ~ updateClientDuringCreate ~ payload:', payload);
      const isPhoneNumberTakenByOtherClientOfThisWorkshop = await User.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+     console.log('🚀 ~ updateClientDuringCreate ~ isPhoneNumberTakenByOtherClientOfThisWorkshop:', isPhoneNumberTakenByOtherClientOfThisWorkshop);
      if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in use, enter another mobile number.');
      }
+     throw new Error('tet');
+
      // check is payload.contact is verified or not
      if (payload.contact) {
           if (user.role !== USER_ROLES.SUPER_ADMIN && user.role !== USER_ROLES.ADMIN) {
