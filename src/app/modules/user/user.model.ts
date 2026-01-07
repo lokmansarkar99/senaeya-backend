@@ -178,6 +178,11 @@ userSchema.pre('save', async function (next) {
 
 // Query Middleware
 userSchema.pre('find', function (next) {
+     // Skip the filter if it's a login attempt
+     if (this.getFilter().contact) {
+          return next();
+     }
+
      this.find({ isDeleted: { $ne: true } });
      next();
 });
