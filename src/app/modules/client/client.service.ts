@@ -43,6 +43,13 @@ import { ICar } from '../car/car.interface';
  */
 
 const createClient = async (payload: any) => {
+     const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
+          contact: payload.contact,
+          providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
+     });
+     if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in use, enter another mobile number.');
+     }
      // check is payload.contact is verified or not
      if (payload.contact) {
           const isVerifiedContact = await CheckPhoneNumber.findOne({ phoneNumber: payload.contact, isVerified: true });
@@ -174,16 +181,13 @@ const updateClientDuringCreate = async (
           };
      },
 ) => {
-     console.log('🚀 ~ updateClientDuringCreate ~ payload:', payload);
      const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
           contact: payload.contact,
           providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
      });
-     console.log('🚀 ~ updateClientDuringCreate ~ isPhoneNumberTakenByOtherClientOfThisWorkshop:', isPhoneNumberTakenByOtherClientOfThisWorkshop);
      if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in use, enter another mobile number.');
      }
-     throw new Error('tet');
 
      // check is payload.contact is verified or not
      if (payload.contact) {
