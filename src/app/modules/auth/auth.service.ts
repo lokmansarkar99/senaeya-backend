@@ -31,8 +31,9 @@ const loginUserFromDB = async (payload: ILoginData) => {
      }
 
      const isExistUser = await User.findOne({ contact }).select('+password');
+     console.log('🚀 ~ loginUserFromDB ~ isExistUser:', isExistUser);
      if (!isExistUser) {
-          throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+          throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!*");
      }
 
      if (role && role !== USER_ROLES.WORKSHOP_OWNER && role !== USER_ROLES.WORKSHOP_MEMBER) {

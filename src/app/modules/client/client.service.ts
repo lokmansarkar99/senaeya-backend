@@ -273,11 +273,15 @@ const updateClientDuringCreate = async (payload: {
                }
                if (payload.carType) {
                     if (payload.carType === CLIENT_CAR_TYPE.SAUDI && !payload.plateNumberForSaudi) {
-                         (isExistCar as ICar).plateNumberForSaudi = payload.plateNumberForSaudi;
+                         if (JSON.stringify(payload.plateNumberForSaudi) !== JSON.stringify((isExistCar as ICar).plateNumberForSaudi)) {
+                              (isExistCar as ICar).plateNumberForSaudi = payload.plateNumberForSaudi;
+                         }
                          throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for Saudi is required');
                     }
                     if (payload.carType === CLIENT_CAR_TYPE.INTERNATIONAL && !payload.plateNumberForInternational) {
-                         (isExistCar as ICar).plateNumberForInternational = payload.plateNumberForInternational;
+                         if (payload.plateNumberForInternational !== (isExistCar as ICar).plateNumberForInternational) {
+                              (isExistCar as ICar).plateNumberForInternational = payload.plateNumberForInternational;
+                         }
                          throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for International is required');
                     }
                     (isExistCar as ICar).carType = payload.carType;
