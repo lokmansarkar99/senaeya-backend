@@ -233,6 +233,9 @@ const updateClientDuringCreate = async (payload: {
                if (payload.name && payload.name.trim() !== userDetails?.name?.trim()) {
                     userDetails.name = payload.name;
                }
+               console.log("payload.contact",payload.contact)
+               console.log("userDetails.contact",userDetails.contact)
+               console.log("isExistClient.contact",isExistClient.contact)
                if (payload.contact && payload.contact.trim() !== userDetails?.contact?.trim()) {
                     userDetails.contact = payload.contact;
                }
