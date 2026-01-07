@@ -28,7 +28,7 @@ router.post(
 );
 router.patch(
      '/update-during-create',
-     auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
+     auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
      // fileUploadHandler(),
      // parseFileData(FOLDER_NAMES.DOCUMENT),
      validateUserAuthority(),
