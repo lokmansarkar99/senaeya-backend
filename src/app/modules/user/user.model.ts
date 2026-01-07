@@ -27,7 +27,7 @@ const userSchema = new Schema<IUser, UserModel>(
           contact: {
                type: String,
                required: true,
-               unique: true,
+               // unique: true,
           },
           nationality: {
                type: String,
@@ -136,13 +136,13 @@ userSchema.statics.isMatchPassword = async (password: string, hashPassword: stri
 
 // Pre-Save Hook for Hashing Password & Checking contact Uniqueness
 userSchema.pre('save', async function (next) {
-     // Only check email uniqueness if this is a new user or email is being changed
-     if (this.isNew || this.isModified('contact')) {
-          const existingUser = await User.findOne({ contact: this.get('contact') });
-          if (existingUser && existingUser._id.toString() !== this._id.toString()) {
-               throw new AppError(StatusCodes.BAD_REQUEST, 'contact already exists!');
-          }
-     }
+     // // Only check email uniqueness if this is a new user or email is being changed
+     // if (this.isNew || this.isModified('contact')) {
+     //      const existingUser = await User.findOne({ contact: this.get('contact') });
+     //      if (existingUser && existingUser._id.toString() !== this._id.toString()) {
+     //           throw new AppError(StatusCodes.BAD_REQUEST, 'contact already exists!');
+     //      }
+     // }
 
      // Only hash password if it's provided and modified
      if (this.password && this.isModified('password')) {
