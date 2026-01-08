@@ -199,16 +199,16 @@ const updateClientDuringCreate = async (
                }
           }
 
-          // check is exist user or as client
-          const isExistUser = await User.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
-          if (isExistUser) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'User already exists with this contact number.');
-          }
+          // // check is exist user or as client
+          // const isExistUser = await User.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+          // if (isExistUser) {
+          //      throw new AppError(StatusCodes.NOT_FOUND, 'User already exists with this contact number.');
+          // }
 
-          const isExistClient = await Client.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId });
-          if (isExistClient) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Client already exists with this contact number.');
-          }
+          // const isExistClient = await Client.findOne({ contact: payload.contact, providerWorkShopId: payload.providerWorkShopId });
+          // if (isExistClient) {
+          //      throw new AppError(StatusCodes.NOT_FOUND, 'Client already exists with this contact number.');
+          // }
      }
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
           let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
