@@ -14,6 +14,8 @@ import { redisClient } from './helpers/redis/redis';
 import { socketHelper } from './helpers/socketHelper';
 import { logger } from './shared/logger';
 import setupTimeManagement from './utils/cronJobs';
+import { User } from './app/modules/user/user.model';
+import { Client } from './app/modules/client/client.model';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -43,7 +45,14 @@ export async function startServer() {
           // httpServer.listen(httpPort, `${ipAddress}`, () => {
           //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           // });
-          httpServer.listen(httpPort, `0.0.0.0`, () => {
+          httpServer.listen(httpPort, `0.0.0.0`, async () => {
+               const allClients = await User.find({ role: 'CLIENT' }).lean();
+               allClients.forEach(async (u) => {
+                    console.log(u._id);
+                    const client = await Client.findById(u._id).select('providerWorkShopId');
+                    u.providerWorkShopId = client?.providerWorkShopId;
+                    await User.findByIdAndUpdate(u._id, { providerWorkShopId: client?.providerWorkShopId });
+               });
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
 
