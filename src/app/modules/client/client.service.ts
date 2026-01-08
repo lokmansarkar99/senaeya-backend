@@ -184,9 +184,10 @@ const updateClientDuringCreate = async (
      const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
           contact: payload.contact,
           providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
+          clientType: CLIENT_TYPE.WORKSHOP,
      });
      if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in use, enter another mobile number.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in used By a Workshop, enter another mobile number.');
      }
 
      // check is payload.contact is verified or not
