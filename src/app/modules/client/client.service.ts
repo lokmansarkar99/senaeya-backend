@@ -210,23 +210,83 @@ const updateClientDuringCreate = async (
           //      throw new AppError(StatusCodes.NOT_FOUND, 'Client already exists with this contact number.');
           // }
      }
+
+     const isExistCar = await Car.findById(payload.carId);
+     if (!isExistCar) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
+     }
+
+     const isExistBrand = await CarBrand.findById(payload.brand);
+     if (!isExistBrand) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Brand not found with provided ID: ' + payload.brand);
+     }
+
+     const isExistModel = await CarModel.findOne({
+          _id: new mongoose.Types.ObjectId(payload.model),
+          brand: new mongoose.Types.ObjectId(payload.brand),
+     });
+     if (!isExistModel) {
+          throw new AppError(
+               StatusCodes.NOT_FOUND,
+               `Model not found with provided ID: '${payload.model}' for brand: '${payload.brand}' (${isExistBrand.title}) - Model ID: ${payload.model} - Brand ID: ${payload.brand}`,
+          );
+     }
+
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          let isExistClient = await Client.findOne({ workShopNameAsClient: payload.workShopNameAsClient, clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
+          let isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
           if (!isExistClient) {
-               isExistClient = await Client.create({
-                    clientType: payload.clientType,
-                    workShopNameAsClient: payload.workShopNameAsClient,
-                    documentNumber: payload.documentNumber || null,
-                    providerWorkShopId: payload.providerWorkShopId,
-                    contact: payload.contact,
-               });
-               if (!isExistClient) {
-                    throw new AppError(StatusCodes.NOT_FOUND, 'Client creation failed.');
-               }
-               return isExistClient;
+               throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found');
           }
 
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
+          // use mongoose transaction
+          const session = await mongoose.startSession();
+          session.startTransaction();
+          try {
+               if (payload.workShopNameAsClient) {
+                    isExistClient.workShopNameAsClient = payload.workShopNameAsClient;
+                    await isExistClient.save({ session });
+               }
+
+               // link the client vs user and client vs car relation
+               if (payload.brand) {
+                    isExistCar.brand = new Types.ObjectId(payload.brand!);
+               }
+               if (payload.model) {
+                    (isExistCar as ICar).model = new Types.ObjectId(payload.model!);
+               }
+               if (payload.year) {
+                    isExistCar.year = payload.year!.toString();
+               }
+               if (payload.vin) {
+                    (isExistCar as ICar).vin = payload.vin;
+               }
+               if (payload.carType) {
+                    if (payload.carType === CLIENT_CAR_TYPE.SAUDI && !payload.plateNumberForSaudi) {
+                         if (JSON.stringify(payload.plateNumberForSaudi) !== JSON.stringify((isExistCar as ICar).plateNumberForSaudi)) {
+                              (isExistCar as ICar).plateNumberForSaudi = payload.plateNumberForSaudi;
+                         }
+                         throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for Saudi is required');
+                    }
+                    if (payload.carType === CLIENT_CAR_TYPE.INTERNATIONAL && !payload.plateNumberForInternational) {
+                         if (payload.plateNumberForInternational !== (isExistCar as ICar).plateNumberForInternational) {
+                              (isExistCar as ICar).plateNumberForInternational = payload.plateNumberForInternational;
+                         }
+                         throw new AppError(StatusCodes.BAD_REQUEST, 'Plate number for International is required');
+                    }
+                    (isExistCar as ICar).carType = payload.carType;
+               }
+               await isExistCar.save({ session });
+               await session.commitTransaction();
+               session.endSession();
+               return isExistClient;
+          } catch (error) {
+               console.log('🚀 ~ updateClientDuringCreate ~ error:', error);
+               // Abort the transaction on error
+               await session.abortTransaction();
+               session.endSession();
+
+               throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Operation failed..');
+          }
      } else if (payload.clientType === CLIENT_TYPE.USER) {
           const isExistClient = await Client.findOne({
                _id: new mongoose.Types.ObjectId(payload.clientId),
@@ -241,27 +301,6 @@ const updateClientDuringCreate = async (
           const userDetails = await User.findOne({ _id: isExistClient.clientId, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
           if (!userDetails) {
                throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
-          }
-
-          const isExistCar = await Car.findById(payload.carId);
-          if (!isExistCar) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
-          }
-
-          const isExistBrand = await CarBrand.findById(payload.brand);
-          if (!isExistBrand) {
-               throw new AppError(StatusCodes.NOT_FOUND, 'Brand not found with provided ID: ' + payload.brand);
-          }
-
-          const isExistModel = await CarModel.findOne({
-               _id: new mongoose.Types.ObjectId(payload.model),
-               brand: new mongoose.Types.ObjectId(payload.brand),
-          });
-          if (!isExistModel) {
-               throw new AppError(
-                    StatusCodes.NOT_FOUND,
-                    `Model not found with provided ID: '${payload.model}' for brand: '${payload.brand}' (${isExistBrand.title}) - Model ID: ${payload.model} - Brand ID: ${payload.brand}`,
-               );
           }
 
           // use mongoose transaction
