@@ -233,6 +233,7 @@ const updateClientDuringCreate = async (
                clientType: CLIENT_TYPE.USER,
                providerWorkShopId: payload.providerWorkShopId,
           });
+          console.log('🚀 ~ updateClientDuringCreate ~ isExistClient:', isExistClient);
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
           }
