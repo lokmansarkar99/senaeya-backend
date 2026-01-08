@@ -228,6 +228,7 @@ const updateClientDuringCreate = async (
 
           throw new AppError(StatusCodes.NOT_FOUND, 'Client already exist for you.....');
      } else if (payload.clientType === CLIENT_TYPE.USER) {
+          console.log('🚀 ~ updateClientDuringCreate ~ payload.clientId:', payload.clientId);
           const isExistClient = await Client.findOne({
                _id: new mongoose.Types.ObjectId(payload.clientId),
                // clientType: CLIENT_TYPE.USER,
