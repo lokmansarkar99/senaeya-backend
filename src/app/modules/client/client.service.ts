@@ -181,11 +181,14 @@ const updateClientDuringCreate = async (
           };
      },
 ) => {
-     const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
+     const isPhoneNumberTakenByOtherClientOfThisWorkshop =
+          await Client.findOne({
           contact: payload.contact,
+          _id: { $ne: new mongoose.Types.ObjectId(payload.clientId) },
           providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
           clientType: CLIENT_TYPE.WORKSHOP,
      });
+
      if (isPhoneNumberTakenByOtherClientOfThisWorkshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Mobile number already in used By a Workshop, enter another mobile number.');
      }
