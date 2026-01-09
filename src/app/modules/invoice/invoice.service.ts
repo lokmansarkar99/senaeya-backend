@@ -313,7 +313,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           })
           .populate({
                path: 'providerWorkShopId',
-               select: 'image ownerId address workshopNameArabic taxVatNumber crn bankAccountNumber',
+               select: 'image ownerId address workshopNameArabic workshopNameEnglish taxVatNumber crn bankAccountNumber',
                populate: {
                     path: 'ownerId',
                     select: 'name',
@@ -321,11 +321,11 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           })
           .populate({
                path: 'sparePartsList',
-               select: 'item quantity finalCost',
-               populate: {
-                    path: 'item',
-                    select: 'title cost',
-               },
+               select: 'itemName quantity cost code finalCost',
+               // populate: {
+               //      path: 'item',
+               //      select: 'title cost',
+               // },
           })
           .populate({
                path: 'car',

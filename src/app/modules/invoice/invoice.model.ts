@@ -113,16 +113,17 @@ InvoiceSchema.pre('validate', async function (next) {
           noTaxOnlyCostOfWorks += payload.worksList.reduce((acc, work) => acc + work.finalCost, 0);
      }
      // discount
-     let onlyDiscoutFlatAmount = default_discount;
-     const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
-     if (workShopSettings && workShopSettings.workShopDiscount) {
-          onlyDiscoutFlatAmount = workShopSettings.workShopDiscount as number;
-     }
-     if (noTaxOnlyCostOfWorks && payload.discount && payload.discountType) {
-          onlyDiscoutFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (noTaxOnlyCostOfWorks * payload.discount) / 100 : payload.discount;
-     }
+     // let onlyDiscoutFlatAmount = default_discount;
+     // const workShopSettings = await Settings.findOne({ providerWorkShopId: payload.providerWorkShopId }).select('workShopDiscount');
+     // if (workShopSettings && workShopSettings.workShopDiscount) {
+     //      onlyDiscoutFlatAmount = workShopSettings.workShopDiscount as number;
+     // }
+     // if (noTaxOnlyCostOfWorks && payload.discount && payload.discountType) {
+     //      onlyDiscoutFlatAmount = payload.discountType === DiscountType.PERCENTAGE ? (noTaxOnlyCostOfWorks * payload.discount) / 100 : payload.discount;
+     // }
 
-     let noTaxButDiscountAdded_WorkCosts = noTaxOnlyCostOfWorks - onlyDiscoutFlatAmount;
+     // let noTaxButDiscountAdded_WorkCosts = noTaxOnlyCostOfWorks - onlyDiscoutFlatAmount;
+     let noTaxButDiscountAdded_WorkCosts = noTaxOnlyCostOfWorks - (payload.discount || 0);
      let vatPercentage = default_vat;
      const appSettings = await Settings.findOne({ providerWorkShopId: undefined }).select('defaultVat');
      if (appSettings && appSettings.defaultVat) {
@@ -146,7 +147,8 @@ InvoiceSchema.pre('validate', async function (next) {
      payload.totalCostExcludingTax = noTaxOnlyPartsCosts + noTaxOnlyCostOfWorks;
      payload.taxAmount = onlyTaxInFlatAmount;
      payload.totalCostIncludingTax = withTaxAndDiscountWorkCosts;
-     payload.finalDiscountInFlatAmount = onlyDiscoutFlatAmount;
+     // payload.finalDiscountInFlatAmount = onlyDiscoutFlatAmount;
+     payload.finalDiscountInFlatAmount = payload.discount || 0;
      payload.taxPercentage = vatPercentage;
      payload.finalCost = finalCost;
      payload.totalCostOfWorkShopExcludingTax = noTaxOnlyCostOfWorks;
