@@ -87,9 +87,12 @@ const getTryCouponByCode = async (packageId: string, couponCode: string) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Coupon has not started.');
      }
 
+     console.log('🚀 ~ getTryCouponByCode ~ Number(isExistPackage.price):', Number(isExistPackage.price));
      const discountAmount = calculateDiscount(coupon, Number(isExistPackage.price));
+     console.log('🚀 ~ getTryCouponByCode ~ discountAmount:', discountAmount);
 
      const discountedPrice = Number(isExistPackage.price) - discountAmount;
+     console.log('🚀 ~ getTryCouponByCode ~ discountedPrice:', discountedPrice);
 
      return { coupon, discountedPrice, discountAmount };
 };
