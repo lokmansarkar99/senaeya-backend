@@ -7,6 +7,7 @@ export const calculateDiscount = (coupon: ICoupon, orderAmount: number): number 
      if (coupon.discountType === COUPON_DISCOUNT_TYPE.PERCENTAGE) {
           discountAmount = (coupon.discountValue / 100) * orderAmount;
      } else if (coupon.discountType === COUPON_DISCOUNT_TYPE.FLAT) {
+          console.log('🚀 ~ calculateDiscount ~ coupon.discountValue:', coupon.discountValue);
           discountAmount = coupon.discountValue;
      }
 
