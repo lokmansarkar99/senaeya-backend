@@ -13,7 +13,7 @@ export type IPackage = {
      paymentType: PackagePaymentType;
      subscriptionType: PackageSubscriptionType;
      status: PackageStatus;
-     discountPercentage: number;
+     discountPercentage?: number;
      isDeleted: boolean;
 };
 

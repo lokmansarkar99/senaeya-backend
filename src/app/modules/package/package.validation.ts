@@ -21,7 +21,7 @@ const createPackageZodSchema = z.object({
           subscriptionType: z.nativeEnum(PackageSubscriptionType, {
                required_error: 'Subscription type is required',
           }),
-          discountPercentage: z.number(),
+          discountPercentage: z.number().optional(),
           cutOffprice: z.number(),
      }),
 });
