@@ -55,8 +55,8 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           cart_id: isExistPackage._id.toString(),
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
-          callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          callback: `https://api.senaeya.net/api/v1/clickpay/callback`, // Your callback URL
+          return: `https://api.senaeya.net/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
      console.log('🚀 ~ result:', result);
