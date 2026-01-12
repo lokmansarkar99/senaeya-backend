@@ -26,6 +26,12 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
      if (!payload.contact) {
           payload.contact = user.contact;
      }
+     if (payload.contact) {
+          const isExistWorkshopByContact = await WorkShop.findOne({ contact: payload.contact });
+          if (isExistWorkshopByContact) {
+               throw new AppError(StatusCodes.BAD_REQUEST, 'WorkShop already exists with this phone.');
+          }
+     }
      payload.ownerId = user.id;
      const result = await WorkShop.create(payload);
      if (!result) {
