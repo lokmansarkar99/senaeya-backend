@@ -59,6 +59,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?providerWorkShopId=${req.body.providerWorkShopId}&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
      };
      const result = await initiatePaymentService(paymentRequest);
+     console.log('🚀 ~ result:', result);
 
      if (result && result.redirect_url) {
           // Redirect user to ClickPay's hosted page
