@@ -465,6 +465,7 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
+     console.log(`🚀 ~ getClientByClientContact ~ { contact, providerWorkShopId }:`, { contact, providerWorkShopId });
      const client = await Client.findOne({ contact, providerWorkShopId }).populate('clientId', 'documentNumber workshopNameEnglish workshopNameArabic');
      if (!client) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.4');
