@@ -130,6 +130,7 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
           Car.find()
                .populate({
                     path: 'client',
+                    match: query.contact ? { contact: query.contact } : {},
                     populate: {
                          path: 'clientId',
                     },
