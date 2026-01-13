@@ -126,11 +126,12 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
 };
 
 const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+     console.log('🚀 ~ getAllCars ~ query:', query);
      const queryBuilder = new QueryBuilder(
           Car.find()
                .populate({
                     path: 'client',
-                    match: query.contact ? { contact: query.contact } : {},
+                    match: query.contact ? { contact: query.searchTerm } : {},
                     populate: {
                          path: 'clientId',
                     },
