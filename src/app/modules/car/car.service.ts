@@ -137,7 +137,7 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
           : {};
      const queryBuilder = new QueryBuilder(
           Car.find({
-               ...carFilters,
+               // ...carFilters,
           })
                .populate({
                     path: 'client',
