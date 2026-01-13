@@ -148,6 +148,8 @@ import { Invoice } from '../invoice/invoice.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { IworkShop } from '../workShop/workShop.interface';
 import { WorkShop } from '../workShop/workShop.model';
+import AppError from '../../../errors/AppError';
+import { StatusCodes } from 'http-status-codes';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
@@ -225,6 +227,10 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           WorkShop.findById(providerWorkShopId).populate('ownerId', 'contact'),
      ]);
 
+     if (!workshop) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found');
+     }
+
      const numberOfPaidInvoices = paidInvoicesAgg[0]?.count || 0;
      const numberOfUnpaidPostpaidInvoices = unpaidPostpaidInvoicesAgg[0]?.count || 0;
      const numberOfUnpaidNonPostpaidInvoices = unpaidNonPostpaidInvoicesAgg[0]?.count || 0;
@@ -292,8 +298,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&access_token=${access_token}`,
           });
 
-          console.log('🚀 ~ getAllReportsByCreatedDateRange ~ workshop:', workshop);
-          await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop?.contact, body: message });
+          await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop.contact, body: message });
 
           await sendNotifications({
                title: `${user.name}`,
