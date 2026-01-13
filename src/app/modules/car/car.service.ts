@@ -4,7 +4,7 @@ import { ICar, IcarCreate } from './car.interface';
 import { Car } from './car.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import unlinkFile from '../../../shared/unlinkFile';
-import { CLIENT_CAR_TYPE } from '../client/client.enum';
+import { CLIENT_CAR_TYPE, CLIENT_TYPE } from '../client/client.enum';
 import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
 import { CarModel } from '../carModel/carModel.model';
@@ -126,12 +126,21 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
 };
 
 const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     console.log('🚀 ~ getAllCars ~ query:', query);
+     const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
+     const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
+     const arrayOfClientIds = searchedClients.map((client) => client._id);
+     delete query.searchTerm;
+     const carFilters = arrayOfClientIds
+          ? {
+                 client: { $in: arrayOfClientIds },
+            }
+          : {};
      const queryBuilder = new QueryBuilder(
-          Car.find()
+          Car.find({
+               ...carFilters,
+          })
                .populate({
                     path: 'client',
-                    match: query.contact ? { contact: query.searchTerm } : {},
                     populate: {
                          path: 'clientId',
                     },
