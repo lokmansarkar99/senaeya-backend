@@ -145,6 +145,7 @@ const createClient = async (payload: any) => {
                session.endSession();
                return isExistClient;
           } catch (error) {
+               console.log('🚀 ~ createClient ~ error:', error);
                // Abort the transaction on error
                await session.abortTransaction();
                session.endSession();
@@ -181,8 +182,7 @@ const updateClientDuringCreate = async (
           };
      },
 ) => {
-     const isPhoneNumberTakenByOtherClientOfThisWorkshop =
-          await Client.findOne({
+     const isPhoneNumberTakenByOtherClientOfThisWorkshop = await Client.findOne({
           contact: payload.contact,
           _id: { $ne: new mongoose.Types.ObjectId(payload.clientId) },
           providerWorkShopId: new mongoose.Types.ObjectId(payload.providerWorkShopId),
