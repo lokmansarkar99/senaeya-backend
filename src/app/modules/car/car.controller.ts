@@ -25,6 +25,17 @@ const getAllCars = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getAllCarsForAdmin = catchAsync(async (req: Request, res: Response) => {
+     const result = await carService.getAllCarsForAdmin(req.query);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Cars retrieved successfully',
+          data: result,
+     });
+});
+
 const getAllUnpaginatedCars = catchAsync(async (req: Request, res: Response) => {
      const result = await carService.getAllUnpaginatedCars();
 
@@ -82,14 +93,15 @@ const getCarById = catchAsync(async (req: Request, res: Response) => {
           message: 'Car retrieved successfully',
           data: result || undefined,
      });
-});  
+});
 
 export const carController = {
      createCar,
      getAllCars,
+     getAllCarsForAdmin,
      getAllUnpaginatedCars,
      updateCar,
      deleteCar,
      hardDeleteCar,
-     getCarById
+     getCarById,
 };

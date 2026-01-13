@@ -126,6 +126,49 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
 };
 
 const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+     // const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
+     // const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
+     // const arrayOfClientIds = searchedClients.map((client) => client._id);
+     // delete query.searchTerm;
+     // const carFilters = arrayOfClientIds
+     //      ? {
+     //             client: { $in: arrayOfClientIds },
+     //        }
+     //      : {};
+     const queryBuilder = new QueryBuilder(
+          Car.find({
+               // ...carFilters,
+          })
+               .populate({
+                    path: 'client',
+                    populate: {
+                         path: 'clientId',
+                    },
+               })
+               .populate({
+                    path: 'model',
+                    select: 'title',
+               })
+               .populate({
+                    path: 'plateNumberForSaudi.symbol',
+                    select: 'title image',
+               })
+               .populate({
+                    path: 'brand',
+                    select: '_id image title',
+                    populate: {
+                         path: 'country',
+                         select: '_id image title',
+                    },
+               }),
+          query,
+     );
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     const meta = await queryBuilder.countTotal();
+     return { meta, result };
+};
+
+const getAllCarsForAdmin = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
      const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
      const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
      const arrayOfClientIds = searchedClients.map((client) => client._id);
@@ -137,7 +180,7 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
           : {};
      const queryBuilder = new QueryBuilder(
           Car.find({
-               carFilters,
+               ...carFilters,
           })
                .populate({
                     path: 'client',
@@ -277,4 +320,5 @@ export const carService = {
      hardDeleteCar,
      getCarById,
      createCarWithSession,
+     getAllCarsForAdmin,
 };
