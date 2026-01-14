@@ -1,9 +1,49 @@
 import fs from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
+import { getTLVForValue } from './generateFatooraQr';
 
+const generateQRFromObject = async (data: any) => {
+     // Create TLV buffers for each field
+     const tlvBuffers: Buffer[] = [
+          getTLVForValue(1, data.workshopName),
+          getTLVForValue(2, data.subscriptionId),
+          getTLVForValue(3, data.start),
+          getTLVForValue(4, data.end),
+          getTLVForValue(5, data.status),
+          getTLVForValue(6, data.amountPaid),
+     ];
 
-const generateQRFromObject = async (data: any, fileName: string = 'subscription_qr_code') => {
+     // Concatenate all TLVs into one buffer
+     const qrBuffer = Buffer.concat(tlvBuffers);
+
+     // Convert to Base64 (this will be encoded inside the QR)
+     const qrBase64 = qrBuffer.toString('base64');
+     console.log('✅ Base64 TLV Payload:\n', qrBase64);
+
+     // Ensure uploads/image directory exists
+     const uploadsDir = path.join(process.cwd(), 'uploads', 'image');
+     if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+     }
+
+     // Generate QR image path
+     const fileName = `${data.workshopName}_${data.subscriptionId}_subscription_qr_code.png`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+     const filePath = path.join(uploadsDir, fileName);
+
+     // Generate QR code
+     await QRCode.toFile(filePath, qrBase64, {
+          type: 'png',
+          errorCorrectionLevel: 'M',
+          margin: 1,
+          scale: 6,
+     });
+
+     console.log(`🎉 QR Code saved at ${filePath}`);
+     return { qrImagePath: `/image/${fileName}` };
+};
+
+const generateQRFromObject_old = async (data: any, fileName: string = 'subscription_qr_code') => {
      try {
           // Extract only essential information for the QR code
           const qrData = {
@@ -14,7 +54,6 @@ const generateQRFromObject = async (data: any, fileName: string = 'subscription_
                start: data.currentPeriodStart,
                end: data.currentPeriodEnd,
           };
-
 
           // Format the full object data into a table-like string (for display purposes)
           const tableData = `
@@ -48,7 +87,7 @@ const generateQRFromObject = async (data: any, fileName: string = 'subscription_
           console.log(`✅ QR Code generated at: ${filePath}`);
 
           return {
-               qrImagePath: relativePath
+               qrImagePath: relativePath,
           };
      } catch (error) {
           console.error('❌ Error generating QR code:', error);
@@ -56,7 +95,4 @@ const generateQRFromObject = async (data: any, fileName: string = 'subscription_
      }
 };
 
-
-
-
-export { generateQRFromObject };
+export { generateQRFromObject_old, generateQRFromObject };

@@ -8,7 +8,7 @@ import QRCode from 'qrcode';
  * @param tagValue - String value for this tag
  * @returns Buffer containing [tag][length][value]
  */
-function getTLVForValue(tagNum: number, tagValue: string): Buffer {
+export function getTLVForValue(tagNum: number, tagValue: string): Buffer {
      const tagBuffer = Buffer.from([tagNum]);
      const valueBuffer = Buffer.from(tagValue, 'utf8');
      const lengthBuffer = Buffer.from([valueBuffer.length]);
@@ -78,5 +78,3 @@ generateFatooraQR({
 });
 
 // command : npx ts-node src/helpers/qrcode/generateFatooraQr.ts
-
-
