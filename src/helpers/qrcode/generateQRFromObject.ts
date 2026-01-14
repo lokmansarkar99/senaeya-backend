@@ -87,6 +87,15 @@ const generateQRFromObject = async (data: {
           getTLVForValue(6, data.amountPaid.toString()),
      ];
 
+     console.log(`
+_${data.workshop.workshopNameEnglish.toString()}
+_${data._id.toString()}
+_${data.currentPeriodStart.toString()}
+_${data.currentPeriodEnd.toString()}
+_${data.status.toString()}
+_${data.amountPaid.toString()}
+          `);
+
      // Concatenate all TLVs into one buffer
      const qrBuffer = Buffer.concat(tlvBuffers);
 
