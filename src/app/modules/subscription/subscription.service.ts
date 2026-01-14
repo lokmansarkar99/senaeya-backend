@@ -159,7 +159,7 @@ const createSubscriptionByPackageIdForWorkshop = async (
                // WhatsApp notification
                const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
                await whatsAppHelper.sendWhatsAppTextMessage({
-                    to: (workshop.ownerId as any).contact,
+                    to: workshop.contact,
                     body: message,
                });
 
@@ -219,7 +219,7 @@ const upgradeSubscriptionToDB = async (subscriptionId: string, payload: any) => 
           const action = payload.currentPeriodEnd > activeSubscription.currentPeriodEnd ? 'extended' : 'downgraded';
 
           await whatsAppHelper.sendWhatsAppTextMessage({
-               to: (workshop.ownerId as any).contact,
+               to: workshop.contact,
                body: `
                     Your subscription to Senaeya app has been ${action} for ${extendedDaysCount}  days.
     تم تمديد اشتراككم في تطبيق الصناعية لمدة ${extendedDaysCount}  يوم.
