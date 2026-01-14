@@ -32,8 +32,12 @@ const forgetPassword = (values: { name: string; password: string; contact: strin
 };
 
 const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; workshopNameArabic: string }) => {
-     return `Your car is ready for collection at ${values.workshopNameEnglish}
-     سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
+     //  return `Your car is ready for collection at ${values.workshopNameEnglish}
+     //  سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
+     return `
+      Your car is ready for collection at ${values.workshopNameEnglish}
+     سيارتك جاهزة للاستلام في ${values.workshopNameArabic} 
+    `;
 };
 
 const createInvoice = async (
