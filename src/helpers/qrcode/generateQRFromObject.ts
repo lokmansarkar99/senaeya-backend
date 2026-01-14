@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import { getTLVForValue } from './generateFatooraQr';
 
 const generateQRFromObject = async (data: any) => {
+     console.log('🚀 ~ generateQRFromObject ~ data:', data);
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
           getTLVForValue(1, data.workshopName.toString()),
