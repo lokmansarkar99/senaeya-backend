@@ -3,80 +3,7 @@ import path from 'path';
 import QRCode from 'qrcode';
 import { getTLVForValue } from './generateFatooraQr';
 
-const generateQRFromObject = async (data: {
-     _id: string;
-     trxId: string;
-     __v: number;
-
-     amountPaid: number;
-     price: number;
-     flatDiscountedAmount: number;
-     flatVatAmount: number;
-     vatPercent: number;
-
-     contact: string;
-     coupon: string;
-
-     status: 'active' | 'inactive' | 'expired';
-
-     createdAt: Date;
-     updatedAt: Date;
-     currentPeriodStart: Date;
-     currentPeriodEnd: Date;
-
-     package: string;
-
-     workshop: {
-          _id: string;
-
-          workshopNameEnglish: string;
-          workshopNameArabic: string;
-
-          contact: string;
-          address: string;
-
-          unn: string;
-          crn: string;
-          mln: string;
-          taxVatNumber: string;
-          bankAccountNumber: string;
-
-          workshopGEOlocation: {
-               type: 'Point';
-               coordinates: number[];
-          };
-
-          isAvailableMobileWorkshop: boolean;
-          isDeleted: boolean;
-          isUsedTrial: boolean;
-
-          generatedInvoiceCount: number;
-
-          regularWorkingSchedule: {
-               startDay: string;
-               endDay: string;
-               startTime: string;
-               endTime: string;
-          };
-
-          ramadanWorkingSchedule: {
-               startDay: string;
-               endDay: string;
-               startTime: string;
-               endTime: string;
-          };
-
-          ownerId: string;
-          helperUserId: string;
-
-          subscribedPackage: string;
-          subscriptionId: string;
-
-          createdAt: Date;
-          updatedAt: Date;
-          __v: number;
-     };
-}) => {
+const generateQRFromObject = async (data: any) => {
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
           getTLVForValue(1, data.workshop.workshopNameEnglish.toString()),
@@ -86,15 +13,6 @@ const generateQRFromObject = async (data: {
           getTLVForValue(5, data.status.toString()),
           getTLVForValue(6, data.amountPaid.toString()),
      ];
-
-     console.log(`
-_${data.workshop.workshopNameEnglish.toString()}
-_${data._id.toString()}
-_${data.currentPeriodStart.toString()}
-_${data.currentPeriodEnd.toString()}
-_${data.status.toString()}
-_${data.amountPaid.toString()}
-          `);
 
      // Concatenate all TLVs into one buffer
      const qrBuffer = Buffer.concat(tlvBuffers);
@@ -110,7 +28,7 @@ _${data.amountPaid.toString()}
      }
 
      // Generate QR image path
-     const fileName = `${data.workshopName}_${data.subscriptionId}_subscription_qr_code.png`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+     const fileName = `${data.workshop.workshopNameEnglish}_${data._id}_subscription_qr_code.png`.replace(/[^a-zA-Z0-9_.-]/g, '_');
      const filePath = path.join(uploadsDir, fileName);
 
      // Generate QR code
