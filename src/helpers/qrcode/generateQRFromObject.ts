@@ -3,14 +3,86 @@ import path from 'path';
 import QRCode from 'qrcode';
 import { getTLVForValue } from './generateFatooraQr';
 
-const generateQRFromObject = async (data: any) => {
-     console.log('🚀 ~ generateQRFromObject ~ data:', data);
+const generateQRFromObject = async (data: {
+     _id: string;
+     trxId: string;
+     __v: number;
+
+     amountPaid: number;
+     price: number;
+     flatDiscountedAmount: number;
+     flatVatAmount: number;
+     vatPercent: number;
+
+     contact: string;
+     coupon: string;
+
+     status: 'active' | 'inactive' | 'expired';
+
+     createdAt: Date;
+     updatedAt: Date;
+     currentPeriodStart: Date;
+     currentPeriodEnd: Date;
+
+     package: string;
+
+     workshop: {
+          _id: string;
+
+          workshopNameEnglish: string;
+          workshopNameArabic: string;
+
+          contact: string;
+          address: string;
+
+          unn: string;
+          crn: string;
+          mln: string;
+          taxVatNumber: string;
+          bankAccountNumber: string;
+
+          workshopGEOlocation: {
+               type: 'Point';
+               coordinates: number[];
+          };
+
+          isAvailableMobileWorkshop: boolean;
+          isDeleted: boolean;
+          isUsedTrial: boolean;
+
+          generatedInvoiceCount: number;
+
+          regularWorkingSchedule: {
+               startDay: string;
+               endDay: string;
+               startTime: string;
+               endTime: string;
+          };
+
+          ramadanWorkingSchedule: {
+               startDay: string;
+               endDay: string;
+               startTime: string;
+               endTime: string;
+          };
+
+          ownerId: string;
+          helperUserId: string;
+
+          subscribedPackage: string;
+          subscriptionId: string;
+
+          createdAt: Date;
+          updatedAt: Date;
+          __v: number;
+     };
+}) => {
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
-          getTLVForValue(1, data.workshopName.toString()),
-          getTLVForValue(2, data.subscriptionId.toString()),
-          getTLVForValue(3, data.start.toString()),
-          getTLVForValue(4, data.end.toString()),
+          getTLVForValue(1, data.workshop.workshopNameEnglish.toString()),
+          getTLVForValue(2, data._id.toString()),
+          getTLVForValue(3, data.currentPeriodStart.toString()),
+          getTLVForValue(4, data.currentPeriodEnd.toString()),
           getTLVForValue(5, data.status.toString()),
           getTLVForValue(6, data.amountPaid.toString()),
      ];
