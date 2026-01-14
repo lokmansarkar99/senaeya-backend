@@ -4150,10 +4150,16 @@ const subscriptionDetailsPdf = async (subscription: ISubscription & { workshop: 
      `;
 };
 
-const subscriptionExtended = (values: { daysCount: number }) => {
-     return `Your subscription to Senaeya app has been extended for ${values.daysCount} days.
-    تم تمديد اشتراككم في تطبيق الصناعية لمدة ${values.daysCount} يوم.
-    `;
+const subscriptionExtended = (values: { daysCount: number; subscriptionId: string }) => {
+     //  return `Your subscription to Senaeya app has been extended for ${values.daysCount} days.
+     // تم تمديد اشتراككم في تطبيق الصناعية لمدة ${values.daysCount} يوم.
+     // `;
+     return `
+      The subscription was successful, and the invoice was issued and sent via WhatsApp
+      تم الاشتراك بنجاح وتم إصدار الفاتورة وإرسالها عبر الواتساب
+    
+      visit: ${config.frontend_subscription_url}/${values.subscriptionId}
+      `;
 };
 
 const scheduleInvoiceWarningMessage = ({ workshopNameEnglish, workshopNameArabic }: { workshopNameEnglish: string; workshopNameArabic: string }) => {

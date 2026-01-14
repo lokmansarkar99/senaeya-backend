@@ -157,7 +157,7 @@ const createSubscriptionByPackageIdForWorkshop = async (
                const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
 
                // WhatsApp notification
-               const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount });
+               const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
                await whatsAppHelper.sendWhatsAppTextMessage({
                     to: (workshop.ownerId as any).contact,
                     body: message,
@@ -209,6 +209,23 @@ const upgradeSubscriptionToDB = async (subscriptionId: string, payload: any) => 
      }
 
      const updatedSubscription = await Subscription.findByIdAndUpdate(subscriptionId, { $set: payload }, { new: true, runValidators: true });
+
+     // **
+
+     if (payload.currentPeriodEnd) {
+          // Calculate subscription duration in days
+          const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
+
+          const action = payload.currentPeriodEnd > activeSubscription.currentPeriodEnd ? 'extended' : 'downgraded';
+
+          await whatsAppHelper.sendWhatsAppTextMessage({
+               to: (workshop.ownerId as any).contact,
+               body: `
+                    Your subscription to Senaeya app has been ${action} for ${extendedDaysCount}  days.
+    تم تمديد اشتراككم في تطبيق الصناعية لمدة ${extendedDaysCount}  يوم.
+               `,
+          });
+     }
 
      return updatedSubscription;
 };

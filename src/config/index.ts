@@ -7,6 +7,7 @@ export default {
      frontend_url: process.env.FRONTEND_URL,
      frontend_invoice_url: process.env.FRONTEND_INVOICE_URL,
      frontend_report_url: process.env.FRONTEND_REPORT_URL,
+     frontend_subscription_url: process.env.FRONTEND_SUBSCRIPTION_URL,
      backend_url: process.env.BACKEND_URL,
      reset_pass_expire_time: process.env.RESET_TOKEN_EXPIRE_TIME,
      database_url: process.env.DATABASE_URL,
