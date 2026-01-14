@@ -213,17 +213,19 @@ const upgradeSubscriptionToDB = async (subscriptionId: string, payload: any) => 
      // **
 
      if (payload.currentPeriodEnd) {
-          // Calculate subscription duration in days
-          const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
+          const oldEndDate = new Date(activeSubscription.currentPeriodEnd);
+          const newEndDate = new Date(payload.currentPeriodEnd);
 
-          const action = payload.currentPeriodEnd > activeSubscription.currentPeriodEnd ? 'extended' : 'downgraded';
+          const extendedDaysCount = Math.round((newEndDate.getTime() - oldEndDate.getTime()) / 86400000);
+
+          const action = extendedDaysCount >= 0 ? 'extended' : 'downgraded';
 
           await whatsAppHelper.sendWhatsAppTextMessage({
                to: workshop.contact,
                body: `
-                    Your subscription to Senaeya app has been ${action} for ${extendedDaysCount}  days.
-    تم تمديد اشتراككم في تطبيق الصناعية لمدة ${extendedDaysCount}  يوم.
-               `,
+Your subscription to Senaeya app has been ${action} for ${extendedDaysCount} days.
+تم ${action === 'extended' ? 'تمديد' : 'تخفيض'} اشتراككم في تطبيق الصناعية لمدة ${extendedDaysCount} يوم.
+    `,
           });
      }
 
