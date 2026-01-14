@@ -6,12 +6,12 @@ import { getTLVForValue } from './generateFatooraQr';
 const generateQRFromObject = async (data: any) => {
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
-          getTLVForValue(1, data.workshopName),
-          getTLVForValue(2, data.subscriptionId),
-          getTLVForValue(3, data.start),
-          getTLVForValue(4, data.end),
-          getTLVForValue(5, data.status),
-          getTLVForValue(6, data.amountPaid),
+          getTLVForValue(1, data.workshopName.toString()),
+          getTLVForValue(2, data.subscriptionId.toString()),
+          getTLVForValue(3, data.start.toString()),
+          getTLVForValue(4, data.end.toString()),
+          getTLVForValue(5, data.status.toString()),
+          getTLVForValue(6, data.amountPaid.toString()),
      ];
 
      // Concatenate all TLVs into one buffer
