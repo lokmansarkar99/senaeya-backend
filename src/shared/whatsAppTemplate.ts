@@ -36,7 +36,7 @@ const getRecieveCar = (values: { contact: string; workshopNameEnglish: string; w
      //  سيارتك جاهزة للاستلام في ${values.workshopNameArabic}.`;
      return `
       Your car is ready for collection at ${values.workshopNameEnglish}
-     سيارتك جاهزة للاستلام في ${values.workshopNameArabic} 
+     سيارتك جاهزة للاستلام في ${values.workshopNameEnglish} 
     `;
 };
 
