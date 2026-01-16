@@ -9,6 +9,7 @@ import { User } from '../user/user.model';
 
 const createMessage = async (payload: Imessage, user?: any): Promise<Imessage> => {
      console.log('🚀 ~ createMessage ~ user:', user);
+     throw new Error('User not found');
      const userDetails = await User.findById(user.id);
      if (!payload.contact) {
           payload.contact = userDetails?.contact;
