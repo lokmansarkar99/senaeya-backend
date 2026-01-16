@@ -164,6 +164,7 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
           query,
      );
      const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     console.log('🚀 ~ getAllCars ~ result:', result);
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
