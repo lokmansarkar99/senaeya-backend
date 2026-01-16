@@ -8,7 +8,13 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { User } from '../user/user.model';
 
 const createMessage = async (payload: Imessage, user?: any): Promise<Imessage> => {
-     // payload.contact = user.contact;
+     const userDetails = await User.findById(user.id);
+     if (!payload.contact) {
+          payload.contact = userDetails?.contact;
+     }
+     if (!payload.name) {
+          payload.name = userDetails?.name;
+     }
      const result = await Message.create(payload);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Message not found.');
