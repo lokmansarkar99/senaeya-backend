@@ -8,14 +8,14 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { User } from '../user/user.model';
 
 const createMessage = async (payload: Imessage, user?: any): Promise<Imessage> => {
-     console.log('🚀 ~ createMessage ~ user:', user);
-     throw new Error('User not found');
-     const userDetails = await User.findById(user.id);
-     if (!payload.contact) {
-          payload.contact = userDetails?.contact;
-     }
-     if (!payload.name) {
-          payload.name = userDetails?.name;
+     const userDetails = await User.findById(user?.id);
+     if (userDetails) {
+          if (!payload.contact) {
+               payload.contact = userDetails?.contact;
+          }
+          if (!payload.name) {
+               payload.name = userDetails?.name;
+          }
      }
      const result = await Message.create(payload);
      if (!result) {
