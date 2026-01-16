@@ -8,6 +8,7 @@ import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { User } from '../user/user.model';
 
 const createMessage = async (payload: Imessage, user?: any): Promise<Imessage> => {
+     console.log('🚀 ~ createMessage ~ user:', user);
      const userDetails = await User.findById(user.id);
      if (!payload.contact) {
           payload.contact = userDetails?.contact;
