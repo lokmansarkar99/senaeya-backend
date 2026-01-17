@@ -105,6 +105,20 @@ const mySubscriptionDetails = catchAsync(async (req, res) => {
           data: result,
      });
 });
+
+//deleteSubscriptionById
+const deleteSubscriptionById = catchAsync(async (req, res) => {
+     const subscriptionId = req.params.id;
+     const result = await SubscriptionService.deleteSubscriptionById(subscriptionId);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Delete subscription successfully',
+          data: result,
+     });
+});
+
 export const SubscriptionController = {
      subscriptions,
      subscriptionDetails,
@@ -116,4 +130,5 @@ export const SubscriptionController = {
      deleteSubscriptionPackageToDB,
      getSubscriptionById,
      mySubscriptionDetails,
+     deleteSubscriptionById,
 };

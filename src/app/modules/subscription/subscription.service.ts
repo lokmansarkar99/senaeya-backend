@@ -346,6 +346,37 @@ const mySubscriptionDetailsToDB = async (workshopId: string) => {
           throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to generate subscription details PDF');
      }
 };
+
+const deleteSubscriptionById = async (id: string) => {
+     const session = await mongoose.startSession();
+     session.startTransaction();
+
+     try {
+          const subscription = await Subscription.findByIdAndDelete(id, { session });
+
+          if (!subscription) {
+               throw new Error('Subscription not found');
+          }
+
+          const subscribedWorkshop = await WorkShop.findById(subscription.workshop, null, { session });
+
+          if (subscribedWorkshop) {
+               subscribedWorkshop.subscribedPackage = null;
+               subscribedWorkshop.subscriptionId = null;
+               await subscribedWorkshop.save({ session });
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return subscription;
+     } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+          throw error;
+     }
+};
+
 export const SubscriptionService = {
      subscriptionDetailsFromDB,
      subscriptionsFromDB,
@@ -357,4 +388,5 @@ export const SubscriptionService = {
      deleteSubscriptionPackageToDB,
      getSubscriptionByIdToDB,
      mySubscriptionDetailsToDB,
+     deleteSubscriptionById,
 };

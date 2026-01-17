@@ -16,5 +16,7 @@ router.get('/get/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES
 router.get('/details/workshop/:id', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.mySubscriptionDetails);
 router.delete('/cancel/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.cancelSubscription);
 router.delete('/delete/package/:packageId', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.deleteSubscriptionPackageToDB);
+// deleteSubscriptionById
+router.delete('/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.deleteSubscriptionById);
 
 export const SubscriptionRoutes = router;
