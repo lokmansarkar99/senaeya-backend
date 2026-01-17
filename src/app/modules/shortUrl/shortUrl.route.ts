@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/', shortUrlController.createShortUrl);
 
-router.get('/shortUrl/:id', shortUrlController.getShortUrlById);
+router.get('/:id', shortUrlController.getShortUrlById);
 
 export const shortUrlRoutes = router;
