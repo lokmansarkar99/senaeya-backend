@@ -15,14 +15,14 @@ const createShortUrl = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
-const getShortUrlByShortUrl = catchAsync(async (req: Request, res: Response) => {
-     const { shortUrl } = req.params;
-     const result = await shortUrlService.getShortUrlByShortUrl(shortUrl);
+const getShortUrlById = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     const result = await shortUrlService.getShortUrlById(id);
 
      res.redirect(`${result?.shortUrl}`);
 });
 
 export const shortUrlController = {
      createShortUrl,
-     getShortUrlByShortUrl,
+     getShortUrlById,
 };

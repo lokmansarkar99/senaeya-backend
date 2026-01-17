@@ -3,7 +3,7 @@ import AppError from '../../../errors/AppError';
 import { IshortUrl } from './shortUrl.interface';
 import { ShortUrl } from './shortUrl.model';
 
-const createShortUrl = async (payload: { shortUrl: string }): Promise<IshortUrl> => {
+const createShortUrl = async (payload: { shortUrl: string }) => {
      const isExist = await ShortUrl.findOne({ shortUrl: payload.shortUrl });
      if (isExist) {
           return isExist;
@@ -15,12 +15,12 @@ const createShortUrl = async (payload: { shortUrl: string }): Promise<IshortUrl>
      return result;
 };
 
-const getShortUrlByShortUrl = async (shortUrl: string): Promise<IshortUrl | null> => {
-     const result = await ShortUrl.findOne({ shortUrl });
+const getShortUrlById = async (id: string): Promise<IshortUrl | null> => {
+     const result = await ShortUrl.findById(id);
      return result;
 };
 
 export const shortUrlService = {
      createShortUrl,
-     getShortUrlByShortUrl,
+     getShortUrlById,
 };
