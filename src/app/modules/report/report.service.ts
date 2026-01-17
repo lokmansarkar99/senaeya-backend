@@ -282,7 +282,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                shortUrl: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
           });
           const message = whatsAppTemplate.getReportDetails({
-               url: `${config.backend_url}/shortUrl/${result._id}`,
+               url: `${config.backend_url_short}/shortUrl/${result._id}`,
           });
           // const message = whatsAppTemplate.getReportDetails({
           //      url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
