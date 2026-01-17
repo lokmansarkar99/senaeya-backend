@@ -233,7 +233,7 @@ Your subscription to Senaeya app has been ${action} for ${extendedDaysCount} day
 };
 const cancelSubscriptionToDB = async (workshop: string) => {
      const activeSubscription = await Subscription.findOne({
-          workshop,
+          workshop: new mongoose.Types.ObjectId(workshop),
           status: 'active',
      }).populate([
           {
