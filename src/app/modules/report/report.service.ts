@@ -150,6 +150,7 @@ import { IworkShop } from '../workShop/workShop.interface';
 import { WorkShop } from '../workShop/workShop.model';
 import AppError from '../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
+import { shortUrlService } from '../shortUrl/shortUrl.service';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
@@ -276,27 +277,16 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      };
 
      if (isReleased) {
-          // const createReportTemplate = whatsAppTemplate.createReport(report, lang);
-          // const reportInpdfPath = await generatePDF(createReportTemplate);
-          // const fileBuffer = fs.readFileSync(reportInpdfPath);
-          // const fileName = `Report file pdf_${startDate}_to_${endDate}`;
-          // const reportAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', fileName, 'application/pdf');
-          // await whatsAppHelper.sendWhatsAppPDFMessage({
-          //      to: user.contact,
-          //      priority: 10,
-          //      referenceId: '',
-          //      msgId: '',
-          //      mentions: '',
-          //      filename: `${fileName}_report.pdf`,
-          //      document: reportAwsLink,
-          //      caption: `Report file pdf from ${startDate} to ${endDate}
-          //      ملف التقرير pdf من ${startDate} إلى ${endDate}`,
-          // });
-
-          // await releaseInvoiceToWhatsApp(populatedResult);
-          const message = whatsAppTemplate.getReportDetails({
-               url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
+          // create a short url with the report url
+          const result = await shortUrlService.createShortUrl({
+               shortUrl: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
           });
+          const message = whatsAppTemplate.getReportDetails({
+               url: result.shortUrl,
+          });
+          // const message = whatsAppTemplate.getReportDetails({
+          //      url: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
+          // });
 
           await whatsAppHelper.sendWhatsAppTextMessage({ to: workshop.contact, body: message });
 
