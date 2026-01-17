@@ -245,6 +245,8 @@ const cancelSubscriptionToDB = async (workshop: string) => {
                },
           },
      ]);
+     const allSubscriptions = await Subscription.find();
+     console.log('🚀 ~ cancelSubscriptionToDB ~ allSubscriptions:', allSubscriptions);
      if (!activeSubscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'No active subscription found to cancel');
      }
