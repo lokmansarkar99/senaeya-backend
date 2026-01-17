@@ -26,6 +26,8 @@ app.use(
           origin: [
                'http://158.252.71.185:3000',
                'http://localhost:3000',
+               'http://localhost:3001',
+               'http://localhost:3002',
                'http://10.10.7.37:3000',
                'api.senaeya.net',
                'dashboard.senaeya.net',
