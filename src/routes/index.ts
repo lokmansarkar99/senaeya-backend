@@ -25,6 +25,7 @@ import { NotificationRoutes } from '../app/modules/notification/notification.rou
 import { CouponRoutes } from '../app/modules/coupon/coupon.route';
 import { SubscriptionRoutes } from '../app/modules/subscription/subscription.routes';
 import { RuleRoute } from '../app/modules/rule/rule.route';
+import { shortUrlRoutes } from '../app/modules/shortUrl/shortUrl.route';
 const router = express.Router();
 const routes = [
      {
@@ -130,6 +131,10 @@ const routes = [
      {
           path: '/rule',
           route: RuleRoute,
+     },
+     {
+          path: '/shortUrl',
+          route: shortUrlRoutes,
      },
 ];
 
