@@ -56,26 +56,22 @@ export async function startServer() {
                     console.log('🚀 ~ startServer ~ isExistSubs.recieptNumber:', isExistSubs?.recieptNumber);
                     if (!isExistSubs) return;
                     // create a new recieptNumber
-                    const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-                    console.log('🚀 ~ startServer ~ recieptNumber:', recieptNumber);
-                    isExistSubs.recieptNumber = (recieptNumber as IAutoIncrement).value;
-                    console.log('🚀 ~ startServer ~ isExistSubs.recieptNumber:', isExistSubs.recieptNumber);
-                    await isExistSubs.save();
+                    const counter = await AutoIncrementService.increaseAutoIncrement('subscription');
+                    subscription.recieptNumber = counter.value;
+                    await subscription.save();
                });
 
                const allIvcs = await Invoice.find();
                console.log('🚀 ~ startServer ~ allIvcs:', allIvcs);
 
-               allIvcs.forEach(async (ivc) => {
-                    const isExistInvs = await Invoice.findById(ivc._id);
+               allIvcs.forEach(async (invoice) => {
+                    const isExistInvs = await Invoice.findById(invoice._id);
                     console.log('🚀 ~ startServer ~ isExistInvs.recieptNumber:', isExistInvs?.recieptNumber);
                     if (!isExistInvs) return;
                     // create a new recieptNumber
-                    const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-                    console.log('🚀 ~ startServer ~ recieptNumber:', recieptNumber);
-                    isExistInvs.recieptNumber = (recieptNumber as IAutoIncrement).value;
-                    console.log('🚀 ~ startServer ~ isExistInvs.recieptNumber:', isExistInvs.recieptNumber);
-                    await isExistInvs.save();
+                    const counter = await AutoIncrementService.increaseAutoIncrement('invoice');
+                    invoice.recieptNumber = counter.value;
+                    await invoice.save();
                });
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });

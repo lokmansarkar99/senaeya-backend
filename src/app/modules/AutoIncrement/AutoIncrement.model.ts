@@ -3,26 +3,24 @@ import { IAutoIncrement } from './AutoIncrement.interface';
 
 const AutoIncrementSchema = new Schema<IAutoIncrement>(
      {
-          value: { type: Number, required: true, min: 1 },
-          isDeleted: { type: Boolean, default: false },
-          deletedAt: { type: Date },
+          key: {
+               type: String,
+               required: true,
+               unique: true, // VERY IMPORTANT
+               index: true,
+          },
+          value: {
+               type: Number,
+               default: 0,
+               min: 0,
+          },
      },
      { timestamps: true },
 );
 
-AutoIncrementSchema.pre('find', function (next) {
-     this.find({ isDeleted: false });
-     next();
-});
-
-AutoIncrementSchema.pre('findOne', function (next) {
-     this.findOne({ isDeleted: false });
-     next();
-});
-
-AutoIncrementSchema.pre('aggregate', function (next) {
-     this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-     next();
-});
+/**
+ * ❌ DO NOT use soft-delete hooks here
+ * Counters must always be visible
+ */
 
 export const AutoIncrement = model<IAutoIncrement>('AutoIncrement', AutoIncrementSchema);

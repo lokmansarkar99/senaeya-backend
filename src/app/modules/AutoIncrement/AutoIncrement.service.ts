@@ -1,15 +1,17 @@
 import { AutoIncrement } from './AutoIncrement.model';
-import { IAutoIncrement } from './AutoIncrement.interface';
-const increaseAutoIncrement = async (session?: any) => {
-     let result;
-     let getLastValue = { value: 0 } as { value: number };
-     getLastValue = (await AutoIncrement.findOne().sort({ value: -1 })) as IAutoIncrement;
-     if (session) {
-          result = await AutoIncrement.create({ value: Number(getLastValue.value) + 1 }, { session });
-     } else {
-          result = await AutoIncrement.create({ value: Number(getLastValue.value) + 1 });
-     }
-     return result;
+
+const increaseAutoIncrement = async (key: 'invoice' | 'subscription', session?: any) => {
+     const counter = await AutoIncrement.findOneAndUpdate(
+          { key },
+          { $inc: { value: 1 } }, // ✅ ATOMIC
+          {
+               new: true,
+               upsert: true, // create if not exists
+               session,
+          },
+     );
+
+     return counter; // counter.value is SAFE
 };
 
 export const AutoIncrementService = {
