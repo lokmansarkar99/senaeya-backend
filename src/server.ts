@@ -51,27 +51,27 @@ export async function startServer() {
                const allSubscriptions = await Subscription.find();
 
                allSubscriptions.forEach(async (subscription) => {
-                    const isExist = await Subscription.findById(subscription._id);
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
-                    if (!isExist) return;
+                    const isExistSubs = await Subscription.findById(subscription._id);
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistSubs.recieptNumber);
+                    if (!isExistSubs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-                    isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
-                    await isExist.save();
+                    isExistSubs.recieptNumber = (recieptNumber as IAutoIncrement).value;
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistSubs.recieptNumber);
+                    await isExistSubs.save();
                });
 
                const allIvcs = await Invoice.find();
 
                allIvcs.forEach(async (ivc) => {
-                    const isExist = await Invoice.findById(ivc._id);
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
-                    if (!isExist) return;
+                    const isExistInvs = await Invoice.findById(ivc._id);
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistInvs.recieptNumber);
+                    if (!isExistInvs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-                    isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
-                    await isExist.save();
+                    isExistInvs.recieptNumber = (recieptNumber as IAutoIncrement).value;
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistInvs.recieptNumber);
+                    await isExistInvs.save();
                });
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
