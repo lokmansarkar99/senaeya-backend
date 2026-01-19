@@ -415,10 +415,29 @@ const resendInvoice = async (invoiceId: string) => {
           type: 'ALERT',
      });
 
-     await sendToTopic({
-          topic: 'WORKSHOP_OWNER',
-          notification: { title: 'Invoice Issued', body: `Invoice No. ${invoiceId} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp` },
-     });
+     if ((result.client as any).clientId._id) {
+          const existingToken = await DeviceToken.findOne({
+               userId: (result.client as any).clientId._id,
+          });
+          if (existingToken && existingToken.fcmToken) {
+               await sendToTopic({
+                    token: existingToken.fcmToken,
+                    title: 'Invoice Issued',
+                    body: `Invoice No. ${invoiceId} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+                    data: {
+                         title: `${(result.client as any).clientId.name}`,
+                         receiver: (result.client as any).clientId._id,
+                         message: `Invoice No. ${invoiceId} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+                         message_ar: `تم إصدار الفاتورة رقم (${invoiceId}) وإرسال نسخة إلى جوال العميل عبر الواتساب`,
+                         message_bn: `ইনভয়েস নং (${invoiceId}) জারি করা হয়েছে এবং এর একটি কপি গ্রাহকের মোবাইলে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।`,
+                         message_tl: `Nailabas na ang Invoice No. (${invoiceId}) at naipadala na ang kopya nito sa mobile ng customer sa pamamagitan ng WhatsApp.`,
+                         message_hi: `इनवॉइस संख्या (${invoiceId}) जारी कर दिया गया है और इसकी एक प्रति ग्राहक के मोबाइल पर व्हाट्सएप के माध्यम से भेज दी गई है।`,
+                         message_ur: `انوائس نمبر (${invoiceId}) جاری کر دیا گیا ہے اور اس کی کاپی واٹس ایپ کے ذریعے صارف کے موبائل پر بھیج دی گئی ہے۔`,
+                         type: 'ALERT',
+                    },
+               });
+          }
+     }
      await releaseInvoiceToWhatsApp(result);
      return result;
 };

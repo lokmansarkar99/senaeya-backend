@@ -8,6 +8,8 @@ import { USER_ROLES } from '../../../enums/user';
 import { User } from '../user/user.model';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
+import DeviceToken from '../DeviceToken/DeviceToken.model';
+import mongoose from 'mongoose';
 
 const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop> => {
      //Three fields can be added from the administration, including: the name of the region, the name of the city, and the name of the industrial complex in which the workshop is located. This data is obtained from the workshop location specified in the application and entered manually.
@@ -54,10 +56,29 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
           type: 'ALERT',
      });
 
-     await sendToTopic({
-          topic: 'WORKSHOP_OWNER',
-          notification: { title: 'Workshop Registered', body: `The workshop has been successfully registered.` },
-     });
+     if (user.id) {
+          const existingToken = await DeviceToken.findOne({
+               userId: new mongoose.Types.ObjectId(user.id),
+          });
+          if (existingToken && existingToken.fcmToken) {
+               await sendToTopic({
+                    token: existingToken.fcmToken,
+                    title: 'Workshop Registration',
+                    body: `The workshop has been successfully registered.`,
+                    data: {
+                         title: `${userIs?.name}`,
+                         receiver: user.id,
+                         message: `The workshop has been successfully registered.`,
+                         message_ar: `تم تسجيل الورشة بنجاح`,
+                         message_bn: `কর্মশালাটি সফলভাবে নিবন্ধিত হয়েছে।`,
+                         message_tl: `Matagumpay na nairehistro ang workshop`,
+                         message_hi: `कार्यशाला का पंजीकरण सफलतापूर्वक हो चुका है।`,
+                         message_ur: `ورکشاپ کامیابی کے ساتھ رجسٹر ہو چکی ہے۔`,
+                         type: 'ALERT',
+                    },
+               });
+          }
+     }
      return result;
 };
 
@@ -115,10 +136,30 @@ const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any
           message_ur: `ورکشاپ کے ڈیٹا میں کامیابی کے ساتھ ترمیم کی گئی ہے۔`,
           type: 'ALERT',
      });
-     await sendToTopic({
-          topic: 'WORKSHOP_OWNER',
-          notification: { title: 'Workshop Data Modified', body: `Workshop data has been modified successfully.` },
-     });
+
+     if (isExistWorkshop.ownerId) {
+          const existingToken = await DeviceToken.findOne({
+               userId: isExistWorkshop.ownerId,
+          });
+          if (existingToken && existingToken.fcmToken) {
+               await sendToTopic({
+                    token: existingToken.fcmToken,
+                    title: 'Workshop Data Modification',
+                    body: `Workshop data has been modified successfully.`,
+                    data: {
+                         title: `${isExistWorkshop?.workshopNameEnglish}`,
+                         receiver: isExistWorkshop.ownerId.toString(),
+                         message: `Workshop data has been modified successfully.`,
+                         message_ar: `تم تعديل بيانات الورشة بنجاح`,
+                         message_bn: `কর্মশালার তথ্য সফলভাবে পরিবর্তন করা হয়েছে।`,
+                         message_tl: `Matagumpay na nabago ang datos ng workshop`,
+                         message_hi: `कार्यशाला का डेटा सफलतापूर्वक संशोधित कर दिया गया है।`,
+                         message_ur: `ورکشاپ کے ڈیٹا میں کامیابی کے ساتھ ترمیم کی گئی ہے۔`,
+                         type: 'ALERT',
+                    },
+               });
+          }
+     }
      return await WorkShop.findById(id);
 };
 

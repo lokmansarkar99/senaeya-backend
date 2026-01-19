@@ -7,6 +7,7 @@ import { User } from '../../../app/modules/user/user.model';
 import { Subscription } from '../../../app/modules/subscription/subscription.model';
 import { sendNotifications } from '../../notificationsHelper';
 import { sendToTopic } from '../../../app/modules/pushNotification/pushNotification.service';
+import DeviceToken from '../../../app/modules/DeviceToken/DeviceToken.model';
 
 const formatUnixToIsoUtc = (timestamp: number): string => {
      const date = new Date(timestamp * 1000);
@@ -95,10 +96,25 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
                               message: `A new subscription has been purchase for ${existingUser.name}`,
                               type: 'ORDER',
                          });
-                         await sendToTopic({
-                              topic: 'SUPER_ADMIN',
-                              notification: { title: 'New Subscription', body: `A new subscription has been purchase for ${existingUser.name}` },
-                         });
+
+                         if (getAdmin._id) {
+                              const existingToken = await DeviceToken.findOne({
+                                   userId: getAdmin._id,
+                              });
+                              if (existingToken && existingToken.fcmToken) {
+                                   await sendToTopic({
+                                        token: existingToken.fcmToken,
+                                        title: 'New Subscription',
+                                        body: `A new subscription has been purchase for ${existingUser.name}`,
+                                        data: {
+                                             title: `${existingUser.name}`,
+                                             receiver: getAdmin._id.toString(),
+                                             message: `A new subscription has been purchase for ${existingUser.name}`,
+                                             type: 'ORDER',
+                                        },
+                                   });
+                              }
+                         }
                     } else {
                          throw new AppError(StatusCodes.NOT_FOUND, `Pricing plan not found for Price ID: ${priceId}`);
                     }

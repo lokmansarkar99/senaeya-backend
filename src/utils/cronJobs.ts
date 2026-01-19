@@ -10,6 +10,7 @@ import { sendNotifications } from '../helpers/notificationsHelper';
 import { whatsAppHelper } from '../helpers/whatsAppHelper';
 import { whatsAppTemplate } from '../shared/whatsAppTemplate';
 import { sendToTopic } from '../app/modules/pushNotification/pushNotification.service';
+import DeviceToken from '../app/modules/DeviceToken/DeviceToken.model';
 // ====== CRON JOB SCHEDULERS ======
 const scheduleTrialWarningCheck = () => {
      // Run every 5 days at 9:00 AM '0 9 */5 * *'
@@ -58,10 +59,30 @@ const scheduleTrialWarningCheck = () => {
                               message_ur: `معذرت... سبسکرپشن ختم ہونے میں 5 دن باقی ہیں۔`,
                               type: 'ALERT',
                          });
-                         await sendToTopic({
-                              topic: 'WORKSHOP_OWNER',
-                              notification: { title: 'Subscription Warning', body: `Sorry... 5 days left until the subscription expires` },
-                         });
+
+                         if ((subscription.workshop as any).ownerId._id) {
+                              const existingToken = await DeviceToken.findOne({
+                                   userId: (subscription.workshop as any).ownerId._id,
+                              });
+                              if (existingToken && existingToken.fcmToken) {
+                                   await sendToTopic({
+                                        token: existingToken.fcmToken,
+                                        title: 'Subscription Warning',
+                                        body: `Sorry... 5 days left until the subscription expires`,
+                                        data: {
+                                             title: `${(subscription.workshop as any)?.workshopNameEnglish}`,
+                                             receiver: (subscription.workshop as any).ownerId._id,
+                                             message: `Sorry... 5 days left until the subscription expires`,
+                                             message_ar: `عفوا ... بقي 5 أيام على انتهاء الاشتراك`,
+                                             message_bn: `দুঃখিত... সাবস্ক্রিপশনের মেয়াদ শেষ হতে আর ৫ দিন বাকি।`,
+                                             message_tl: `Pasensya na... 5 araw na lang bago matapos ang subscription`,
+                                             message_hi: `क्षमा करें... सदस्यता समाप्त होने में केवल 5 दिन शेष हैं।`,
+                                             message_ur: `معذرت... سبسکرپشن ختم ہونے میں 5 دن باقی ہیں۔`,
+                                             type: 'ALERT',
+                                        },
+                                   });
+                              }
+                         }
                     });
                     console.log('✅ Subscription warning WhatsApp messages sent');
                }
