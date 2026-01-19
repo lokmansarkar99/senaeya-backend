@@ -20,6 +20,7 @@ export type ISubscription = {
      currentPeriodEnd: Date;
      createdAt: Date;
      updatedAt: Date;
+     recieptNumber: number;
 };
 
 export type SubscriptionModel = Model<ISubscription, Record<string, unknown>>;

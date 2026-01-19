@@ -51,6 +51,7 @@ const InvoiceSchema = new Schema<IInvoice>(
           invoiceAwsLink: { type: String, required: false },
           isDeleted: { type: Boolean, default: false },
           deletedAt: { type: Date },
+          recieptNumber: { type: Number, required: true },
      },
      { timestamps: true },
 );

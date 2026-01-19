@@ -54,6 +54,7 @@ export interface IInvoice {
      updatedAt: Date;
      isDeleted: boolean;
      deletedAt?: Date;
+     recieptNumber: number;
 }
 
 export type IInvoiceFilters = {

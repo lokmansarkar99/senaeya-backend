@@ -68,6 +68,7 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
                default: 'active',
                required: true,
           },
+          recieptNumber: { type: Number, required: true },
      },
      {
           timestamps: true,

@@ -20,6 +20,8 @@ import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
 import DeviceToken from '../DeviceToken/DeviceToken.model';
+import { AutoIncrementService } from '../AutoIncrement/AutoIncrement.service';
+import { IAutoIncrement } from '../AutoIncrement/AutoIncrement.interface';
 
 const subscriptionDetailsFromDB = async (id: string): Promise<{ subscription: ISubscription | {} }> => {
      const subscription = await Subscription.findOne({ userId: id }).populate('package', 'title credit duration').lean();
@@ -240,6 +242,10 @@ const createSubscriptionByPackageIdForWorkshop = async (
                     }
                }
           }
+
+          // create a new recieptNumber
+          const recieptNumber = await AutoIncrementService.increaseAutoIncrement({ session });
+          subscription.recieptNumber = (recieptNumber as IAutoIncrement).value;
 
           await session.commitTransaction();
           session.endSession();

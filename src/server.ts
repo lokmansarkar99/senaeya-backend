@@ -51,7 +51,20 @@ export async function startServer() {
           socketServer = new SocketServer(httpServer, {
                pingTimeout: 60000,
                cors: {
-                    origin: config.allowed_origins || '*',
+                    origin: [
+                         'http://158.252.71.185:3000',
+                         'http://localhost:3000',
+                         'http://localhost:3001',
+                         'http://localhost:3002',
+                         'http://10.10.7.37:3000',
+                         'api.senaeya.net',
+                         'dashboard.senaeya.net',
+                         'http://api.senaeya.net',
+                         'http://dashboard.senaeya.net',
+                         'https://api.senaeya.net',
+                         'https://dashboard.senaeya.net',
+                         'https://sanaiya-new.vercel.app',
+                    ],
                },
           });
 

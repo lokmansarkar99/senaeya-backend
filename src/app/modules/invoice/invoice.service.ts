@@ -16,6 +16,8 @@ import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import config from '../../../config';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
 import DeviceToken from '../DeviceToken/DeviceToken.model';
+import { AutoIncrementService } from '../AutoIncrement/AutoIncrement.service';
+import { IAutoIncrement } from '../AutoIncrement/AutoIncrement.interface';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
@@ -104,6 +106,10 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
                // Update invoice with payment reference
                resultInvoice.payment = payment._id;
+
+               // create a new recieptNumber
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement({ session });
+               resultInvoice.recieptNumber = (recieptNumber as IAutoIncrement).value;
                await resultInvoice.save({ session });
           }
 
