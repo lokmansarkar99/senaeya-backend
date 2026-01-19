@@ -35,7 +35,7 @@
 // export const messaging = admin.messaging();
 
 import admin from 'firebase-admin';
-import serviceAccount from '../../../../senaeya-59503-firebase-adminsdk-fbsvc-0333dd46c2.json';
+import serviceAccount from '../../../../the-mainland-firebase-adminsdk-fbsvc-48474320df.json';
 
 if (!admin.apps.length) {
      admin.initializeApp({
