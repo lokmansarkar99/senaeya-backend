@@ -57,6 +57,7 @@ export async function startServer() {
                     if (!isExistSubs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+                    console.log('🚀 ~ startServer ~ recieptNumber:', recieptNumber);
                     isExistSubs.recieptNumber = (recieptNumber as IAutoIncrement).value;
                     console.log('🚀 ~ startServer ~ isExistSubs.recieptNumber:', isExistSubs.recieptNumber);
                     await isExistSubs.save();
@@ -71,6 +72,7 @@ export async function startServer() {
                     if (!isExistInvs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+                    console.log('🚀 ~ startServer ~ recieptNumber:', recieptNumber);
                     isExistInvs.recieptNumber = (recieptNumber as IAutoIncrement).value;
                     console.log('🚀 ~ startServer ~ isExistInvs.recieptNumber:', isExistInvs.recieptNumber);
                     await isExistInvs.save();
