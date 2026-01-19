@@ -50,6 +50,7 @@ export async function startServer() {
           // Set up Socket.io server on same port as HTTP server
           socketServer = new SocketServer(httpServer, {
                pingTimeout: 60000,
+               transports: ['polling', 'websocket'], // @@
                cors: {
                     origin: [
                          'http://158.252.71.185:3000',
@@ -65,6 +66,7 @@ export async function startServer() {
                          'https://dashboard.senaeya.net',
                          'https://sanaiya-new.vercel.app',
                     ],
+                    credentials: true, // @@
                },
           });
 
