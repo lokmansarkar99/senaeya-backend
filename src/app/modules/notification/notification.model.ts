@@ -29,6 +29,11 @@ const notificationSchema = new Schema<INotification>(
                type: String,
                required: true,
           },
+          message_ar: { type: String },
+          message_bn: { type: String },
+          message_tl: { type: String },
+          message_hi: { type: String },
+          message_ur: { type: String },
           receiver: {
                type: Schema.Types.ObjectId,
                ref: 'User',

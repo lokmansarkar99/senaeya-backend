@@ -168,6 +168,11 @@ const createSubscriptionByPackageIdForWorkshop = async (
                     title: workshop.workshopNameEnglish,
                     receiver: (workshop.ownerId as any)._id,
                     message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
+                    message_ar: `تم تمديد اشتراككم في تطبيق الصناعية لمدة (${extendedDaysCount}) يوم`,
+                    message_bn: `Senaeya অ্যাপে আপনার সাবস্ক্রিপশনের মেয়াদ (${extendedDaysCount}) দিনের জন্য বাড়ানো হয়েছে।`,
+                    message_tl: `Ang iyong subscription sa Senaeya app ay pinalawig nang (${extendedDaysCount}) araw`,
+                    message_hi: `सेनाया ऐप की आपकी सदस्यता (${extendedDaysCount}) दिनों के लिए बढ़ा दी गई है।`,
+                    message_ur: `Senaeya ایپ کی آپ کی رکنیت (${extendedDaysCount}) دنوں کے لیے بڑھا دی گئی ہے۔`,
                     type: 'ALERT',
                });
 

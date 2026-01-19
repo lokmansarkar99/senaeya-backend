@@ -293,7 +293,12 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           await sendNotifications({
                title: `${user.name}`,
                receiver: user.id,
-               message: `The report was issued and sent to the workshop manager's mobile phone via WhatsApp.`,
+               message: `The report was issued and sent to the workshop manager's mobile via WhatsApp`,
+               message_ar: `تم إصدار التقرير وإرساله إلى جوال مدير الورشة عبر الواتساب`,
+               message_bn: `প্রতিবেদনটি জারি করা হয়েছিল এবং হোয়াটসঅ্যাপের মাধ্যমে কর্মশালার ব্যবস্থাপকের মোবাইলে পাঠানো হয়েছিল।`,
+               message_tl: `Ang ulat ay inilabas at ipinadala sa mobile ng workshop manager sa pamamagitan ng WhatsApp.`,
+               message_hi: `रिपोर्ट जारी कर व्हाट्सएप के माध्यम से वर्कशॉप मैनेजर के मोबाइल पर भेज दी गई।`,
+               message_ur: `رپورٹ جاری کر کے ورکشاپ مینیجر کے موبائل پر واٹس ایپ کے ذریعے بھیج دی گئی۔`,
                type: 'ALERT',
           });
      }

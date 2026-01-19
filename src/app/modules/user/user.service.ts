@@ -54,8 +54,12 @@ const createUserToDB = async (payload: IUser & { helperUserId: { contact: string
           await sendNotifications({
                title: `${createUser?.name}`,
                receiver: createUser.id,
-               message: `Workshop manager data has been modified successfully.
-`,
+               message: `Workshop manager data has been modified successfully.`,
+               message_ar: `تم تعديل بيانات مدير الورشة بنجاح`,
+               message_bn: `ওয়ার্কশপ ম্যানেজারের ডেটা সফলভাবে পরিবর্তন করা হয়েছে।`,
+               message_tl: `Matagumpay na nabago ang datos ng tagapamahala ng workshop`,
+               message_hi: `कार्यशाला प्रबंधक का डेटा सफलतापूर्वक संशोधित कर दिया गया है।`,
+               message_ur: `ورکشاپ مینیجر کے ڈیٹا میں کامیابی کے ساتھ ترمیم کر دی گئی ہے۔`,
                type: 'ALERT',
           });
           return result;

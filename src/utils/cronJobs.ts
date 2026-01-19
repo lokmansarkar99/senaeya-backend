@@ -50,6 +50,11 @@ const scheduleTrialWarningCheck = () => {
                               title: `${(subscription.workshop as any)?.workshopNameEnglish}`,
                               receiver: (subscription.workshop as any).ownerId._id,
                               message: `Sorry... 5 days left until the subscription expires`,
+                              message_ar: `عفوا ... بقي 5 أيام على انتهاء الاشتراك`,
+                              message_bn: `দুঃখিত... সাবস্ক্রিপশনের মেয়াদ শেষ হতে আর ৫ দিন বাকি।`,
+                              message_tl: `Pasensya na... 5 araw na lang bago matapos ang subscription`,
+                              message_hi: `क्षमा करें... सदस्यता समाप्त होने में केवल 5 दिन शेष हैं।`,
+                              message_ur: `معذرت... سبسکرپشن ختم ہونے میں 5 دن باقی ہیں۔`,
                               type: 'ALERT',
                          });
                     });

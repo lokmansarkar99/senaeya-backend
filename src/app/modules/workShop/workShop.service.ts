@@ -45,6 +45,11 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
           title: `${userIs?.name}`,
           receiver: user.id,
           message: `The workshop has been successfully registered.`,
+          message_ar: `تم تسجيل الورشة بنجاح`,
+          message_bn: `কর্মশালাটি সফলভাবে নিবন্ধিত হয়েছে।`,
+          message_tl: `Matagumpay na nairehistro ang workshop`,
+          message_hi: `कार्यशाला का पंजीकरण सफलतापूर्वक हो चुका है।`,
+          message_ur: `ورکشاپ کامیابی کے ساتھ رجسٹر ہو چکی ہے۔`,
           type: 'ALERT',
      });
      return result;
@@ -97,6 +102,11 @@ const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any
           title: `${isExistWorkshop?.workshopNameEnglish}`,
           receiver: isExistWorkshop.ownerId,
           message: `Workshop data has been modified successfully.`,
+          message_ar: `تم تعديل بيانات الورشة بنجاح`,
+          message_bn: `কর্মশালার তথ্য সফলভাবে পরিবর্তন করা হয়েছে।`,
+          message_tl: `Matagumpay na nabago ang datos ng workshop`,
+          message_hi: `कार्यशाला का डेटा सफलतापूर्वक संशोधित कर दिया गया है।`,
+          message_ur: `ورکشاپ کے ڈیٹا میں کامیابی کے ساتھ ترمیم کی گئی ہے۔`,
           type: 'ALERT',
      });
      return await WorkShop.findById(id);
