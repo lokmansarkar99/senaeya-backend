@@ -14,6 +14,7 @@ import { Payment } from './payment.model';
 import { generatePDF, releaseInvoiceToWhatsApp } from './payment.utils';
 import config from '../../../config';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 
 const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedFieldEnum; postPaymentDate: Date | string; isCashRecieved: boolean; cardApprovalCode: string }>) => {
      const isExistPayment = await Payment.findOne({ invoice: payload.invoice, providerWorkShopId: payload.providerWorkShopId, paymentStatus: PaymentStatus.PAID });
@@ -133,7 +134,17 @@ const createPayment = async (payload: Partial<Ipayment & { lang: TranslatedField
                title: `${(populatedResult.client as any)?.clientId?.name || (populatedResult.client as any)?.workShopNameAsClient || 'Unknown Client'}`,
                receiver: (populatedResult.client as any)?.clientId?._id,
                message: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp`,
+               message_ar: `تم إصدار الفاتورة رقم ${populatedResult._id} وتم إرسال نسخة منها إلى هاتف العميل عبر واتساب`,
+               message_bn: `ইনভয়েস নম্বর ${populatedResult._id} ইস্যু করা হয়েছে এবং একটি কপি হোয়াটসঅ্যাপের মাধ্যমে গ্রাহকের মোবাইল ফোনে পাঠানো হয়েছে`,
+               message_tl: `Ang Invoice No. ${populatedResult._id} ay naibigay na at isang kopya ang ipinadala sa mobile phone ng customer sa pamamagitan ng WhatsApp`,
+               message_hi: `चालान संख्या ${populatedResult._id} जारी कर दी गई है और उसकी एक प्रति व्हाट्सएप के माध्यम से ग्राहक के मोबाइल फोन पर भेज दी गई है`,
+               message_ur: `انوائس نمبر ${populatedResult._id} جاری کر دیا گیا ہے اور اس کی ایک نقل واٹس ایپ کے ذریعے کسٹمر کے موبائل فون پر بھیج دی گئی ہے`,
                type: 'ALERT',
+          });
+
+          await sendToTopic({
+               topic: 'WORKSHOP_OWNER',
+               notification: { title: 'Invoice Issued', body: `Invoice No. ${populatedResult._id} has been issued and a copy has been sent to the customer’s mobile phone via WhatsApp` },
           });
           // await releaseInvoiceToWhatsApp(populatedResult);
 

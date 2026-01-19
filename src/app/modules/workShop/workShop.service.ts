@@ -7,6 +7,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 import { USER_ROLES } from '../../../enums/user';
 import { User } from '../user/user.model';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 
 const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop> => {
      //Three fields can be added from the administration, including: the name of the region, the name of the city, and the name of the industrial complex in which the workshop is located. This data is obtained from the workshop location specified in the application and entered manually.
@@ -51,6 +52,11 @@ const createWorkShop = async (payload: IworkShop, user: any): Promise<IworkShop>
           message_hi: `कार्यशाला का पंजीकरण सफलतापूर्वक हो चुका है।`,
           message_ur: `ورکشاپ کامیابی کے ساتھ رجسٹر ہو چکی ہے۔`,
           type: 'ALERT',
+     });
+
+     await sendToTopic({
+          topic: 'WORKSHOP_OWNER',
+          notification: { title: 'Workshop Registered', body: `The workshop has been successfully registered.` },
      });
      return result;
 };
@@ -108,6 +114,10 @@ const updateWorkShop = async (id: string, payload: Partial<IworkShop>, user: any
           message_hi: `कार्यशाला का डेटा सफलतापूर्वक संशोधित कर दिया गया है।`,
           message_ur: `ورکشاپ کے ڈیٹا میں کامیابی کے ساتھ ترمیم کی گئی ہے۔`,
           type: 'ALERT',
+     });
+     await sendToTopic({
+          topic: 'WORKSHOP_OWNER',
+          notification: { title: 'Workshop Data Modified', body: `Workshop data has been modified successfully.` },
      });
      return await WorkShop.findById(id);
 };

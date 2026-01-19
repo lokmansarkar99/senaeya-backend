@@ -18,6 +18,7 @@ import { generateQRFromObject } from '../../../helpers/qrcode/generateQRFromObje
 import { generatePDF } from '../payment/payment.utils';
 import { S3Helper } from '../../../helpers/aws/s3helper';
 import fs from 'fs';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 
 const subscriptionDetailsFromDB = async (id: string): Promise<{ subscription: ISubscription | {} }> => {
      const subscription = await Subscription.findOne({ userId: id }).populate('package', 'title credit duration').lean();
@@ -176,13 +177,28 @@ const createSubscriptionByPackageIdForWorkshop = async (
                     type: 'ALERT',
                });
 
+               await sendToTopic({
+                    topic: 'WORKSHOP_OWNER',
+                    notification: { title: 'Subscription Extended', body: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.` },
+               });
+
                // Notify Super Admin
                const superAdminId = await User.findOne({ role: 'SUPER_ADMIN' }).select('_id name');
                await sendNotifications({
                     title: superAdminId?.name,
                     receiver: superAdminId?._id,
                     message: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
+                    message_ar: 'تم الاشتراك في التطبيق بنجاح وتم إصدار الفاتورة وإرسالها عبر واتساب.',
+                    message_bn: 'অ্যাপ্লিকেশনটি সফলভাবে সাবস্ক্রাইব করা হয়েছে এবং ইনভয়েস ইস্যু করে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।',
+                    message_tl: 'Matagumpay na naisubscripe ang application at ang invoice ay naibigay na at ipinadala sa pamamagitan ng WhatsApp.',
+                    message_hi: 'एप्लिकेशन को सफलतापूर्वक सब्सक्राइब कर लिया गया है और इनवॉइस जारी कर व्हाट्सएप के माध्यम से भेज दिया गया है।',
+                    message_ur: 'ایپلیکیشن کو کامیابی کے ساتھ سبسکرائب کر لیا گیا ہے اور انوائس جاری کر کے واٹس ایپ کے ذریعے بھیج دی گئی ہے۔',
                     type: 'ALERT',
+               });
+
+               await sendToTopic({
+                    topic: 'WORKSHOP_OWNER',
+                    notification: { title: 'Subscription Done', body: `The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.` },
                });
           }
 

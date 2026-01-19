@@ -1,0 +1,11 @@
+
+export enum PUSHNOTIFICATION_TOPIC {
+    USER = 'USER',
+    ADMIN = 'ADMIN',
+    BUSINESS = 'BUSINESS',
+    VENDOR = 'VENDOR',
+    SHOP = 'SHOP',
+    SHOP_ADMIN = 'SHOP_ADMIN',
+    ORDER = 'ORDER',
+    PRODUCT = 'PRODUCT',
+}

@@ -9,6 +9,7 @@ import { WorkShop } from '../app/modules/workShop/workShop.model';
 import { sendNotifications } from '../helpers/notificationsHelper';
 import { whatsAppHelper } from '../helpers/whatsAppHelper';
 import { whatsAppTemplate } from '../shared/whatsAppTemplate';
+import { sendToTopic } from '../app/modules/pushNotification/pushNotification.service';
 // ====== CRON JOB SCHEDULERS ======
 const scheduleTrialWarningCheck = () => {
      // Run every 5 days at 9:00 AM '0 9 */5 * *'
@@ -56,6 +57,10 @@ const scheduleTrialWarningCheck = () => {
                               message_hi: `क्षमा करें... सदस्यता समाप्त होने में केवल 5 दिन शेष हैं।`,
                               message_ur: `معذرت... سبسکرپشن ختم ہونے میں 5 دن باقی ہیں۔`,
                               type: 'ALERT',
+                         });
+                         await sendToTopic({
+                              topic: 'WORKSHOP_OWNER',
+                              notification: { title: 'Subscription Warning', body: `Sorry... 5 days left until the subscription expires` },
                          });
                     });
                     console.log('✅ Subscription warning WhatsApp messages sent');

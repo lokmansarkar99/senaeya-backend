@@ -6,6 +6,7 @@ import { Package } from '../../../app/modules/package/package.model';
 import { User } from '../../../app/modules/user/user.model';
 import { Subscription } from '../../../app/modules/subscription/subscription.model';
 import { sendNotifications } from '../../notificationsHelper';
+import { sendToTopic } from '../../../app/modules/pushNotification/pushNotification.service';
 
 const formatUnixToIsoUtc = (timestamp: number): string => {
      const date = new Date(timestamp * 1000);
@@ -93,6 +94,10 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
                               receiver: getAdmin._id,
                               message: `A new subscription has been purchase for ${existingUser.name}`,
                               type: 'ORDER',
+                         });
+                         await sendToTopic({
+                              topic: 'SUPER_ADMIN',
+                              notification: { title: 'New Subscription', body: `A new subscription has been purchase for ${existingUser.name}` },
                          });
                     } else {
                          throw new AppError(StatusCodes.NOT_FOUND, `Pricing plan not found for Price ID: ${priceId}`);

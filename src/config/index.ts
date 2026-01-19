@@ -12,6 +12,8 @@ export default {
      backend_url_short: process.env.BACKEND_URL_SHORT,
      reset_pass_expire_time: process.env.RESET_TOKEN_EXPIRE_TIME,
      database_url: process.env.DATABASE_URL,
+     firebase_service_account: process.env.FIREBASE_SERVICE_ACCOUNT,
+     firebase_service_account_key: process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
      node_env: process.env.NODE_ENV,
      port: process.env.PORT,
      bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,

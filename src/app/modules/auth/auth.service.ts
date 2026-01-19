@@ -22,6 +22,7 @@ import { WorkShop } from '../workShop/workShop.model';
 import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
 import { Rule } from '../rule/rule.model';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -457,6 +458,11 @@ const checkUserAuthority = async (providerWorkShopId: string) => {
                     message_hi: `आपकी ऐप सदस्यता समाप्त हो गई है... सेवा जारी रखने के लिए कृपया अपनी सदस्यता का नवीनीकरण करें।`,
                     message_ur: `آپ کی ایپ سبسکرپشن کی میعاد ختم ہو گئی ہے... سروس جاری رکھنے کے لیے براہ کرم اپنی رکنیت کی تجدید کریں۔`,
                     type: 'ALERT',
+               });
+
+               await sendToTopic({
+                    topic: 'WORKSHOP_OWNER',
+                    notification: { title: 'Subscription Expired', body: `Your app subscription has expired ... Please renew your subscription to continue service` },
                });
                throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
                                    انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);

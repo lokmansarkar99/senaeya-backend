@@ -151,6 +151,7 @@ import { WorkShop } from '../workShop/workShop.model';
 import AppError from '../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { shortUrlService } from '../shortUrl/shortUrl.service';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
@@ -300,6 +301,11 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                message_hi: `रिपोर्ट जारी कर व्हाट्सएप के माध्यम से वर्कशॉप मैनेजर के मोबाइल पर भेज दी गई।`,
                message_ur: `رپورٹ جاری کر کے ورکشاپ مینیجر کے موبائل پر واٹس ایپ کے ذریعے بھیج دی گئی۔`,
                type: 'ALERT',
+          });
+
+          await sendToTopic({
+               topic: 'WORKSHOP_OWNER',
+               notification: { title: 'Report Issued', body: `Report has been issued and sent to the workshop manager's mobile via WhatsApp` },
           });
      }
 
