@@ -51,6 +51,30 @@ export async function startServer() {
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
 
+          const allSubscriptions = await Subscription.find().select('_id');
+
+          allSubscriptions.forEach(async (subscription) => {
+               const isExist = await Subscription.findById(subscription._id);
+               if (!isExist) return;
+               // create a new recieptNumber
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
+               await isExist.save();
+          });
+
+          const allIvcs = await Invoice.find().select('_id');
+
+          allIvcs.forEach(async (ivc) => {
+               const isExist = await Invoice.findById(ivc._id);
+               if (!isExist) return;
+               // create a new recieptNumber
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExist.recieptNumber);
+               await isExist.save();
+          });
+
           // Set up Socket.io server on same port as HTTP server
           socketServer = new SocketServer(httpServer, {
                pingTimeout: 60000,
@@ -84,28 +108,6 @@ export async function startServer() {
           //@ts-ignore
           global.io = socketServer;
           logger.info(colors.yellow(`♻️  Socket is listening on same port ${httpPort}`));
-
-          const allSubscriptions = await Subscription.find().select('_id');
-
-          allSubscriptions.forEach(async (subscription) => {
-               const isExist = await Subscription.findById(subscription._id);
-               if (!isExist) return;
-               // create a new recieptNumber
-               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
-               await isExist.save();
-          });
-
-          const allIvcs = await Invoice.find().select('_id');
-
-          allIvcs.forEach(async (ivc) => {
-               const isExist = await Invoice.findById(ivc._id);
-               if (!isExist) return;
-               // create a new recieptNumber
-               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
-               await isExist.save();
-          });
 
           // 🔥 Start BullMQ Worker (listens for schedule jobs)
           startScheduleWorker();
