@@ -61,12 +61,16 @@ import { firebaseAdmin } from './pushNotification.config';
 export const sendToTopic = async ({ token, title, body, data }: { token: string; title: string; body: string; data?: Record<string, string> }) => {
      if (!token) return;
 
-     await firebaseAdmin.messaging().send({
-          token,
-          notification: {
-               title,
-               body,
-          },
-          data,
-     });
+     try {
+          await firebaseAdmin.messaging().send({
+               token,
+               notification: {
+                    title,
+                    body,
+               },
+               data,
+          });
+     } catch (error) {
+          console.log('🚀 ~ sendToTopic ~ error:', error);
+     }
 };
