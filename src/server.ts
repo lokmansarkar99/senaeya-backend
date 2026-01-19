@@ -88,19 +88,23 @@ export async function startServer() {
           const allSubscriptions = await Subscription.find().select('_id');
 
           allSubscriptions.forEach(async (subscription) => {
+               const isExist = await Subscription.findById(subscription._id);
+               if (!isExist) return;
                // create a new recieptNumber
                const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-               subscription.recieptNumber = (recieptNumber as IAutoIncrement).value;
-               await subscription.save();
+               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               await isExist.save();
           });
 
           const allIvcs = await Invoice.find().select('_id');
 
-          allSubscriptions.forEach(async (ivc) => {
+          allIvcs.forEach(async (ivc) => {
+               const isExist = await Invoice.findById(ivc._id);
+               if (!isExist) return;
                // create a new recieptNumber
                const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
-               ivc.recieptNumber = (recieptNumber as IAutoIncrement).value;
-               await ivc.save();
+               isExist.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               await isExist.save();
           });
 
           // 🔥 Start BullMQ Worker (listens for schedule jobs)
