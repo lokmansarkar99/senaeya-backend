@@ -52,7 +52,7 @@ export async function startServer() {
 
                allSubscriptions.forEach(async (subscription) => {
                     const isExistSubs = await Subscription.findById(subscription._id);
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistSubs.recieptNumber);
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistSubs?.recieptNumber);
                     if (!isExistSubs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
@@ -65,7 +65,7 @@ export async function startServer() {
 
                allIvcs.forEach(async (ivc) => {
                     const isExistInvs = await Invoice.findById(ivc._id);
-                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistInvs.recieptNumber);
+                    console.log('🚀 ~ startServer ~ isExist.recieptNumber:', isExistInvs?.recieptNumber);
                     if (!isExistInvs) return;
                     // create a new recieptNumber
                     const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
