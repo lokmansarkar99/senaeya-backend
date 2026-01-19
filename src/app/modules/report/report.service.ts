@@ -137,7 +137,7 @@
 
 /* **************new ***************** */
 
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import config from '../../../config';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
@@ -152,6 +152,7 @@ import AppError from '../../../errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { shortUrlService } from '../shortUrl/shortUrl.service';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
+import DeviceToken from '../DeviceToken/DeviceToken.model';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
@@ -303,10 +304,29 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                type: 'ALERT',
           });
 
-          await sendToTopic({
-               topic: 'WORKSHOP_OWNER',
-               notification: { title: 'Report Issued', body: `Report has been issued and sent to the workshop manager's mobile via WhatsApp` },
-          });
+          if (user.id) {
+               const existingToken = await DeviceToken.findOne({
+                    userId: new mongoose.Types.ObjectId(user.id),
+               });
+               if (existingToken && existingToken.fcmToken) {
+                    await sendToTopic({
+                         token: existingToken.fcmToken,
+                         title: 'Report Issued',
+                         body: `The report was issued and sent to the workshop manager's mobile via WhatsApp`,
+                         data: {
+                              title: `${user.name}`,
+                              receiver: user.id,
+                              message: `The report was issued and sent to the workshop manager's mobile via WhatsApp`,
+                              message_ar: `تم إصدار التقرير وإرساله إلى جوال مدير الورشة عبر الواتساب`,
+                              message_bn: `প্রতিবেদনটি জারি করা হয়েছিল এবং হোয়াটসঅ্যাপের মাধ্যমে কর্মশালার ব্যবস্থাপকের মোবাইলে পাঠানো হয়েছিল।`,
+                              message_tl: `Ang ulat ay inilabas at ipinadala sa mobile ng workshop manager sa pamamagitan ng WhatsApp.`,
+                              message_hi: `रिपोर्ट जारी कर व्हाट्सएप के माध्यम से वर्कशॉप मैनेजर के मोबाइल पर भेज दी गई।`,
+                              message_ur: `رپورٹ جاری کر کے ورکشاپ مینیجر کے موبائل پر واٹس ایپ کے ذریعے بھیج دی گئی۔`,
+                              type: 'ALERT',
+                         },
+                    });
+               }
+          }
      }
 
      return report;

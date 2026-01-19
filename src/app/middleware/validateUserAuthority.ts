@@ -8,6 +8,8 @@ import { sendNotifications } from '../../helpers/notificationsHelper';
 import Settings from '../modules/settings/settings.model';
 import { Rule } from '../modules/rule/rule.model';
 import { sendToTopic } from '../modules/pushNotification/pushNotification.service';
+import DeviceToken from '../modules/DeviceToken/DeviceToken.model';
+import mongoose from 'mongoose';
 
 const validateUserAuthority = () => {
      return async (req: Request, res: Response, next: NextFunction) => {
@@ -53,10 +55,29 @@ const validateUserAuthority = () => {
                                         type: 'ALERT',
                                    });
 
-                                   await sendToTopic({
-                                        topic: 'WORKSHOP_OWNER',
-                                        notification: { title: 'Subscription Expired', body: `Your app subscription has expired ... Please renew your subscription to continue service` },
-                                   });
+                                   if (user.id) {
+                                        const existingToken = await DeviceToken.findOne({
+                                             userId: new mongoose.Types.ObjectId(user.id),
+                                        });
+                                        if (existingToken && existingToken.fcmToken) {
+                                             await sendToTopic({
+                                                  token: existingToken.fcmToken,
+                                                  title: 'Subscription Expired',
+                                                  body: 'Your app subscription has expired ... Please renew your subscription to continue service',
+                                                  data: {
+                                                       title: `${(workShop as any)?.workshopNameEnglish}`,
+                                                       receiver: (workShop as any).ownerId._id,
+                                                       message: `Your app subscription has expired ... Please renew your subscription to continue service`,
+                                                       message_ar: `انتهى اشتراك التطبيق .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة`,
+                                                       message_bn: `আপনার অ্যাপ সাবস্ক্রিপশনের মেয়াদ শেষ হয়ে গেছে... পরিষেবা চালিয়ে যেতে অনুগ্রহ করে আপনার সাবস্ক্রিপশন পুনর্নবীকরণ করুন।`,
+                                                       message_tl: `Nag-expire na ang subscription mo sa app... Paki-renew ang subscription mo para maipagpatuloy ang serbisyo.`,
+                                                       message_hi: `आपकी ऐप सदस्यता समाप्त हो गई है... सेवा जारी रखने के लिए कृपया अपनी सदस्यता का नवीनीकरण करें।`,
+                                                       message_ur: `آپ کی ایپ سبسکرپشن کی میعاد ختم ہو گئی ہے... سروس جاری رکھنے کے لیے براہ کرم اپنی رکنیت کی تجدید کریں۔`,
+                                                       type: 'ALERT',
+                                                  },
+                                             });
+                                        }
+                                   }
                                    throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
                                    انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
                               }

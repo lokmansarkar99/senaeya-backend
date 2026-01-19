@@ -23,6 +23,7 @@ import { MAX_FREE_INVOICE_COUNT } from '../workShop/workshop.enum';
 import { Rule } from '../rule/rule.model';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
+import mongoose from 'mongoose';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -460,10 +461,30 @@ const checkUserAuthority = async (providerWorkShopId: string) => {
                     type: 'ALERT',
                });
 
-               await sendToTopic({
-                    topic: 'WORKSHOP_OWNER',
-                    notification: { title: 'Subscription Expired', body: `Your app subscription has expired ... Please renew your subscription to continue service` },
-               });
+               if ((workShop as any).ownerId._id) {
+                    const existingToken = await DeviceToken.findOne({
+                         userId: (workShop as any).ownerId._id,
+                    });
+                    if (existingToken && existingToken.fcmToken) {
+                         await sendToTopic({
+                              token: existingToken.fcmToken,
+                              title: 'Subscription Expired',
+                              body: 'Your app subscription has expired ... Please renew your subscription to continue service',
+                              data: {
+                                   title: `${(workShop as any)?.workshopNameEnglish}`,
+                                   receiver: (workShop as any).ownerId._id,
+                                   message: `Your app subscription has expired ... Please renew your subscription to continue service`,
+                                   message_ar: `انتهى اشتراك التطبيق .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة`,
+                                   message_bn: `আপনার অ্যাপ সাবস্ক্রিপশনের মেয়াদ শেষ হয়ে গেছে... পরিষেবা চালিয়ে যেতে অনুগ্রহ করে আপনার সাবস্ক্রিপশন পুনর্নবীকরণ করুন।`,
+                                   message_tl: `Nag-expire na ang subscription mo sa app... Paki-renew ang subscription mo para maipagpatuloy ang serbisyo.`,
+                                   message_hi: `आपकी ऐप सदस्यता समाप्त हो गई है... सेवा जारी रखने के लिए कृपया अपनी सदस्यता का नवीनीकरण करें।`,
+                                   message_ur: `آپ کی ایپ سبسکرپشن کی میعاد ختم ہو گئی ہے... سروس جاری رکھنے کے لیے براہ کرم اپنی رکنیت کی تجدید کریں۔`,
+                                   type: 'ALERT',
+                              },
+                         });
+                    }
+               }
+
                throw new Error(`Your subscription to Senaeya app has expired. Please renew your subscription to continue the service.
                                    انتهى الاشتراك في تطبيق الصناعية .. نرجو منكم تجديد الاشتراك لاستمرار الخدمة.`);
           }
