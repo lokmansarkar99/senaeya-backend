@@ -108,8 +108,8 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                resultInvoice.payment = payment._id;
 
                // create a new recieptNumber
-               const recieptNumber = await AutoIncrementService.increaseAutoIncrement({ session });
-               resultInvoice.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session);
+               resultInvoice.recieptNumber = recieptNumber.value;
                await resultInvoice.save({ session });
           }
 

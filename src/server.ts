@@ -14,10 +14,6 @@ import { redisClient } from './helpers/redis/redis';
 import { socketHelper } from './helpers/socketHelper';
 import { logger } from './shared/logger';
 import setupTimeManagement from './utils/cronJobs';
-import { Subscription } from './app/modules/subscription/subscription.model';
-import { AutoIncrementService } from './app/modules/AutoIncrement/AutoIncrement.service';
-import { IAutoIncrement } from './app/modules/AutoIncrement/AutoIncrement.interface';
-import { Invoice } from './app/modules/invoice/invoice.model';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -47,32 +43,7 @@ export async function startServer() {
           // httpServer.listen(httpPort, `${ipAddress}`, () => {
           //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           // });
-          httpServer.listen(httpPort, `0.0.0.0`, async () => {
-               const allSubscriptions = await Subscription.find();
-               console.log('🚀 ~ startServer ~ allSubscriptions:', allSubscriptions);
-
-               allSubscriptions.forEach(async (subscription) => {
-                    const isExistSubs = await Subscription.findById(subscription._id);
-                    console.log('🚀 ~ startServer ~ isExistSubs.recieptNumber:', isExistSubs?.recieptNumber);
-                    if (!isExistSubs) return;
-                    // create a new recieptNumber
-                    const counter = await AutoIncrementService.increaseAutoIncrement('subscription');
-                    subscription.recieptNumber = counter.value;
-                    await subscription.save();
-               });
-
-               const allIvcs = await Invoice.find();
-               console.log('🚀 ~ startServer ~ allIvcs:', allIvcs);
-
-               allIvcs.forEach(async (invoice) => {
-                    const isExistInvs = await Invoice.findById(invoice._id);
-                    console.log('🚀 ~ startServer ~ isExistInvs.recieptNumber:', isExistInvs?.recieptNumber);
-                    if (!isExistInvs) return;
-                    // create a new recieptNumber
-                    const counter = await AutoIncrementService.increaseAutoIncrement('invoice');
-                    invoice.recieptNumber = counter.value;
-                    await invoice.save();
-               });
+          httpServer.listen(httpPort, `0.0.0.0`, () => {
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
 
