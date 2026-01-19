@@ -14,6 +14,10 @@ import { redisClient } from './helpers/redis/redis';
 import { socketHelper } from './helpers/socketHelper';
 import { logger } from './shared/logger';
 import setupTimeManagement from './utils/cronJobs';
+import { Subscription } from './app/modules/subscription/subscription.model';
+import { AutoIncrementService } from './app/modules/AutoIncrement/AutoIncrement.service';
+import { IAutoIncrement } from './app/modules/AutoIncrement/AutoIncrement.interface';
+import { Invoice } from './app/modules/invoice/invoice.model';
 
 // Define the types for the servers
 let httpServer: HttpServer;
@@ -80,6 +84,24 @@ export async function startServer() {
           //@ts-ignore
           global.io = socketServer;
           logger.info(colors.yellow(`♻️  Socket is listening on same port ${httpPort}`));
+
+          const allSubscriptions = await Subscription.find().select('_id');
+
+          allSubscriptions.forEach(async (subscription) => {
+               // create a new recieptNumber
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+               subscription.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               await subscription.save();
+          });
+
+          const allIvcs = await Invoice.find().select('_id');
+
+          allSubscriptions.forEach(async (ivc) => {
+               // create a new recieptNumber
+               const recieptNumber = await AutoIncrementService.increaseAutoIncrement();
+               ivc.recieptNumber = (recieptNumber as IAutoIncrement).value;
+               await ivc.save();
+          });
 
           // 🔥 Start BullMQ Worker (listens for schedule jobs)
           startScheduleWorker();
