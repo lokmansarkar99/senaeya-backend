@@ -49,6 +49,7 @@ export async function startServer() {
           // });
           httpServer.listen(httpPort, `0.0.0.0`, async () => {
                const allSubscriptions = await Subscription.find();
+               console.log('🚀 ~ startServer ~ allSubscriptions:', allSubscriptions.length);
 
                allSubscriptions.forEach(async (subscription) => {
                     const isExistSubs = await Subscription.findById(subscription._id);
@@ -62,6 +63,7 @@ export async function startServer() {
                });
 
                const allIvcs = await Invoice.find();
+               console.log('🚀 ~ startServer ~ allIvcs:', allIvcs.length);
 
                allIvcs.forEach(async (ivc) => {
                     const isExistInvs = await Invoice.findById(ivc._id);
