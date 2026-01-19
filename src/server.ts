@@ -48,7 +48,7 @@ export async function startServer() {
           //      logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           // });
           httpServer.listen(httpPort, `0.0.0.0`, async () => {
-               const allSubscriptions = await Subscription.find().select('_id');
+               const allSubscriptions = await Subscription.find();
 
                allSubscriptions.forEach(async (subscription) => {
                     const isExist = await Subscription.findById(subscription._id);
@@ -61,7 +61,7 @@ export async function startServer() {
                     await isExist.save();
                });
 
-               const allIvcs = await Invoice.find().select('_id');
+               const allIvcs = await Invoice.find();
 
                allIvcs.forEach(async (ivc) => {
                     const isExist = await Invoice.findById(ivc._id);
