@@ -11,11 +11,11 @@ router.get('/admin', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), Notificatio
 router.patch('/', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.readNotification);
 router.patch('/admin', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.adminReadNotification);
 router.patch('/send-notifications', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), NotificationController.sendAdminPushNotification);
-router.patch(
-     '/send-push-notifications',
-     auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-     validateRequest(notificationValidation.pushNotificationToUserValidation),
-     NotificationController.pushNotificationToUser,
-);
+// router.patch(
+//      '/send-push-notifications',
+//      auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+//      validateRequest(notificationValidation.pushNotificationToUserValidation),
+//      NotificationController.pushNotificationToUser,
+// );
 
 export const NotificationRoutes = router;
