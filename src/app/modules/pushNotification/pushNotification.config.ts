@@ -61,6 +61,8 @@ if (!admin.apps.length) {
 
 export default admin;
 
+export const messaging = admin.messaging();
+
 interface message {
      notification: {
           title: string;

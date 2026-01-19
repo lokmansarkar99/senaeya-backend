@@ -36,7 +36,7 @@ export const sendToTopic = async ({
      };
 
      try {
-          const messageId = await messaging.getMessaging().send(message);
+          const messageId = await messaging.send(message);
           logger.info('FCM sent successfully', { topic, messageId, notification });
 
           return {

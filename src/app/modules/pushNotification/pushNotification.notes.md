@@ -8,7 +8,7 @@
 - generate base64 of json file
 
 ```
-base64 senaeya-59503-firebase-adminsdk-fbsvc-72325157a0.json
+base64 senaeya-59503-firebase-adminsdk-fbsvc-0333dd46c2.json | tr -d '\n'
 ```
 
 ```
