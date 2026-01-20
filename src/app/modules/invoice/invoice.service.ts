@@ -79,6 +79,18 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                );
           }
 
+          // create a new recieptNumber
+          const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session);
+          console.log('****************************');
+          console.log('****************************');
+          console.log('****************************');
+          console.log('****************************');
+          console.log('🚀 ~ createInvoice ~ recieptNumber:', recieptNumber);
+          console.log('****************************');
+          console.log('****************************');
+          console.log('****************************');
+          console.log('****************************');
+          payload.recieptNumber = recieptNumber.value;
           // Create invoice within transaction
           const [resultInvoice] = await Invoice.create([payload], { session });
 
@@ -106,17 +118,6 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
                // Update invoice with payment reference
                resultInvoice.payment = payment._id;
-
-               // create a new recieptNumber
-               const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session);
-               console.log('****************************');
-               console.log('****************************');
-               console.log('****************************');
-               console.log('🚀 ~ createInvoice ~ recieptNumber:', recieptNumber);
-               console.log('****************************');
-               console.log('****************************');
-               console.log('****************************');
-               resultInvoice.recieptNumber = recieptNumber.value;
                await resultInvoice.save({ session });
           }
 
