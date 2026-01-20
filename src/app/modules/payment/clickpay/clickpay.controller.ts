@@ -50,14 +50,13 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
 
      const paymentRequest = {
           customer_details: {
-               name: 'John Smith',
-               email: 'jsmith@gmail.com',
-               phone: '9711111111111',
-               street1: '404, 11th st, void',
-               city: 'Dubai',
-               state: 'DU',
-               country: 'AE',
-               ip: '127.0.0.1',
+               name: '',
+               email: 'senaeya.app@gmail.com',
+               phone: '',
+               street1: 'Riyadh',
+               city: 'Riyadh',
+               state: 'Riyadh',
+               country: 'Saudi arabia',
           },
           cart_amount: toBePaidAmount,
           cart_currency: CLICKPAY_CURRENCY,
