@@ -109,6 +109,13 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
 
                // create a new recieptNumber
                const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session);
+               console.log('****************************');
+               console.log('****************************');
+               console.log('****************************');
+               console.log('🚀 ~ createInvoice ~ recieptNumber:', recieptNumber);
+               console.log('****************************');
+               console.log('****************************');
+               console.log('****************************');
                resultInvoice.recieptNumber = recieptNumber.value;
                await resultInvoice.save({ session });
           }
