@@ -11,11 +11,7 @@ router.get('/success', SubscriptionController.orderSuccess);
 router.get('/cancel', SubscriptionController.orderCancel);
 router.post('/create-checkout-session/:id', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.createCheckoutSession);
 router.patch('/update/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.updateSubscription);
-router.get(
-     '/get/:id',
-     // auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER),
-     SubscriptionController.getSubscriptionById,
-);
+router.get('/get/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN, USER_ROLES.WORKSHOP_OWNER), SubscriptionController.getSubscriptionById);
 // get my subscription details
 router.get('/details/workshop/:id', auth(USER_ROLES.WORKSHOP_OWNER), SubscriptionController.mySubscriptionDetails);
 router.delete('/cancel/:id', auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), SubscriptionController.cancelSubscription);
