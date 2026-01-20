@@ -24,6 +24,7 @@ router.get('/success', async (req, res) => {
           status: 'active',
           currentPeriodEnd: { $gt: new Date().toISOString() },
      });
+     console.log('🚀 ~ isExistSubscription:', isExistSubscription);
      if (!isExistSubscription) {
           await SubscriptionService.createSubscriptionByPackageIdForWorkshop(
                req.query.providerWorkShopId as string,
