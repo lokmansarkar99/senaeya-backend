@@ -366,15 +366,15 @@ const getSubscriptionByIdToDB = async (subscriptionId: string) => {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
      }
      // generate qr code if it doesn't exist
-     // if (!subscription.subscription_qr_code) {
-     const qrCode = await generateQRFromObject(subscription);
-     // Update and get the updated document
-     subscription = await Subscription.findByIdAndUpdate(
-          subscription._id,
-          { subscription_qr_code: qrCode.qrImagePath },
-          { new: true }, // This returns the updated document
-     );
-     // }
+     if (!subscription.subscription_qr_code) {
+          const qrCode = await generateQRFromObject(subscription);
+          // Update and get the updated document
+          subscription = await Subscription.findByIdAndUpdate(
+               subscription._id,
+               { subscription_qr_code: qrCode.qrImagePath },
+               { new: true }, // This returns the updated document
+          );
+     }
      return subscription;
 };
 
