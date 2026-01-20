@@ -49,6 +49,16 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      toBePaidAmount = toBePaidAmount + flatVatAmount;
 
      const paymentRequest = {
+          customer_details: {
+               name: 'John Smith',
+               email: 'jsmith@gmail.com',
+               phone: '9711111111111',
+               street1: '404, 11th st, void',
+               city: 'Dubai',
+               state: 'DU',
+               country: 'AE',
+               ip: '127.0.0.1',
+          },
           cart_amount: toBePaidAmount,
           cart_currency: CLICKPAY_CURRENCY,
           cart_description: isExistPackage.description || 'Order Payment',
