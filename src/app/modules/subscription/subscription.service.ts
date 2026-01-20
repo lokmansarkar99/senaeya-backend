@@ -396,15 +396,15 @@ const mySubscriptionDetailsToDB = async (workshopId: string) => {
                );
           }
 
-          if (subscription && !subscription.subscriptionInvoiceAwsLink) {
-               const createsubscriptionDetailsPdfTemplate = await whatsAppTemplate.subscriptionDetailsPdf(subscription as ISubscription as any);
-               const invoiceInpdfPath = await generatePDF(createsubscriptionDetailsPdfTemplate);
-               const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-               const subscriptionInvoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', subscription!._id?.toString(), 'application/pdf');
+          // if (subscription && !subscription.subscriptionInvoiceAwsLink) {
+          //      const createsubscriptionDetailsPdfTemplate = await whatsAppTemplate.subscriptionDetailsPdf(subscription as ISubscription as any);
+          //      const invoiceInpdfPath = await generatePDF(createsubscriptionDetailsPdfTemplate);
+          //      const fileBuffer = fs.readFileSync(invoiceInpdfPath);
+          //      const subscriptionInvoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', subscription!._id?.toString(), 'application/pdf');
 
-               subscription.subscriptionInvoiceAwsLink = subscriptionInvoiceAwsLink;
-               await subscription.save();
-          }
+          //      subscription.subscriptionInvoiceAwsLink = subscriptionInvoiceAwsLink;
+          //      await subscription.save();
+          // }
 
           return subscription;
      } catch (error) {
