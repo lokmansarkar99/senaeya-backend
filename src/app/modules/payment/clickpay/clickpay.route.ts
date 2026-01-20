@@ -16,6 +16,7 @@ router.post('/callback', clickpayController.paymentCallback);
 
 // make a success route with html return
 router.get('/success', async (req, res) => {
+     console.log(req.query);
      // checke already subscribed and not expired
      const isExistSubscription = await Subscription.findOne({
           workshop: req.query.providerWorkShopId,
