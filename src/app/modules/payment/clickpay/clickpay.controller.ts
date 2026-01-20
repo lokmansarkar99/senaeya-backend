@@ -19,7 +19,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
      }
      let isExistCoupon;
      let toBePaidAmount = isExistPackage.price;
-     let flatDiscountedAmount;
+     let flatDiscountedAmount = 0;
      if (req.query.couponCode) {
           isExistCoupon = await CouponService.getTryCouponByCode(req.params.packageId, req.query.couponCode as string);
           console.log('🚀 ~ isExistCoupon:', isExistCoupon);
