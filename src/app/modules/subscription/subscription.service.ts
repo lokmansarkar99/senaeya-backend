@@ -380,7 +380,7 @@ const getSubscriptionByIdToDB = async (subscriptionId: string) => {
 };
 
 const mySubscriptionDetailsToDB = async (workshopId: string) => {
-     let subscription = await Subscription.findOne({ workshop: workshopId }).populate('workshop');
+     let subscription = await Subscription.findOne({ workshop: new mongoose.Types.ObjectId(workshopId) }).populate('workshop');
      if (!subscription) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Subscription not found');
      }
