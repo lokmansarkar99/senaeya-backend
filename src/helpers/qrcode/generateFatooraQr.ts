@@ -24,17 +24,25 @@ export interface IFatooraQr {
      workshopNameArabic: string;
      taxVatNumber: string;
      createdAt: string;
-     finalCost: string;
+     totalCostIncludingTax: string;
+     taxAmount: string;
      invoiceId: string;
 }
 export async function generateFatooraQR(data: IFatooraQr) {
      // Create TLV buffers for each field
+     // /**
+     //  * 1 : Sellers's Name
+     //  * 2 : Seller's TRN
+     //  * 3 : createdAt
+     //  * 4 : totalCostIncludingTax
+     //  * 5 : taxAmount
+     //  */
      const tlvBuffers: Buffer[] = [
           getTLVForValue(1, data.workshopNameArabic),
           getTLVForValue(2, data.taxVatNumber),
           getTLVForValue(3, data.createdAt),
-          getTLVForValue(4, data.finalCost),
-          getTLVForValue(5, data.invoiceId),
+          getTLVForValue(4, data.totalCostIncludingTax),
+          getTLVForValue(5, data.taxAmount),
      ];
 
      // Concatenate all TLVs into one buffer
@@ -71,7 +79,8 @@ generateFatooraQR({
      workshopNameArabic: 'My Shop LLC',
      taxVatNumber: '312345678901234',
      createdAt: '2025-10-30T13:10:00Z',
-     finalCost: '1234.50',
+     totalCostIncludingTax: '1234.50',
+     taxAmount: '52',
      invoiceId: '5456654564646',
 }).catch((err) => {
      console.error('❌ Error generating QR:', err);

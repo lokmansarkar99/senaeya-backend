@@ -188,7 +188,8 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                     workshopNameArabic: (populatedResult.providerWorkShopId as any).workshopNameArabic,
                     taxVatNumber: (populatedResult.providerWorkShopId as any).taxVatNumber,
                     createdAt: populatedResult.createdAt.toISOString(),
-                    finalCost: populatedResult.finalCost.toString(),
+                    totalCostIncludingTax: populatedResult.totalCostIncludingTax.toString(),
+                    taxAmount: populatedResult.taxAmount.toString(),
                     invoiceId: populatedResult._id.toString(),
                });
                populatedResult.invoiceQRLink = qrPath;
