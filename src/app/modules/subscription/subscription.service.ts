@@ -252,6 +252,7 @@ const createSubscriptionByPackageIdForWorkshop = async (
 
           return subscription;
      } catch (error: any) {
+          console.log('🚀 ~ createSubscriptionByPackageIdForWorkshop ~ error:', error);
           await session.abortTransaction();
           session.endSession();
           throw error;
