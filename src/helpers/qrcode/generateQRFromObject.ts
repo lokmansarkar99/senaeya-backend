@@ -4,15 +4,20 @@ import QRCode from 'qrcode';
 import { getTLVForValue } from './generateFatooraQr';
 
 const generateQRFromObject = async (data: any) => {
-     console.log('🚀 ~ generateQRFromObject ~ data:', data);
+     // /**
+     //  * 1 : Sellers's Name
+     //  * 2 : Seller's TRN
+     //  * 3 : createdAt
+     //  * 4 : totalCostIncludingTax
+     //  * 5 : taxAmount
+     //  */
      // Create TLV buffers for each field
      const tlvBuffers: Buffer[] = [
           getTLVForValue(1, data.workshop.workshopNameEnglish.toString()),
-          getTLVForValue(2, data._id.toString()),
-          getTLVForValue(3, data.currentPeriodStart.toString()),
-          getTLVForValue(4, data.currentPeriodEnd.toString()),
-          getTLVForValue(5, data.status.toString()),
-          getTLVForValue(6, data.amountPaid.toString()),
+          getTLVForValue(2, data.workshop.taxVatNumber.toString()),
+          getTLVForValue(3, data.createdAt.toString()),
+          getTLVForValue(4, data.flatDiscountedAmount.toString()),
+          getTLVForValue(5, data.flatVatAmount.toString()),
      ];
 
      // Concatenate all TLVs into one buffer
