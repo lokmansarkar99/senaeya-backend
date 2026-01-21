@@ -16,7 +16,7 @@ const generateQRFromObject = async (data: any) => {
           getTLVForValue(1, data.workshop.workshopNameEnglish.toString()),
           getTLVForValue(2, data.workshop.taxVatNumber.toString()),
           getTLVForValue(3, data.createdAt.toString()),
-          getTLVForValue(4, data.flatDiscountedAmount.toString()),
+          getTLVForValue(4, data.amountPaid.toString()),
           getTLVForValue(5, data.flatVatAmount.toString()),
      ];
 
