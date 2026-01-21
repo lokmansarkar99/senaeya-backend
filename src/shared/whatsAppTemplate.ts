@@ -4178,10 +4178,12 @@ const subscriptionDeleted = () => {
     `;
 };
 
-const getInvoiceDetails = ({ url }: { url: string }) => `Please find the details of your invoice(يرجى العثور على تفاصيل فاتورتك) : 
+const getInvoiceDetails = ({ url }: { url: string }) => `Invoice issued by Senaeya App
+فاتورة صادرة من تطبيق الصناعية
 ${url}`;
 
-const getReportDetails = ({ url }: { url: string }) => `plz check the report : 
+const getReportDetails = ({ url }: { url: string }) => `Report issued by Senaeya App
+تقرير صادر من تطبيق الصناعية : 
 ${url}`;
 
 export const whatsAppTemplate = {
