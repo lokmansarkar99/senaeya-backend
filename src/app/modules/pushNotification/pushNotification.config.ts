@@ -35,14 +35,11 @@
 // export const messaging = admin.messaging();
 
 import admin from 'firebase-admin';
-import config from '../../../config';
-const serviceAccount = config.firebase_service_account;
-
-const parsedServiceAccount = JSON.parse(serviceAccount!);
+import serviceAccount from './../../../../senaeya-59503-firebase-adminsdk-fbsvc-43c70aed06.json';
 
 if (!admin.apps.length) {
      admin.initializeApp({
-          credential: admin.credential.cert(parsedServiceAccount.private_key),
+          credential: admin.credential.cert(serviceAccount as any),
      });
 }
 
