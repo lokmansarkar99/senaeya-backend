@@ -35,11 +35,20 @@
 // export const messaging = admin.messaging();
 
 import admin from 'firebase-admin';
-import serviceAccount from './../../../../senaeya-59503-firebase-adminsdk-fbsvc-43c70aed06.json';
+import config from '../../../config';
+import fs from 'fs';
+const serviceAccountPath = config.firebase_service_account;
+
+if (!serviceAccountPath) {
+     throw new Error('FIREBASE_SERVICE_ACCOUNT_PATH is not defined in .env');
+}
+
+// JSON file read & parse
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf-8'));
 
 if (!admin.apps.length) {
      admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount as any),
+          credential: admin.credential.cert(serviceAccount),
      });
 }
 
