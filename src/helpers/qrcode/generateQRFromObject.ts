@@ -4,7 +4,6 @@ import QRCode from 'qrcode';
 import { getTLVForValue } from './generateFatooraQr';
 
 const generateQRFromObject = async (data: any) => {
-     console.log('🚀 ~ generateQRFromObject ~ data:', data);
      // /**
      //  * 1 : Sellers's Name
      //  * 2 : Seller's TRN
