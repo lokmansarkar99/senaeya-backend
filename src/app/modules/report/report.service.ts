@@ -308,6 +308,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                const existingToken = await DeviceToken.findOne({
                     userId: new mongoose.Types.ObjectId(user.id),
                });
+               console.log('🚀 ~ getAllReportsByCreatedDateRange ~ existingToken:', existingToken);
                if (existingToken && existingToken.fcmToken) {
                     await sendToTopic({
                          token: existingToken.fcmToken,
