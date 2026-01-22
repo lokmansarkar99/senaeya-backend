@@ -45,7 +45,6 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
      let info = {};
 
-     console.log('🚀 ~ loginUserFromDB ~ fcmToken:', fcmToken);
      if (fcmToken && deviceId) {
           const existingToken = await DeviceToken.findOne({
                userId: isExistUser._id,
@@ -141,7 +140,6 @@ const loginUserWithFingerPrint = async (payload: ILoginData) => {
 
      let info = {};
 
-     console.log('🚀 ~ loginUserWithFingerPrint ~ fcmToken:', fcmToken);
      if (fcmToken && deviceId) {
           const existingToken = await DeviceToken.findOne({
                userId: isExistUser._id,

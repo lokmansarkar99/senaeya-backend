@@ -62,7 +62,7 @@ export const sendToTopic = async ({ token, title, body, data }: { token: string;
      if (!token) return;
 
      try {
-          await firebaseAdmin.messaging().send({
+          const resFirebase = await firebaseAdmin.messaging().send({
                token,
                notification: {
                     title,
@@ -70,6 +70,7 @@ export const sendToTopic = async ({ token, title, body, data }: { token: string;
                },
                data,
           });
+          console.log('🚀 ~ sendToTopic ~ resFirebase:', resFirebase);
      } catch (error) {
           console.log('🚀 ~ sendToTopic ~ error:', error);
      }
