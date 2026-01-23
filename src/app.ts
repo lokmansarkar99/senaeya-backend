@@ -39,7 +39,7 @@ app.use(
                'http://dashboard.senaeya.net',
                'https://api.senaeya.net',
                'https://dashboard.senaeya.net',
-               'https://sanaiya-new.vercel.app',
+               'https://report.senaeya.net',
           ],
           credentials: true,
      }),
