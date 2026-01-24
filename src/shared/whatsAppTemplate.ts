@@ -4159,9 +4159,8 @@ const subscriptionExtended = (values: { daysCount: number; subscriptionId: strin
      // تم تمديد اشتراككم في تطبيق الصناعية لمدة ${values.daysCount} يوم.
      // `;
      return `
-      The subscription was successful, and the invoice was issued and sent via WhatsApp
-      تم الاشتراك بنجاح وتم إصدار الفاتورة وإرسالها عبر الواتساب
-    
+      Thank you... You have subscribed to Senaeya App
+شكرا لكم ... تم الاشتراك في تطبيق الصناعية            
       visit: ${config.frontend_subscription_url}/${values.subscriptionId}
       `;
 };
