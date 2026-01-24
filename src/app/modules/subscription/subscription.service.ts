@@ -73,9 +73,11 @@ const subscriptionsFromDB = async (query: Record<string, unknown>) => {
      );
      const result = await queryBuilder.filter().sort().paginate().fields().search(['contact']).modelQuery;
      result.forEach(async (sub) => {
+          console.log('🚀 ~ subscriptionsFromDB ~ sub:', sub);
           // create a new recieptNumber
           const recieptNumber = await AutoIncrementService.increaseAutoIncrement('subscription');
-          await Subscription.findByIdAndUpdate(sub._id, { recieptNumber: recieptNumber.value });
+          const resut = await Subscription.findByIdAndUpdate(sub._id, { recieptNumber: recieptNumber.value });
+          console.log('🚀 ~ subscriptionsFromDB ~ resut:', resut);
      });
      const meta = await queryBuilder.countTotal();
      return { meta, result };
