@@ -153,6 +153,11 @@ import { StatusCodes } from 'http-status-codes';
 import { shortUrlService } from '../shortUrl/shortUrl.service';
 import { sendToTopic } from '../pushNotification/pushNotification.service';
 import DeviceToken from '../DeviceToken/DeviceToken.model';
+import { verifyToken } from '../../../utils/verifyToken';
+import { Secret } from 'jsonwebtoken';
+import { USER_ROLES } from '../../../enums/user';
+import { workShopService } from '../workShop/workShop.service';
+import { jwtHelper } from '../../../helpers/jwtHelper';
 
 const getAllReportsByCreatedDateRange = async (query: Record<string, any>, providerWorkShopId: string, user: any, access_token: string) => {
      let { startDate, endDate, income, outlay, noOfCars, lang, isReleased = 'true' } = query;
@@ -279,9 +284,39 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      };
 
      if (isReleased) {
+          // regenertte a token for 1000yr
+          // let verifyUser: {
+          //      id: string;
+          //      role: string;
+          //      email: string;
+          //      contact: string;
+          //      deviceId: string;
+          //      workShops: string[];
+          //      iat: number;
+          //      exp: number;
+          // };
+          let verifyUser;
+          try {
+               verifyUser = verifyToken(access_token, config.jwt.jwt_secret as Secret);
+          } catch (error) {
+               throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized !!');
+          }
+          const jwtData: any = { id: verifyUser.id, role: verifyUser.role, email: verifyUser.email || '', contact: verifyUser.contact, deviceId: verifyUser.deviceId || '' };
+          let workshops;
+          if (verifyUser.role === USER_ROLES.WORKSHOP_MEMBER || verifyUser.role === USER_ROLES.WORKSHOP_OWNER) {
+               const userWorkShops = await workShopService.getAllWorkShops({ ownerId: verifyUser.id, fields: '_id,workshopNameEnglish' });
+               if (userWorkShops.result.length > 0) {
+                    const workShopsIds = userWorkShops.result.map((workShop) => workShop._id!.toString());
+                    jwtData.workShops = workShopsIds;
+                    workshops = userWorkShops.result;
+               }
+          }
+          //create token
+          const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in_for_report as string);
+
           // create a short url with the report url
           const result = await shortUrlService.createShortUrl({
-               shortUrl: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${access_token}`,
+               shortUrl: `${config.frontend_report_url}?startDate=${query.startDate}&endDate=${query.endDate}&income=${query.income || false}&outlay=${query.outlay || false}&noOfCars=${query.noOfCars || false}&isReleased=false&providerWorkShopId=${providerWorkShopId}&lang=${lang || 'en'}&access_token=${accessToken}`,
           });
           const message = whatsAppTemplate.getReportDetails({
                url: `${config.backend_url_short}/shortUrl/${result._id}`,

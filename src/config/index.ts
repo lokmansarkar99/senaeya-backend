@@ -21,6 +21,7 @@ export default {
      jwt: {
           jwt_secret: process.env.JWT_SECRET,
           jwt_expire_in: process.env.JWT_EXPIRE_IN,
+          jwt_expire_in_for_report: process.env.JWT_EXPIRE_IN_FOR_REPORT,
           jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
           jwt_refresh_expire_in: process.env.JWT_REFRESH_EXPIRE_IN,
      },
