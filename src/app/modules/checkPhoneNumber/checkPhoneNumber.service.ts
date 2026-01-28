@@ -35,7 +35,7 @@ const createCheckPhoneNumber = async (payload: IcheckPhoneNumber) => {
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'CheckPhoneNumber not found.');
      }
-     return { message: 'otp sent successfully.', isAlreadyBlocked: isAlreadyBlocked?.status?.toString() === 'blocked' };
+     return { message: 'otp sent successfully.', isAlreadyBlocked: isAlreadyBlocked?.status === CLIENT_STATUS.BLOCKED };
 };
 
 const getCheckPhoneNumberByPhoneNumber = async (phoneNumber: string, otp: number) => {

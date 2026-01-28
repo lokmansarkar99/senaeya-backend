@@ -8,8 +8,8 @@ export enum CLIENT_CAR_TYPE {
      INTERNATIONAL = 'International',
 }
 
-
 export enum CLIENT_STATUS {
      ACTIVE = 'Active',
      BLOCK = 'Block',
+     BLOCKED = 'blocked',
 }
