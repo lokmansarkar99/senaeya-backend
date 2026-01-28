@@ -31,13 +31,11 @@ const createCheckPhoneNumber = async (payload: IcheckPhoneNumber) => {
      });
 
      const result = await CheckPhoneNumber.create({ phoneNumber: payload.phoneNumber.trim(), otp });
-     console.log('🚀 ~ createCheckPhoneNumber ~ payload.phoneNumber:', payload.phoneNumber);
-     const isAlreadyBlocked = await Client.findOne({ contact: payload.phoneNumber }).select('status');
-     console.log('🚀 ~ createCheckPhoneNumber ~ isAlreadyBlocked:', isAlreadyBlocked);
+     const isAlreadyBlocked = await Client.findOne({ contact: payload.phoneNumber.trim() }).select('status');
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'CheckPhoneNumber not found.');
      }
-     return { message: 'otp sent successfully.', isAlreadyBlocked: isAlreadyBlocked?.status === CLIENT_STATUS.BLOCK };
+     return { message: 'otp sent successfully.', isAlreadyBlocked: isAlreadyBlocked?.status?.toString() === 'blocked' };
 };
 
 const getCheckPhoneNumberByPhoneNumber = async (phoneNumber: string, otp: number) => {
