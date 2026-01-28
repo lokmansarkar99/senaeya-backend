@@ -465,62 +465,66 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
-     const client = await Client.findOne({ contact, providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId) }).populate(
-          'clientId',
-          'documentNumber workshopNameEnglish workshopNameArabic',
-     );
-     if (!client) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.4');
-     }
+     try {
+          const client = await Client.findOne({ contact, providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId) }).populate(
+               'clientId',
+               'documentNumber workshopNameEnglish workshopNameArabic',
+          );
+          if (!client) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.4');
+          }
 
-     // find expiredInvoices of the user
-     const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
-     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+          // find expiredInvoices of the user
+          const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+          const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 
-     const expiredPostpaidInvoices = await Invoice.find({
-          client: client._id,
-          paymentStatus: PaymentStatus.UNPAID,
-          $or: [
-               {
-                    paymentType: PaymentMethod.POSTPAID,
-                    postPaymentDate: { $lt: threeDaysAgo },
-               },
-               {
-                    paymentType: { $ne: PaymentMethod.POSTPAID },
-                    createdAt: { $lt: tenDaysAgo },
-               },
-          ],
-     }).select('_id');
+          const expiredPostpaidInvoices = await Invoice.find({
+               client: client._id,
+               paymentStatus: PaymentStatus.UNPAID,
+               $or: [
+                    {
+                         paymentType: PaymentMethod.POSTPAID,
+                         postPaymentDate: { $lt: threeDaysAgo },
+                    },
+                    {
+                         paymentType: { $ne: PaymentMethod.POSTPAID },
+                         createdAt: { $lt: tenDaysAgo },
+                    },
+               ],
+          }).select('_id');
 
-     if (expiredPostpaidInvoices.length > 0) {
-          client.hasPaymentIssues = true;
-          await client.save();
-     } else {
-          client.hasPaymentIssues = false;
-          await client.save();
-     }
+          if (expiredPostpaidInvoices.length > 0) {
+               client.hasPaymentIssues = true;
+               await client.save();
+          } else {
+               client.hasPaymentIssues = false;
+               await client.save();
+          }
 
-     const carOfClient = await Car.findOne({ client: client._id })
-          .populate({
-               path: 'client',
-               populate: {
-                    path: 'clientId',
-               },
-          })
-          .populate({
-               path: 'model',
-               select: 'title',
-          })
-          .populate({
-               path: 'brand',
-               select: '_id image title',
-               populate: {
-                    path: 'country',
+          const carOfClient = await Car.findOne({ client: client._id })
+               .populate({
+                    path: 'client',
+                    populate: {
+                         path: 'clientId',
+                    },
+               })
+               .populate({
+                    path: 'model',
+                    select: 'title',
+               })
+               .populate({
+                    path: 'brand',
                     select: '_id image title',
-               },
-          });
-     // return [carOfClient,client];
-     return carOfClient ? [carOfClient] : [client];
+                    populate: {
+                         path: 'country',
+                         select: '_id image title',
+                    },
+               });
+          // return [carOfClient,client];
+          return carOfClient ? [carOfClient] : [client];
+     } catch (error) {
+          console.log('🚀 ~ getClientByClientContact ~ error:', error);
+     }
 };
 
 const toggleClientStatus = async (id: string): Promise<IClient | null> => {
