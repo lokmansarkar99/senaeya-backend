@@ -21,19 +21,15 @@ router.get('/return', async (req, res) => {
      // log current time of htting this route
      console.log('Current time return url:', new Date().toISOString());
      const { acquirerMessage, acquirerRRN, cartId, customerEmail, respCode, respMessage, respStatus, signature, token, tranRef } = req.query;
-     if (!respStatus || respStatus !== 'A') {
+     if (respStatus || (respStatus !== 'C' && respStatus !== 'D')) {
           res.send(`
-               <h3>Payment Failed</h3>
-          `);
-          // sendResponse(res, {
-          //      statusCode: 400,
-          //      success: false,
-          //      message: 'Payment failed',
-          //      data: {
-          //           isPaid: false,
-          //      },
-          // });
+          <h3>Payment Successful</h3>
+          <p>Thank you! Your payment has been completed.</p>
+     `);
      }
+     res.send(`
+          <h3>Payment Failed</h3>
+     `);
      // // checke already subscribed and not expired
      // const isExistSubscription = await Subscription.findOne({
      //      workshop: req.query.providerWorkShopId,
@@ -53,10 +49,6 @@ router.get('/return', async (req, res) => {
      //           Number(req.query.flatVatAmount),
      //      );
      // }
-     res.send(`
-          <h3>Payment Successful</h3>
-          <p>Thank you! Your payment has been completed.</p>
-     `);
 });
 
 export const clickpayRoutes = router;
