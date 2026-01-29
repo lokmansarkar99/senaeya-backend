@@ -7,6 +7,7 @@ import auth from '../../../middleware/auth';
 import validateUserAuthority from '../../../middleware/validateUserAuthority';
 import { SubscriptionService } from '../../subscription/subscription.service';
 import { Subscription } from '../../subscription/subscription.model';
+import sendResponse from '../../../../shared/sendResponse';
 
 const router = express.Router();
 
@@ -21,7 +22,14 @@ router.get('/success', async (req, res) => {
      console.log('Current time return url:', new Date().toISOString());
      const { acquirerMessage, acquirerRRN, cartId, customerEmail, respCode, respMessage, respStatus, signature, token, tranRef } = req.query;
      if (!respStatus || respStatus !== 'A') {
-          return res.send('<h1>Payment failed</h1>');
+          sendResponse(res, {
+               statusCode: 400,
+               success: false,
+               message: 'Payment failed',
+               data: {
+                    isPaid: false,
+               },
+          });
      }
      // // checke already subscribed and not expired
      // const isExistSubscription = await Subscription.findOne({
@@ -42,7 +50,14 @@ router.get('/success', async (req, res) => {
      //           Number(req.query.flatVatAmount),
      //      );
      // }
-     res.send('<h1>Payment successful</h1>');
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Payment successful',
+          data: {
+               isPaid: true,
+          },
+     });
 });
 
 export const clickpayRoutes = router;
