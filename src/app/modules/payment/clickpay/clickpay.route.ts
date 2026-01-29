@@ -16,7 +16,7 @@ router.post('/initiate/:packageId', auth(USER_ROLES.WORKSHOP_OWNER), validateUse
 router.post('/callback', clickpayController.paymentCallback);
 
 // make a success route with html return
-router.get('/success', async (req, res) => {
+router.get('/return', async (req, res) => {
      console.log(req.query);
      // log current time of htting this route
      console.log('Current time return url:', new Date().toISOString());
