@@ -54,6 +54,6 @@ router.get('/success', async (req, res) => {
           <h3>Payment Successful</h3>
           <p>Thank you! Your payment has been completed.</p>
      `);
-
+});
 
 export const clickpayRoutes = router;
