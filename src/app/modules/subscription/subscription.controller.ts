@@ -37,15 +37,14 @@ const cancelSubscription = catchAsync(async (req, res) => {
 });
 // create checkout session
 const createCheckoutSession = catchAsync(async (req, res) => {
-     const { id }: any = req.user;
-     const packageId = req.params.id;
-     // const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(id, packageId, req.query.amountPaid as string, req.query.couponCode as string, req.query.contact as string);
+     const { providerWorkShopId, packageId, amountPaid, couponCode, contact, vatPercent, flatDiscountedAmount, flatVatAmount } = req.body;
+     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(providerWorkShopId, packageId, amountPaid, couponCode, contact, vatPercent, flatDiscountedAmount, flatVatAmount);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
           message: 'Create checkout session successfully',
-          // data: result,
+          data: result,
      });
 });
 // update subscriptions
