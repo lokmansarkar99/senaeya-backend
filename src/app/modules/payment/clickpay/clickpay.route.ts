@@ -22,14 +22,17 @@ router.get('/success', async (req, res) => {
      console.log('Current time return url:', new Date().toISOString());
      const { acquirerMessage, acquirerRRN, cartId, customerEmail, respCode, respMessage, respStatus, signature, token, tranRef } = req.query;
      if (!respStatus || respStatus !== 'A') {
-          sendResponse(res, {
-               statusCode: 400,
-               success: false,
-               message: 'Payment failed',
-               data: {
-                    isPaid: false,
-               },
-          });
+          res.send(`
+               <h3>Payment Failed</h3>
+          `);
+          // sendResponse(res, {
+          //      statusCode: 400,
+          //      success: false,
+          //      message: 'Payment failed',
+          //      data: {
+          //           isPaid: false,
+          //      },
+          // });
      }
      // // checke already subscribed and not expired
      // const isExistSubscription = await Subscription.findOne({
