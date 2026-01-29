@@ -50,14 +50,10 @@ router.get('/success', async (req, res) => {
      //           Number(req.query.flatVatAmount),
      //      );
      // }
-     sendResponse(res, {
-          statusCode: 200,
-          success: true,
-          message: 'Payment successful',
-          data: {
-               isPaid: true,
-          },
-     });
-});
+     res.send(`
+          <h3>Payment Successful</h3>
+          <p>Thank you! Your payment has been completed.</p>
+     `);
+
 
 export const clickpayRoutes = router;
