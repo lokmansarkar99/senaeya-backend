@@ -85,7 +85,12 @@ const createSubscriptionByPackageIdForWorkshop = async (
      vatPercent: number,
      flatDiscountedAmount: number,
      flatVatAmount: number,
+     user: any,
 ) => {
+     if (!contact) {
+          contact = user.contact;
+     }
+     console.log({ workShopId, packageId, amountPaid, couponCode, contact, vatPercent, flatDiscountedAmount, flatVatAmount });
      const isExistPackage = await Package.findOne({
           _id: packageId,
           status: 'active',

@@ -38,7 +38,17 @@ const cancelSubscription = catchAsync(async (req, res) => {
 // create checkout session
 const createCheckoutSession = catchAsync(async (req, res) => {
      const { providerWorkShopId, packageId, amountPaid, couponCode, contact, vatPercent, flatDiscountedAmount, flatVatAmount } = req.body;
-     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(providerWorkShopId, packageId, amountPaid, couponCode, contact, vatPercent, flatDiscountedAmount, flatVatAmount);
+     const result = await SubscriptionService.createSubscriptionByPackageIdForWorkshop(
+          providerWorkShopId,
+          packageId,
+          amountPaid,
+          couponCode,
+          contact,
+          vatPercent,
+          flatDiscountedAmount,
+          flatVatAmount,
+          req.user,
+     );
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
