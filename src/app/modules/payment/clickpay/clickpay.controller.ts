@@ -66,7 +66,8 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          // return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          return: `https://webhook.site/004ed1ed-1764-4b47-80ca-e7bd45d1314d`,
      };
      const result = await initiatePaymentService(paymentRequest);
      console.log('🚀 ~ result:', result);
