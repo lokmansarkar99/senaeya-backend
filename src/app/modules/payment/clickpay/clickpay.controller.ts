@@ -65,11 +65,17 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           cart_id: isExistPackage._id.toString(),
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
-          callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          // return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          callback: `https://webhook.site/004ed1ed-1764-4b47-80ca-e7bd45d1314d`, // Your callback URL
+          // callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
           // return: `https://webhook.site/004ed1ed-1764-4b47-80ca-e7bd45d1314d`,
-          return: `https://www.google.com`,
+          // return: `https://www.google.com`,
           return_using_get: true,
+          user_defined: {
+               udf3: ['user id', '2222'],
+               udf4: 'coupon id',
+               udf9: 'package id',
+          },
      };
      const result = await initiatePaymentService(paymentRequest);
      console.log('🚀 ~ result:', result);
