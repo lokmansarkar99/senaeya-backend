@@ -66,13 +66,29 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
           tran_type: TRAN_TYPE.SALE,
           tran_class: TRAN_CLASS.ECOM,
           callback: `${req.protocol}://${req.get('host')}/api/v1/clickpay/callback`, // Your callback URL
-          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          // return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success?&packageId=${req.params.packageId}&providerWorkShopId=${req.body.providerWorkShopId as string}&couponCode=${req.query.couponCode as string}&amountPaid=${toBePaidAmount}&contact=${(req.user as any)?.contact}&vatPercent=${vatPercent}&flatDiscountedAmount=${flatDiscountedAmount}&flatVatAmount=${flatVatAmount}`, // Customer return URL
+          return: `${req.protocol}://${req.get('host')}/api/v1/clickpay/success`, // Customer return URL
           return_using_get: true,
           user_defined: {
-               udf3: ['user id', '2222'],
-               udf4: 'coupon id',
-               udf9: 'package id',
+               packageId: req.params.packageId,
+               providerWorkShopId: req.body.providerWorkShopId as string,
+               couponCode: req.query.couponCode as string,
+               amountPaid: toBePaidAmount.toString(),
+               contact: (req.user as any)?.contact || '',
+               vatPercent: vatPercent.toString(),
+               flatDiscountedAmount: flatDiscountedAmount.toString(),
+               flatVatAmount: flatVatAmount.toString(),
           },
+          // user_defined: {
+          //      udf1: ['packageId', req.params.packageId],
+          //      udf2: ['providerWorkShopId', req.body.providerWorkShopId as string],
+          //      udf3: ['couponCode', req.query.couponCode as string],
+          //      udf4: ['amountPaid', toBePaidAmount.toString()],
+          //      udf5: ['contact', (req.user as any)?.contact || ''],
+          //      udf6: ['vatPercent', vatPercent.toString()],
+          //      udf7: ['flatDiscountedAmount', flatDiscountedAmount.toString()],
+          //      udf8: ['flatVatAmount', flatVatAmount.toString()],
+          // },
      };
      const result = await initiatePaymentService(paymentRequest);
      console.log('🚀 ~ result:', result);
@@ -95,10 +111,11 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const paymentCallback = catchAsync(async (req, res) => {
-     const { transaction_status, payment_gateway_reference, cart_id } = req.body;
+     console.log('Current time callback:', new Date().toISOString());
+     const { user_defined } = req.body;
 
      // Verify the callback (ClickPay may provide a signature; check docs for validation)
-     console.log(`Payment Callback: Order ${cart_id} - Status: ${transaction_status}, Ref: ${payment_gateway_reference}`);
+     console.log(`Payment Callback: Order ${user_defined}`);
 
      // Update your database: e.g., mark order as paid if status === 'success'
      // Example: await updateOrderStatus(cart_id, transaction_status);

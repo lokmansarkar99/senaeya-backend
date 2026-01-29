@@ -17,25 +17,31 @@ router.post('/callback', clickpayController.paymentCallback);
 // make a success route with html return
 router.get('/success', async (req, res) => {
      console.log(req.query);
-     // checke already subscribed and not expired
-     const isExistSubscription = await Subscription.findOne({
-          workshop: req.query.providerWorkShopId,
-          package: req.query.packageId,
-          status: 'active',
-          currentPeriodEnd: { $gt: new Date().toISOString() },
-     });
-     if (!isExistSubscription) {
-          await SubscriptionService.createSubscriptionByPackageIdForWorkshop(
-               req.query.providerWorkShopId as string,
-               req.query.packageId as string,
-               req.query.amountPaid as string,
-               req.query.couponCode as string,
-               req.query.contact as string,
-               Number(req.query.vatPercent),
-               Number(req.query.flatDiscountedAmount),
-               Number(req.query.flatVatAmount),
-          );
+     // log current time of htting this route
+     console.log('Current time return url:', new Date().toISOString());
+     const { acquirerMessage, acquirerRRN, cartId, customerEmail, respCode, respMessage, respStatus, signature, token, tranRef } = req.query;
+     if (!respStatus || respStatus !== 'A') {
+          return res.send('<h1>Payment failed</h1>');
      }
+     // // checke already subscribed and not expired
+     // const isExistSubscription = await Subscription.findOne({
+     //      workshop: req.query.providerWorkShopId,
+     //      package: req.query.packageId,
+     //      status: 'active',
+     //      currentPeriodEnd: { $gt: new Date().toISOString() },
+     // });
+     // if (!isExistSubscription) {
+     //      await SubscriptionService.createSubscriptionByPackageIdForWorkshop(
+     //           req.query.providerWorkShopId as string,
+     //           req.query.packageId as string,
+     //           req.query.amountPaid as string,
+     //           req.query.couponCode as string,
+     //           req.query.contact as string,
+     //           Number(req.query.vatPercent),
+     //           Number(req.query.flatDiscountedAmount),
+     //           Number(req.query.flatVatAmount),
+     //      );
+     // }
      res.send('<h1>Payment successful</h1>');
 });
 
