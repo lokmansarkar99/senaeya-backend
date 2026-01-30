@@ -62,14 +62,45 @@ const createCar = async (payload: IcarCreate): Promise<ICar> => {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists.');
           }
      }
-     const result = await Car.create(payload);
-     if (!result) {
-          if (payload.image) {
-               unlinkFile(payload.image);
+     // const result = await Car.create(payload);
+     // if (!result) {
+     //      if (payload.image) {
+     //           unlinkFile(payload.image);
+     //      }
+     //      throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
+     // }
+     // // include the car in the client
+     // if (payload.client) {
+     //      await Client.updateOne({ _id: payload.client }, { $push: { cars: result._id } });
+     // }
+     // return result;
+
+     const session = await mongoose.startSession();
+     try {
+          session.startTransaction();
+
+          const result = await Car.create([payload], { session });
+          // NOTE: create() with transaction must use array syntax
+          const car = result[0];
+
+          if (!car) {
+               throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
           }
-          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
+
+          // include the car in the client
+          if (payload.client) {
+               await Client.updateOne({ _id: payload.client }, { $push: { cars: car._id } }, { session });
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return car;
+     } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+          throw error;
      }
-     return result;
 };
 
 const createCarWithSession = async (payload: IcarCreate, session: any) => {
