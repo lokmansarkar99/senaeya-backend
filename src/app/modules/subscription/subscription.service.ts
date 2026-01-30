@@ -251,6 +251,7 @@ const createSubscriptionByPackageIdForWorkshop = async (
           // create a new recieptNumber
           const recieptNumber = await AutoIncrementService.increaseAutoIncrement('subscription', session);
           subscription.recieptNumber = recieptNumber.value;
+          await subscription.save({ session });
 
           await session.commitTransaction();
           session.endSession();

@@ -11,5 +11,4 @@ export enum CLIENT_CAR_TYPE {
 export enum CLIENT_STATUS {
      ACTIVE = 'Active',
      BLOCK = 'Block',
-     BLOCKED = 'blocked',
 }

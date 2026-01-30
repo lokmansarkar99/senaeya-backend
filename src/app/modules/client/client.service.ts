@@ -528,7 +528,8 @@ const getClientByClientContact = async (contact: string, providerWorkShopId: str
 };
 
 const toggleClientStatus = async (id: string): Promise<IClient | null> => {
-     const [result] = await Client.find({ _id: id });
+     // const [result] = await Client.find({ _id: id });
+     const result = await Client.findOne({ _id: id });
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found.5');
      }
