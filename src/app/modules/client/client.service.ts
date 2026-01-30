@@ -465,6 +465,8 @@ const getClientById = async (id: string): Promise<IClient | null> => {
 };
 
 const getClientByClientContact = async (contact: string, providerWorkShopId: string) => {
+     console.log('🚀 ~ getClientByClientContact ~ providerWorkShopId:', providerWorkShopId);
+     console.log('🚀 ~ getClientByClientContact ~ contact:', contact);
      try {
           const client = await Client.findOne({ contact, providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId) }).populate(
                'clientId',
