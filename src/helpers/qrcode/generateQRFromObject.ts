@@ -14,10 +14,15 @@ const generateQRFromObject = async (data: any) => {
 
      // date calc
      const date = new Date(data.createdAt);
+
      const dd = String(date.getDate()).padStart(2, '0');
      const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
      const yyyy = date.getFullYear();
-     const formattedDate = `${dd}-${mm}-${yyyy}`;
+
+     const hh = String(date.getHours()).padStart(2, '0');
+     const min = String(date.getMinutes()).padStart(2, '0');
+
+     const formattedDate = `${dd}-${mm}-${yyyy} ${hh}:${min}`;
 
      // vat,price calc
      const priceBeforeTax = 1 + 0.15 !== 0 ? data.amountPaid / (1 + 0.15) : 0.0;
@@ -28,8 +33,8 @@ const generateQRFromObject = async (data: any) => {
           getTLVForValue(1, `مؤسسة مرافئ التجارية`),
           getTLVForValue(2, data.workshop.taxVatNumber.toString()),
           getTLVForValue(3, formattedDate),
-          getTLVForValue(4, data.amountPaid.toString()),
-          getTLVForValue(5, taxAmount.toString()),
+          getTLVForValue(4, data.amountPaid.toFixed(2).toString()),
+          getTLVForValue(5, taxAmount.toFixed(2).toString()),
      ];
 
      // Concatenate all TLVs into one buffer
