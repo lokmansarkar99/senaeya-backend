@@ -169,7 +169,11 @@ const createSubscriptionByPackageIdForWorkshop = async (
                const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
                await whatsAppHelper.sendWhatsAppTextMessage({
                     to: workshop.contact,
-                    body: message,
+                    // body: message,
+                    body: `
+                    Thank you... Subscription successful
+شكرا لكم ... تم الاشتراك بنجاح
+                    `,
                });
 
                // Notification for workshop owner
