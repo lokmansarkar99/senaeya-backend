@@ -165,15 +165,19 @@ const createSubscriptionByPackageIdForWorkshop = async (
           // Calculate subscription duration in days
           const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
 
+          console.log(`**********************
+               *****************
+               *******************`);
+          console.log('🚀 ~ createSubscriptionByPackageIdForWorkshop ~ workshop:', workshop);
           // WhatsApp notification
           const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
           await whatsAppHelper.sendWhatsAppTextMessage({
-               to: workshop.contact,
-               // body: message,
-               body: `
-                    Thank you... Subscription successful
-                    شكرا لكم ... تم الاشتراك بنجاح
-               `,
+               to: contact,
+               body: message,
+               // body: `
+               //      Thank you... Subscription successful
+               //      شكرا لكم ... تم الاشتراك بنجاح
+               // `,
           });
 
           // Notification for workshop owner
