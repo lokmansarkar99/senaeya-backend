@@ -4161,7 +4161,6 @@ const subscriptionExtended = (values: { daysCount: number; subscriptionId: strin
      return `
       Thank you... You have subscribed to Senaeya App
 شكرا لكم ... تم الاشتراك في تطبيق الصناعية            
-      visit: ${config.frontend_subscription_url}/${values.subscriptionId}
       `;
 };
 
