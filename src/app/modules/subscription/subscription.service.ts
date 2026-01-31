@@ -151,106 +151,106 @@ const createSubscriptionByPackageIdForWorkshop = async (
           // Idempotent upsert
           const subscription = await Subscription.findOneAndUpdate({ trxId: payload.trxId }, { $setOnInsert: payload }, { new: true, upsert: true, session });
 
-          const wasInserted = subscription.createdAt && subscription.createdAt.getTime() === subscription.updatedAt.getTime();
+          // const wasInserted = subscription.createdAt && subscription.createdAt.getTime() === subscription.updatedAt.getTime();
 
           // Update workshop only if new subscription
-          if (wasInserted) {
-               workshop.subscriptionId = new mongoose.Types.ObjectId(subscription._id);
-               workshop.subscribedPackage = new Types.ObjectId(packageId);
-               await workshop.save({ session });
+          // if (wasInserted) {
+          workshop.subscriptionId = new mongoose.Types.ObjectId(subscription._id);
+          workshop.subscribedPackage = new Types.ObjectId(packageId);
+          await workshop.save({ session });
 
-               // Increment coupon usage count
-               await Coupon.updateOne({ code: couponCode }, { $inc: { usedCount: 1 } }, { session });
+          // Increment coupon usage count
+          await Coupon.updateOne({ code: couponCode }, { $inc: { usedCount: 1 } }, { session });
 
-               // Calculate subscription duration in days
-               const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
+          // Calculate subscription duration in days
+          const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
 
-               // WhatsApp notification
-               const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
-               await whatsAppHelper.sendWhatsAppTextMessage({
-                    to: workshop.contact,
-                    // body: message,
-                    body: `
-                    Thank you... Subscription successful
-شكرا لكم ... تم الاشتراك بنجاح
-                    `,
+          // WhatsApp notification
+          const message = whatsAppTemplate.subscriptionExtended({ daysCount: extendedDaysCount, subscriptionId: subscription._id.toString() });
+          await whatsAppHelper.sendWhatsAppTextMessage({
+               to: workshop.contact,
+               body: message,
+               // body: `
+               //      Thank you... Subscription successful
+               //      شكرا لكم ... تم الاشتراك بنجاح
+               // `,
+          });
+
+          // Notification for workshop owner
+          await sendNotifications({
+               title: workshop.workshopNameEnglish,
+               receiver: (workshop.ownerId as any)._id,
+               message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
+               message_ar: `تم تمديد اشتراككم في تطبيق الصناعية لمدة (${extendedDaysCount}) يوم`,
+               message_bn: `Senaeya অ্যাপে আপনার সাবস্ক্রিপশনের মেয়াদ (${extendedDaysCount}) দিনের জন্য বাড়ানো হয়েছে।`,
+               message_tl: `Ang iyong subscription sa Senaeya app ay pinalawig nang (${extendedDaysCount}) araw`,
+               message_hi: `सेनाया ऐप की आपकी सदस्यता (${extendedDaysCount}) दिनों के लिए बढ़ा दी गई है।`,
+               message_ur: `Senaeya ایپ کی آپ کی رکنیت (${extendedDaysCount}) دنوں کے لیے بڑھا دی گئی ہے۔`,
+               type: 'ALERT',
+          });
+
+          if ((workshop.ownerId as any)._id) {
+               const existingToken = await DeviceToken.findOne({
+                    userId: (workshop.ownerId as any)._id,
                });
-
-               // Notification for workshop owner
-               await sendNotifications({
-                    title: workshop.workshopNameEnglish,
-                    receiver: (workshop.ownerId as any)._id,
-                    message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
-                    message_ar: `تم تمديد اشتراككم في تطبيق الصناعية لمدة (${extendedDaysCount}) يوم`,
-                    message_bn: `Senaeya অ্যাপে আপনার সাবস্ক্রিপশনের মেয়াদ (${extendedDaysCount}) দিনের জন্য বাড়ানো হয়েছে।`,
-                    message_tl: `Ang iyong subscription sa Senaeya app ay pinalawig nang (${extendedDaysCount}) araw`,
-                    message_hi: `सेनाया ऐप की आपकी सदस्यता (${extendedDaysCount}) दिनों के लिए बढ़ा दी गई है।`,
-                    message_ur: `Senaeya ایپ کی آپ کی رکنیت (${extendedDaysCount}) دنوں کے لیے بڑھا دی گئی ہے۔`,
-                    type: 'ALERT',
-               });
-
-               if ((workshop.ownerId as any)._id) {
-                    const existingToken = await DeviceToken.findOne({
-                         userId: (workshop.ownerId as any)._id,
+               if (existingToken && existingToken.fcmToken) {
+                    await sendToTopic({
+                         token: existingToken.fcmToken,
+                         title: 'Subscription Extended',
+                         body: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
+                         data: {
+                              title: workshop.workshopNameEnglish,
+                              receiver: (workshop.ownerId as any)._id,
+                              message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
+                              message_ar: `تم تمديد اشتراككم في تطبيق الصناعية لمدة (${extendedDaysCount}) يوم`,
+                              message_bn: `Senaeya অ্যাপে আপনার সাবস্ক্রিপশনের মেয়াদ (${extendedDaysCount}) দিনের জন্য বাড়ানো হয়েছে।`,
+                              message_tl: `Ang iyong subscription sa Senaeya app ay pinalawig nang (${extendedDaysCount}) araw`,
+                              message_hi: `सेनाया ऐप की आपकी सदस्यता (${extendedDaysCount}) दिनों के लिए बढ़ा दी गई है।`,
+                              message_ur: `Senaeya ایپ کی آپ کی رکنیت (${extendedDaysCount}) دنوں کے لیے بڑھا دی گئی ہے۔`,
+                              type: 'ALERT',
+                         },
                     });
-                    if (existingToken && existingToken.fcmToken) {
-                         await sendToTopic({
-                              token: existingToken.fcmToken,
-                              title: 'Subscription Extended',
-                              body: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
-                              data: {
-                                   title: workshop.workshopNameEnglish,
-                                   receiver: (workshop.ownerId as any)._id,
-                                   message: `Your subscription to Senaeya app has been extended for ${extendedDaysCount} days.`,
-                                   message_ar: `تم تمديد اشتراككم في تطبيق الصناعية لمدة (${extendedDaysCount}) يوم`,
-                                   message_bn: `Senaeya অ্যাপে আপনার সাবস্ক্রিপশনের মেয়াদ (${extendedDaysCount}) দিনের জন্য বাড়ানো হয়েছে।`,
-                                   message_tl: `Ang iyong subscription sa Senaeya app ay pinalawig nang (${extendedDaysCount}) araw`,
-                                   message_hi: `सेनाया ऐप की आपकी सदस्यता (${extendedDaysCount}) दिनों के लिए बढ़ा दी गई है।`,
-                                   message_ur: `Senaeya ایپ کی آپ کی رکنیت (${extendedDaysCount}) دنوں کے لیے بڑھا دی گئی ہے۔`,
-                                   type: 'ALERT',
-                              },
-                         });
-                    }
-               }
-
-               // Notify Super Admin
-               const superAdminId = await User.findOne({ role: 'SUPER_ADMIN' }).select('_id name');
-               await sendNotifications({
-                    title: superAdminId?.name,
-                    receiver: superAdminId?._id,
-                    message: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
-                    message_ar: 'تم الاشتراك في التطبيق بنجاح وتم إصدار الفاتورة وإرسالها عبر واتساب.',
-                    message_bn: 'অ্যাপ্লিকেশনটি সফলভাবে সাবস্ক্রাইব করা হয়েছে এবং ইনভয়েস ইস্যু করে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।',
-                    message_tl: 'Matagumpay na naisubscripe ang application at ang invoice ay naibigay na at ipinadala sa pamamagitan ng WhatsApp.',
-                    message_hi: 'एप्लिकेशन को सफलतापूर्वक सब्सक्राइब कर लिया गया है और इनवॉइस जारी कर व्हाट्सएप के माध्यम से भेज दिया गया है।',
-                    message_ur: 'ایپلیکیشن کو کامیابی کے ساتھ سبسکرائب کر لیا گیا ہے اور انوائس جاری کر کے واٹس ایپ کے ذریعے بھیج دی گئی ہے۔',
-                    type: 'ALERT',
-               });
-
-               if (superAdminId?._id) {
-                    const existingToken = await DeviceToken.findOne({
-                         userId: superAdminId?._id,
-                    });
-                    if (existingToken && existingToken.fcmToken) {
-                         await sendToTopic({
-                              token: existingToken.fcmToken,
-                              title: 'New Subscription',
-                              body: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
-                              data: {
-                                   title: superAdminId?.name || 'superAdmin',
-                                   receiver: `superAdminId?._id`,
-                                   message: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
-                                   message_ar: 'تم الاشتراك في التطبيق بنجاح وتم إصدار الفاتورة وإرسالها عبر واتساب.',
-                                   message_bn: 'অ্যাপ্লিকেশনটি সফলভাবে সাবস্ক্রাইব করা হয়েছে এবং ইনভয়েস ইস্যু করে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।',
-                                   message_tl: 'Matagumpay na naisubscripe ang application at ang invoice ay naibigay na at ipinadala sa pamamagitan ng WhatsApp.',
-                                   message_hi: 'एप्लिकेशन को सफलतापूर्वक सब्सक्राइब कर लिया गया है और इनवॉइस जारी कर व्हाट्सएप के माध्यम से भेज दिया गया है।',
-                                   message_ur: 'ایپلیکیشن کو کامیابی کے ساتھ سبسکرائب کر لیا گیا ہے اور انوائس جاری کر کے واٹس ایپ کے ذریعے بھیج دی گئی ہے۔',
-                                   type: 'ALERT',
-                              },
-                         });
-                    }
                }
           }
+
+          // Notify Super Admin
+          const superAdminId = await User.findOne({ role: 'SUPER_ADMIN' }).select('_id name');
+          await sendNotifications({
+               title: superAdminId?.name,
+               receiver: superAdminId?._id,
+               message: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
+               message_ar: 'تم الاشتراك في التطبيق بنجاح وتم إصدار الفاتورة وإرسالها عبر واتساب.',
+               message_bn: 'অ্যাপ্লিকেশনটি সফলভাবে সাবস্ক্রাইব করা হয়েছে এবং ইনভয়েস ইস্যু করে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।',
+               message_tl: 'Matagumpay na naisubscripe ang application at ang invoice ay naibigay na at ipinadala sa pamamagitan ng WhatsApp.',
+               message_hi: 'एप्लिकेशन को सफलतापूर्वक सब्सक्राइब कर लिया गया है और इनवॉइस जारी कर व्हाट्सएप के माध्यम से भेज दिया गया है।',
+               message_ur: 'ایپلیکیشن کو کامیابی کے ساتھ سبسکرائب کر لیا گیا ہے اور انوائس جاری کر کے واٹس ایپ کے ذریعے بھیج دی گئی ہے۔',
+               type: 'ALERT',
+          });
+
+          if (superAdminId?._id) {
+               const existingToken = await DeviceToken.findOne({
+                    userId: superAdminId?._id,
+               });
+               if (existingToken && existingToken.fcmToken) {
+                    await sendToTopic({
+                         token: existingToken.fcmToken,
+                         title: 'New Subscription',
+                         body: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
+                         data: {
+                              title: superAdminId?.name || 'superAdmin',
+                              receiver: `superAdminId?._id`,
+                              message: 'The application has been successfully subscribed and the invoice has been issued and sent via WhatsApp.',
+                              message_ar: 'تم الاشتراك في التطبيق بنجاح وتم إصدار الفاتورة وإرسالها عبر واتساب.',
+                              message_bn: 'অ্যাপ্লিকেশনটি সফলভাবে সাবস্ক্রাইব করা হয়েছে এবং ইনভয়েস ইস্যু করে হোয়াটসঅ্যাপের মাধ্যমে পাঠানো হয়েছে।',
+                              message_tl: 'Matagumpay na naisubscripe ang application at ang invoice ay naibigay na at ipinadala sa pamamagitan ng WhatsApp.',
+                              message_hi: 'एप्लिकेशन को सफलतापूर्वक सब्सक्राइब कर लिया गया है और इनवॉइस जारी कर व्हाट्सएप के माध्यम से भेज दिया गया है।',
+                              message_ur: 'ایپلیکیشن کو کامیابی کے ساتھ سبسکرائب کر لیا گیا ہے اور انوائس جاری کر کے واٹس ایپ کے ذریعے بھیج دی گئی ہے۔',
+                              type: 'ALERT',
+                         },
+                    });
+               }
+          }
+          // }
 
           // create a new recieptNumber
           const recieptNumber = await AutoIncrementService.increaseAutoIncrement('subscription', session);
@@ -259,15 +259,6 @@ const createSubscriptionByPackageIdForWorkshop = async (
 
           await session.commitTransaction();
           session.endSession();
-
-          await whatsAppHelper.sendWhatsAppTextMessage({
-               to: workshop.contact,
-               // body: message,
-               body: `
-                    Thank you... Subscription successful
-شكرا لكم ... تم الاشتراك بنجاح
-                    `,
-          });
 
           return subscription;
      } catch (error: any) {
