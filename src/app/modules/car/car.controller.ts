@@ -15,8 +15,7 @@ const createCar = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllCars = catchAsync(async (req: Request, res: Response) => {
-     const { providerWorkShopId } = req.body;
-     const result = await carService.getAllCars(req.query, providerWorkShopId);
+     const result = await carService.getAllCars(req.query);
 
      sendResponse(res, {
           statusCode: 200,
