@@ -1,15 +1,15 @@
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 import AppError from '../../../errors/AppError';
+import unlinkFile from '../../../shared/unlinkFile';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { CarModel } from '../carModel/carModel.model';
+import { CLIENT_CAR_TYPE, CLIENT_TYPE } from '../client/client.enum';
+import { Client } from '../client/client.model';
+import { imageService } from '../image/image.service';
 import { ICar, IcarCreate } from './car.interface';
 import { Car } from './car.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import unlinkFile from '../../../shared/unlinkFile';
-import { CLIENT_CAR_TYPE, CLIENT_TYPE } from '../client/client.enum';
-import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
-import { CarModel } from '../carModel/carModel.model';
-import { Client } from '../client/client.model';
-import mongoose from 'mongoose';
 
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
      console.log('🚀 ~ createCar ~ payload:', payload);
@@ -156,7 +156,7 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
      return result;
 };
 
-const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+const getAllCars = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
      // const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
      // const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
      // const arrayOfClientIds = searchedClients.map((client) => client._id);
@@ -168,6 +168,7 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
      //      : {};
      const queryBuilder = new QueryBuilder(
           Car.find({
+               providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId),
                // ...carFilters,
           })
                .populate({
@@ -207,8 +208,8 @@ const getAllCarsForAdmin = async (query: Record<string, any>): Promise<{ meta: {
      delete query.searchTerm;
      const carFilters = arrayOfClientIds
           ? {
-                 client: { $in: arrayOfClientIds },
-            }
+               client: { $in: arrayOfClientIds },
+          }
           : {};
      const queryBuilder = new QueryBuilder(
           Car.find({
