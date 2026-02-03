@@ -35,6 +35,6 @@ router.patch(
 
 router.delete('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), invoiceController.deleteInvoice);
 
-router.get('/:id', invoiceController.getInvoiceById);
+router.get('/:id([0-9a-fA-F]{24})', invoiceController.getInvoiceById);
 
 export const invoiceRoutes = router;
