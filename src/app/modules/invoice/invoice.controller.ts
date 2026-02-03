@@ -26,7 +26,7 @@ const getAllInvoices = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllInvoicesWithProvider = catchAsync(async (req: Request, res: Response) => {
-     const { providerWorkShopId } = req.query;
+     const { providerWorkShopId } = req.body;
      const result = await invoiceService.getAllInvoicesWithProvider(req.query, providerWorkShopId);
 
      sendResponse(res, {
