@@ -55,6 +55,8 @@ router.patch(
 router.post('/send-message-to-recieve-car/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.sendMessageToRecieveCar);
 
 router.get('/clients-by-carNumber/:carNumber', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getClienstByCarNumber);
+
+router.get('/clients-by-carNumber-with-provider/:carNumber', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), validateUserAuthority(), clientController.getClienstByCarNumberWithProvider);
 router.patch(
      '/:id',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),

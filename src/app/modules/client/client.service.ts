@@ -6,8 +6,12 @@ import AppError from '../../../errors/AppError';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
 import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { ICar } from '../car/car.interface';
 import { Car } from '../car/car.model';
 import { carService } from '../car/car.service';
+import { CarBrand } from '../carBrand/carBrand.model';
+import { CarModel } from '../carModel/carModel.model';
+import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
 import { Invoice } from '../invoice/invoice.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { User } from '../user/user.model';
@@ -15,10 +19,6 @@ import { WorkShop } from '../workShop/workShop.model';
 import { CLIENT_CAR_TYPE, CLIENT_STATUS, CLIENT_TYPE } from './client.enum';
 import { IClient } from './client.interface';
 import { Client } from './client.model';
-import { CheckPhoneNumber } from '../checkPhoneNumber/checkPhoneNumber.model';
-import { CarBrand } from '../carBrand/carBrand.model';
-import { CarModel } from '../carModel/carModel.model';
-import { ICar } from '../car/car.interface';
 
 /** steps
  * client type check user or workshop
@@ -609,6 +609,64 @@ const getClienstByCarNumber = async (carNumber: string) => {
      return clients;
 };
 
+const getClienstByCarNumberWithProvider = async (carNumber: string, providerWorkShopId: string) => {
+     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId);
+     const isExistCarByNumber = await Car.findOne({
+          $or: [{ plateNumberForInternational: carNumber }, { slugForSaudiCarPlateNumber: carNumber }],
+          providerWorkShopId: providerWorkShopMongooseId,
+     });
+     if (!isExistCarByNumber) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
+     }
+     const clients = await Client.find({ cars: { $in: [isExistCarByNumber._id] }, providerWorkShopId: providerWorkShopMongooseId }).populate('clientId', 'name');
+     if (!clients) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
+     }
+
+     const allClientIds = clients.map((client) => client._id);
+     // find expiredInvoices of the user
+     const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+     const expiredPostpaidInvoices = await Invoice.find({
+          client: { $in: allClientIds },
+          providerWorkShopId: providerWorkShopMongooseId,
+          paymentStatus: PaymentStatus.UNPAID,
+          $or: [
+               {
+                    paymentType: PaymentMethod.POSTPAID,
+                    postPaymentDate: { $lt: threeDaysAgo },
+               },
+               {
+                    paymentType: { $ne: PaymentMethod.POSTPAID },
+                    createdAt: { $lt: tenDaysAgo },
+               },
+          ],
+     }).select('client');
+
+     const clientIdsWithPaymentIssues = expiredPostpaidInvoices.map((invoice) => invoice.client);
+
+     if (clientIdsWithPaymentIssues.length > 0) {
+          // update manay allthe client to hasPaymentIssues true
+          await Client.updateMany(
+               { _id: { $in: clientIdsWithPaymentIssues }, providerWorkShopId: providerWorkShopMongooseId },
+               {
+                    $set: { hasPaymentIssues: true },
+               },
+          );
+     } else {
+          // update manay allthe client to hasPaymentIssues true
+          await Client.updateMany(
+               { _id: { $in: clientIdsWithPaymentIssues }, providerWorkShopId: providerWorkShopMongooseId },
+               {
+                    $set: { hasPaymentIssues: false },
+               },
+          );
+     }
+
+     return clients;
+};
+
 export const clientService = {
      createClient,
      updateClientDuringCreate,
@@ -622,4 +680,5 @@ export const clientService = {
      sendMessageToRecieveCar,
      getClientByClientContact,
      getClienstByCarNumber,
+     getClienstByCarNumberWithProvider
 };

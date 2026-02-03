@@ -143,6 +143,19 @@ const getClienstByCarNumber = catchAsync(async (req: Request, res: Response) => 
      });
 });
 
+const getClienstByCarNumberWithProvider = catchAsync(async (req: Request, res: Response) => {
+     const { carNumber } = req.params;
+     const { providerWorkShopId } = req.body;
+     const result = await clientService.getClienstByCarNumberWithProvider(carNumber, providerWorkShopId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Client retrieved successfully',
+          data: result || undefined,
+     });
+});
+
 export const clientController = {
      createClient,
      updateClientDuringCreate,
@@ -156,4 +169,5 @@ export const clientController = {
      toggleClientStatus,
      sendMessageToRecieveCar,
      getClienstByCarNumber,
+     getClienstByCarNumberWithProvider,
 };
