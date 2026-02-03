@@ -25,6 +25,18 @@ const getAllInvoices = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getAllInvoicesWithProvider = catchAsync(async (req: Request, res: Response) => {
+     const { providerWorkShopId } = req.query;
+     const result = await invoiceService.getAllInvoicesWithProvider(req.query, providerWorkShopId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Invoices retrieved successfully',
+          data: result,
+     });
+});
+
 const getAllUnpaginatedInvoices = catchAsync(async (req: Request, res: Response) => {
      const result = await invoiceService.getAllUnpaginatedInvoices();
 
@@ -111,6 +123,7 @@ const resendInvoice = catchAsync(async (req: Request, res: Response) => {
 export const invoiceController = {
      createInvoice,
      getAllInvoices,
+     getAllInvoicesWithProvider,
      getAllUnpaginatedInvoices,
      updateInvoice,
      deleteInvoice,

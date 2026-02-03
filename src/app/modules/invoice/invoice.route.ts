@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get('/', invoiceController.getAllInvoices);
+router.get('/provider', auth(USER_ROLES.WORKSHOP_OWNER, USER_ROLES.WORKSHOP_MEMBER), validateUserAuthority(), invoiceController.getAllInvoicesWithProvider);
 
 router.get('/unpaginated', invoiceController.getAllUnpaginatedInvoices);
 

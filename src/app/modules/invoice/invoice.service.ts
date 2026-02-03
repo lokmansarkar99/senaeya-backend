@@ -285,6 +285,38 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
      return { meta, result };
 };
 
+const getAllInvoicesWithProvider = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
+     const queryBuilder = new QueryBuilder(
+          Invoice.find({
+               providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId)
+          })
+               .populate({
+                    path: 'car',
+                    select: 'model brand year plateNumberForInternational plateNumberForSaudi providerWorkShopId slugForSaudiCarPlateNumber ',
+                    populate: {
+                         path: 'brand plateNumberForSaudi.symbol model',
+                         select: 'title image',
+                    },
+               })
+               .populate({
+                    path: 'client',
+                    select: 'clientId clientType workShopNameAsClient contact',
+                    populate: {
+                         path: 'clientId',
+                         select: 'name',
+                    },
+               })
+               .populate({
+                    path: 'payment',
+                    select: 'createdAt',
+               }),
+          query,
+     );
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['description', 'car']).modelQuery;
+     const meta = await queryBuilder.countTotal();
+     return { meta, result };
+};
+
 const getAllUnpaginatedInvoices = async (): Promise<IInvoice[]> => {
      const result = await Invoice.find();
      return result;
@@ -451,6 +483,7 @@ const resendInvoice = async (invoiceId: string) => {
 export const invoiceService = {
      createInvoice,
      getAllInvoices,
+     getAllInvoicesWithProvider,
      getAllUnpaginatedInvoices,
      updateInvoice,
      deleteInvoice,
