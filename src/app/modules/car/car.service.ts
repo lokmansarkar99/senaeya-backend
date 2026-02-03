@@ -1,15 +1,15 @@
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 import AppError from '../../../errors/AppError';
+import unlinkFile from '../../../shared/unlinkFile';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { CarModel } from '../carModel/carModel.model';
+import { CLIENT_CAR_TYPE, CLIENT_TYPE } from '../client/client.enum';
+import { Client } from '../client/client.model';
+import { imageService } from '../image/image.service';
 import { ICar, IcarCreate } from './car.interface';
 import { Car } from './car.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import unlinkFile from '../../../shared/unlinkFile';
-import { CLIENT_CAR_TYPE, CLIENT_TYPE } from '../client/client.enum';
-import { imageService } from '../image/image.service';
 import { generateSlug } from './car.utils';
-import { CarModel } from '../carModel/carModel.model';
-import { Client } from '../client/client.model';
-import mongoose from 'mongoose';
 
 const createCar = async (payload: IcarCreate): Promise<ICar> => {
      console.log('🚀 ~ createCar ~ payload:', payload);
@@ -62,18 +62,21 @@ const createCar = async (payload: IcarCreate): Promise<ICar> => {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists.');
           }
      }
-     // const result = await Car.create(payload);
-     // if (!result) {
-     //      if (payload.image) {
-     //           unlinkFile(payload.image);
-     //      }
-     //      throw new AppError(StatusCodes.NOT_FOUND, 'Car not found.');
-     // }
-     // // include the car in the client
-     // if (payload.client) {
-     //      await Client.updateOne({ _id: payload.client }, { $push: { cars: result._id } });
-     // }
-     // return result;
+     // check if already any car is already exist with the same brand, model,platenumbersaudi slug,platenumberinternational,vin
+     const existing = await Car.findOne({
+          brand: payload.brand,
+          model: payload.model,
+          vin: payload.vin,
+          $or: [
+               { slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber },
+               { plateNumberForInternational: payload.plateNumberForInternational },
+          ]
+     });
+     if (existing) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists.');
+     }
+
+
 
      const session = await mongoose.startSession();
      try {
@@ -145,6 +148,21 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
           if (isExistCar) {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists.');
           }
+     }
+
+
+     // check if already any car is already exist with the same brand, model,platenumbersaudi slug,platenumberinternational,vin
+     const existing = await Car.findOne({
+          brand: payload.brand,
+          model: payload.model,
+          vin: payload.vin,
+          $or: [
+               { slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber },
+               { plateNumberForInternational: payload.plateNumberForInternational },
+          ]
+     });
+     if (existing) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists.');
      }
      const [result] = await Car.create([payload], { session });
      if (!result) {
