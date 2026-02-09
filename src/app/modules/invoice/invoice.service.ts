@@ -1,23 +1,22 @@
 import { StatusCodes } from 'http-status-codes';
 import mongoose from 'mongoose';
+import config from '../../../config';
 import AppError from '../../../errors/AppError';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { generateFatooraQR } from '../../../helpers/qrcode/generateFatooraQr';
 import { addToBullQueueToCheckInvoicePaymentStatus, sparePartsQueue } from '../../../helpers/redis/queues';
 import { whatsAppHelper } from '../../../helpers/whatsAppHelper';
+import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { AutoIncrementService } from '../AutoIncrement/AutoIncrement.service';
+import DeviceToken from '../DeviceToken/DeviceToken.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.enum';
 import { Payment } from '../payment/payment.model';
 import { releaseInvoiceToWhatsApp } from '../payment/payment.utils';
+import { sendToTopic } from '../pushNotification/pushNotification.service';
 import { WorkShop } from '../workShop/workShop.model';
 import { IInvoice } from './invoice.interface';
 import { Invoice } from './invoice.model';
-import { whatsAppTemplate } from '../../../shared/whatsAppTemplate';
-import config from '../../../config';
-import { sendToTopic } from '../pushNotification/pushNotification.service';
-import DeviceToken from '../DeviceToken/DeviceToken.model';
-import { AutoIncrementService } from '../AutoIncrement/AutoIncrement.service';
-import { IAutoIncrement } from '../AutoIncrement/AutoIncrement.interface';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
@@ -80,7 +79,7 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
           }
 
           // create a new recieptNumber
-          const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session);
+          const recieptNumber = await AutoIncrementService.increaseAutoIncrement('invoice', session, payload.providerWorkShopId?.toString());
           payload.recieptNumber = recieptNumber.value;
           // Create invoice within transaction
           const [resultInvoice] = await Invoice.create([payload], { session });

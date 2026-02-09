@@ -6,7 +6,11 @@ const AutoIncrementSchema = new Schema<IAutoIncrement>(
           key: {
                type: String,
                required: true,
-               unique: true, // VERY IMPORTANT
+               index: true,
+          },
+          workshopId: {
+               type: String,
+               required: false,
                index: true,
           },
           value: {
@@ -22,5 +26,8 @@ const AutoIncrementSchema = new Schema<IAutoIncrement>(
  * ❌ DO NOT use soft-delete hooks here
  * Counters must always be visible
  */
+
+// Create compound index for key + workshopId to ensure uniqueness
+AutoIncrementSchema.index({ key: 1, workshopId: 1 }, { unique: true });
 
 export const AutoIncrement = model<IAutoIncrement>('AutoIncrement', AutoIncrementSchema);
