@@ -28,6 +28,6 @@ const AutoIncrementSchema = new Schema<IAutoIncrement>(
  */
 
 // Create compound index for key + workshopId to ensure uniqueness
-AutoIncrementSchema.index({ key: 1, workshopId: 1 }, { unique: true });
+// AutoIncrementSchema.index({ key: 1, workshopId: 1 }, { unique: true });
 
 export const AutoIncrement = model<IAutoIncrement>('AutoIncrement', AutoIncrementSchema);
