@@ -26,14 +26,14 @@ router.get('/unpaginated', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_R
 
 router.delete('/hard-delete/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.hardDeleteWorkShop);
 router.get('/contact/:contact', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), workShopController.getWorkShopByContact);
-router.get('/crn-mln-unn-tax', auth(USER_ROLES.WORKSHOP_OWNER),validateRequest(workShopValidation.getWorkShopBycrnMlnUnnTaxZodSchema), workShopController.getWorkShopBycrnMlnUnnTax);
+router.get('/crn-mln-unn-tax', auth(USER_ROLES.WORKSHOP_OWNER), validateRequest(workShopValidation.getWorkShopBycrnMlnUnnTaxZodSchema), workShopController.getWorkShopBycrnMlnUnnTax);
 
 router.patch(
      '/:id',
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER),
      fileUploadHandler(),
      parseFileData(FOLDER_NAMES.IMAGE),
-     validateRequest(workShopValidation.updateWorkShopZodSchema),
+     // validateRequest(workShopValidation.updateWorkShopZodSchema),
      workShopController.updateWorkShop,
 );
 
