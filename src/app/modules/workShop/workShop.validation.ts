@@ -110,7 +110,7 @@ const updateWorkShopZodSchemaByWorkshopOwner = z.object({
                .trim()
                .regex(/^SA[A-Z0-9]{22}$/i, 'bankAccountNumber must be 24 characters starting with SA')
                .optional()
-               .nullable(),
+               .nullable().optional(),
           isAvailableMobileWorkshop: z.boolean().optional(),
           workshopGEOlocation: geoLocationSchema.optional(),
           regularWorkingSchedule: workingSubScheduleSchema.partial().optional(),
