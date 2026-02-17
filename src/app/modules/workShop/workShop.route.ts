@@ -33,7 +33,7 @@ router.patch(
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER),
      fileUploadHandler(),
      parseFileData(FOLDER_NAMES.IMAGE),
-     // validateRequest(workShopValidation.updateWorkShopZodSchema),
+     validateRequest(workShopValidation.updateWorkShopZodSchema),
      workShopController.updateWorkShop,
 );
 
