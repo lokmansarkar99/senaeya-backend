@@ -49,7 +49,6 @@ const getAllUnpaginatedInvoices = catchAsync(async (req: Request, res: Response)
 });
 
 const updateInvoice = catchAsync(async (req: Request, res: Response) => {
-     console.log("checkign invoice checking__2")
      const { id } = req.params;
      const result = await invoiceService.updateInvoice(id, req.body);
 
@@ -86,7 +85,6 @@ const hardDeleteInvoice = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getInvoiceById = catchAsync(async (req: Request, res: Response) => {
-     console.log("checking HIT invoice __1 byId ")
      const { id } = req.params;
      const result = await invoiceService.getInvoiceById(id);
 
