@@ -12,7 +12,7 @@ router.get(
      '/',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
      validateRequest(reportValidation.getAllReportsByCreatedDateRangeZodSchema),
-     // validateUserAuthority(),
+     validateUserAuthority(),
      reportController.getAllReportsByCreatedDateRange,
 );
 router.get('/dashboard', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), reportController.getDashboardReport);
