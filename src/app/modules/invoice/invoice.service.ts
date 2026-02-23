@@ -368,7 +368,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                path: 'client',
                populate: {
                     path: 'clientId',
-                    select: 'name contact _id image',
+                    select: 'name contact _id image createdAt',
                },
           })
           .populate({

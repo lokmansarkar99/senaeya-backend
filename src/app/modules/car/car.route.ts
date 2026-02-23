@@ -23,7 +23,7 @@ router.delete('/hard-delete/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WO
 router.patch(
      '/:id',
      auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
-     validateUserAuthority(),
+     // validateUserAuthority(),
      validateRequest(carValidation.updateCarZodSchema),
      carController.updateCar,
 );
