@@ -31,4 +31,4 @@ router.delete('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER
 
 router.get('/:id', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER, USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), validateUserAuthority(), carController.getCarById);
 // car    Routtes
-export const carRoutes = router;
+export const carRoutes = router

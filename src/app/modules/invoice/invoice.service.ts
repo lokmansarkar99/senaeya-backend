@@ -187,21 +187,12 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
                     taxVatNumber: (populatedResult.providerWorkShopId as any).taxVatNumber,
                     createdAt: populatedResult.createdAt.toISOString(),
                     totalCostIncludingTax: populatedResult.totalCostIncludingTax.toString(),
-                    taxAmount: populatedResult.taxAmount.toString(),
+                    taxAmount: populatedResult.taxAmount.toString(), // will be "0" if no taxVatNumber
                     invoiceId: populatedResult._id.toString(),
                });
                populatedResult.invoiceQRLink = qrPath;
+               await populatedResult.save(); // persist the QR link
           }
-
-          // // Generate PDF and upload to S3 (non-DB operations; can be parallelized if needed)
-          // const createInvoiceTemplate = await whatsAppTemplate.createInvoice(populatedResult as any, TranslatedFieldEnum.en);
-          // const invoiceInpdfPath = await generatePDF(createInvoiceTemplate);
-          // const fileBuffer = fs.readFileSync(invoiceInpdfPath);
-          // const invoiceAwsLink = await S3Helper.uploadBufferToS3(fileBuffer, 'pdf', populatedResult._id.toString(), 'application/pdf');
-
-          // // Update invoice with AWS link (after commit, no session)
-          // populatedResult.invoiceAwsLink = invoiceAwsLink;
-          await populatedResult.save();
 
           // Post-commit operations: notifications and WhatsApp release (non-transactional)
           if (isReleased) {
