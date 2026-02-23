@@ -55,6 +55,7 @@ export interface IInvoice {
      isDeleted: boolean;
      deletedAt?: Date;
      recieptNumber: number;
+     image: string
 }
 
 export type IInvoiceFilters = {
