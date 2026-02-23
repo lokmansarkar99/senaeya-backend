@@ -17,6 +17,7 @@ import { sendToTopic } from '../pushNotification/pushNotification.service';
 import { WorkShop } from '../workShop/workShop.model';
 import { IInvoice } from './invoice.interface';
 import { Invoice } from './invoice.model';
+import { User } from '../user/user.model';
 
 const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; isCashRecieved: string; cardApprovalCode: string }>) => {
      const isReleased = payload.isReleased === 'true' || false;
@@ -409,6 +410,18 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*-.**');
      }
+
+     const workshop = result.providerWorkShopId as any;
+
+     const user = await User.findOne(
+          { contact: workshop.contact },
+          { image: 1 }
+     );
+
+     console.log("image👿👿", user?.image);
+
+
+
      return result;
 };
 
