@@ -92,7 +92,7 @@ const getInvoiceById = catchAsync(async (req: Request, res: Response) => {
           statusCode: 200,
           success: true,
           message: 'Invoice retrieved successfully',
-          data: result || undefined,
+          data: { ...result },
      });
 });
 
