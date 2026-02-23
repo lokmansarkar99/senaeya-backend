@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get(
      '/',
-     // auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
+     auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER),
      validateRequest(reportValidation.getAllReportsByCreatedDateRangeZodSchema),
      // validateUserAuthority(),
      reportController.getAllReportsByCreatedDateRange,
