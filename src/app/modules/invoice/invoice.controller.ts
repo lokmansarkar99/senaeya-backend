@@ -87,12 +87,13 @@ const hardDeleteInvoice = catchAsync(async (req: Request, res: Response) => {
 const getInvoiceById = catchAsync(async (req: Request, res: Response) => {
      const { id } = req.params;
      const result = await invoiceService.getInvoiceById(id);
-
+     console.log("result", result)
+     console.log("image", result?.image)
      sendResponse(res, {
           statusCode: 200,
           success: true,
           message: 'Invoice retrieved successfully',
-          data: { ...result },
+          data: { ...result, image: result?.image },
      });
 });
 

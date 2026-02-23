@@ -418,6 +418,7 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
           { image: 1 }
      );
 
+
      return { ...result, image: user?.image as string };
 };
 
