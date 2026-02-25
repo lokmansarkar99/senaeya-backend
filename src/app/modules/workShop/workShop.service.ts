@@ -212,6 +212,16 @@ const getWorkShopBycrnMlnUnnTax = async (crn: string, mln: string, unn: string, 
      };
 };
 
+const isWorkshop = async (user: any): Promise<boolean> => {
+     console.log('🚀 ~ isWorkshop ~ user:', user);
+     const result = await WorkShop.findOne({ ownerId: user.id });
+     if (!result) throw new AppError(StatusCodes.NOT_FOUND, 'WorkShop not found.');
+
+     console.log('result', result);
+     console.log('result?.taxVatNumber?.length', result?.taxVatNumber?.length);
+     return false;
+};
+
 export const workShopService = {
      createWorkShop,
      getAllWorkShops,
@@ -222,4 +232,5 @@ export const workShopService = {
      getWorkShopById,
      getWorkShopByContact,
      getWorkShopBycrnMlnUnnTax,
+     isWorkshop
 };

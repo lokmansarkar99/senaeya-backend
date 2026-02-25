@@ -21,6 +21,7 @@ router.post(
 
 router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllWorkShops);
 router.get('/my', auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllWorkShops);
+router.get("/is-workshop", auth(USER_ROLES.WORKSHOP_MEMBER, USER_ROLES.WORKSHOP_OWNER), workShopController.isWorkshop);
 
 router.get('/unpaginated', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.WORKSHOP_OWNER), workShopController.getAllUnpaginatedWorkShops);
 
