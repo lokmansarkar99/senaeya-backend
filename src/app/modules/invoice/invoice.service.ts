@@ -277,6 +277,7 @@ const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { tot
 };
 
 const getAllInvoicesWithProvider = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
+     console.log("Iman Durbol")
      const queryBuilder = new QueryBuilder(
           Invoice.find({
                providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId)
@@ -406,7 +407,6 @@ const getInvoiceById = async (id: string): Promise<IInvoice | null> => {
                ],
           });
 
-     console.log("result🪷🪷", result);
      if (!result) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invoice not found*-.**');
      }

@@ -7,11 +7,9 @@ const getAllReportsByCreatedDateRange = catchAsync(async (req: Request, res: Res
      const tokenWithBearer = req.headers.authorization;
      const access_token = tokenWithBearer!.split(' ')[1];
      let { providerWorkShopId } = req.body;
-     console.log('🚀 ~ providerWorkShopId:', providerWorkShopId);
      if (!providerWorkShopId) {
           providerWorkShopId = req.query.providerWorkShopId as string;
      }
-     console.log('🚀 ~ providerWorkShopId:', providerWorkShopId);
      const result = await reportService.getAllReportsByCreatedDateRange(req.query, providerWorkShopId, req.user, access_token);
 
      sendResponse(res, {
