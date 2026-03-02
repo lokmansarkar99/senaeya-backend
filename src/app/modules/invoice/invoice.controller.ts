@@ -15,7 +15,8 @@ const createInvoice = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllInvoices = catchAsync(async (req: Request, res: Response) => {
-     const result = await invoiceService.getAllInvoices(req.query);
+     const { providerWorkShopId } = req.body;
+     const result = await invoiceService.getAllInvoices(req.query, providerWorkShopId);
 
      sendResponse(res, {
           statusCode: 200,

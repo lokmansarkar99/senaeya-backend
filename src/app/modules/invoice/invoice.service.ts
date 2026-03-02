@@ -246,9 +246,9 @@ const createInvoice = async (payload: Partial<IInvoice & { isReleased: string; i
      }
 };
 
-const getAllInvoices = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
+const getAllInvoices = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: IInvoice[] }> => {
      const queryBuilder = new QueryBuilder(
-          Invoice.find()
+          Invoice.find({ providerWorkShopId: new mongoose.Types.ObjectId(providerWorkShopId) })
                .populate({
                     path: 'car',
                     select: 'model brand year plateNumberForInternational plateNumberForSaudi providerWorkShopId slugForSaudiCarPlateNumber ',
