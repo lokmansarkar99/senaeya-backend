@@ -316,6 +316,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           //      iat: number;
           //      exp: number;
           // };
+          console.log("ACCESS_TOKEN 😐☠️💐🪷❇️", access_token)
           let verifyUser;
           try {
                verifyUser = verifyToken(access_token, config.jwt.jwt_secret as Secret);
