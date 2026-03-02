@@ -39,13 +39,13 @@ const createCar = async (payload: IcarCreate): Promise<ICar> => {
           payload.slugForSaudiCarPlateNumber = generateSlug(payload.plateNumberForSaudi);
           console.log('🚀 ~ payload.plateNumberForSaudi.slug:', payload.slugForSaudiCarPlateNumber);
           // find saudi car exist by number
-          const isExistCar = await Car.findOne({
-               slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber,
-               carType: CLIENT_CAR_TYPE.SAUDI,
-          });
-          if (isExistCar) {
-               throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists by the slug.');
-          }
+          // const isExistCar = await Car.findOne({
+          //      slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber,
+          //      carType: CLIENT_CAR_TYPE.SAUDI,
+          // });
+          // if (isExistCar) {
+          //      throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists by the slug.');
+          // }
      }
      if (payload.carType == CLIENT_CAR_TYPE.INTERNATIONAL) {
           // payload must include plateNumberForInternational
@@ -249,7 +249,6 @@ const getAllCarsWithOutProvider = async (query: Record<string, any>,): Promise<{
           query,
      );
      const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
-     console.log('🚀 ~ getAllCars ~ result:', result);
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
