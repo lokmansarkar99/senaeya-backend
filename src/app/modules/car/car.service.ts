@@ -218,11 +218,11 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
      return { meta, result };
 };
 
-const getAllCarsWithProvider = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
+const getAllCarsWithProvider = async (query: Record<string, any>,): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+     // const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
      const queryBuilder = new QueryBuilder(
           Car.find({
-               providerWorkShopId: providerWorkShopMongooseId,
+               // providerWorkShopId: providerWorkShopMongooseId,
           })
                .populate({
                     path: 'client',

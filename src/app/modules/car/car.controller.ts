@@ -27,8 +27,8 @@ const getAllCars = catchAsync(async (req: Request, res: Response) => {
 
 const getAllCarsWithProvider = catchAsync(async (req: Request, res: Response) => {
 
-     const { providerWorkShopId } = req.body;
-     const result = await carService.getAllCarsWithProvider(req.query, providerWorkShopId);
+     // const { providerWorkShopId } = req.body;
+     const result = await carService.getAllCarsWithProvider(req.query);
 
      sendResponse(res, {
           statusCode: 200,
