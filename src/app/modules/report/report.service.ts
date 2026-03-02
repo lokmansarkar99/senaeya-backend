@@ -237,6 +237,19 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           WorkShop.findById(providerWorkShopId).populate('ownerId', 'contact'),
      ]);
 
+     console.log("paidInvoicesAgg:", paidInvoicesAgg);
+     console.log("unpaidPostpaidInvoicesAgg:", unpaidPostpaidInvoicesAgg);
+     console.log("unpaidNonPostpaidInvoicesAgg:", unpaidNonPostpaidInvoicesAgg);
+
+     console.log("totalAllIncomeAgg:", totalAllIncomeAgg);
+     console.log("totalCollectedIncomeAgg:", totalCollectedIncomeAgg);
+     console.log("totalUnpaidPostpaidAmountAgg:", totalUnpaidPostpaidAmountAgg);
+
+     console.log("totalExpensesAgg:", totalExpensesAgg);
+     console.log("carsCountAgg:", carsCountAgg);
+
+     console.log("workshop:", workshop);
+
 
 
      if (!workshop) {
@@ -259,6 +272,10 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      const recordedFinancialBalance = totalAllIncomeRecorded - totalExpenses;
 
      const numberOfCars = carsCountAgg[0]?.count || 0;
+
+
+
+
 
      let report: {
           numberOfPaidInvoices: number;
