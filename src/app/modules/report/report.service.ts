@@ -180,7 +180,8 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           ...providerFilter,
      };
 
-     console.log(Invoice.find())
+     console.log("CHECK ALL INVOICES 😐☠️💐🪷❇️", Invoice.findOne(invoiceMatchBase))
+
 
      // Expenses filtered by spendingDate within range (business date) and optional provider scope
      const expenseMatchBase: any = {
@@ -237,18 +238,8 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           WorkShop.findById(providerWorkShopId).populate('ownerId', 'contact'),
      ]);
 
-     console.log("paidInvoicesAgg:", paidInvoicesAgg);
-     console.log("unpaidPostpaidInvoicesAgg:", unpaidPostpaidInvoicesAgg);
-     console.log("unpaidNonPostpaidInvoicesAgg:", unpaidNonPostpaidInvoicesAgg);
 
-     console.log("totalAllIncomeAgg:", totalAllIncomeAgg);
-     console.log("totalCollectedIncomeAgg:", totalCollectedIncomeAgg);
      console.log("totalUnpaidPostpaidAmountAgg:", totalUnpaidPostpaidAmountAgg);
-
-     console.log("totalExpensesAgg:", totalExpensesAgg);
-     console.log("carsCountAgg:", carsCountAgg);
-
-     console.log("workshop:", workshop);
 
 
 
