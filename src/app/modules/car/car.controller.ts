@@ -122,7 +122,7 @@ const getCarById = catchAsync(async (req: Request, res: Response) => {
 export const carController = {
      createCar,
      getAllCars,
-     getAllCarsWithOutProvider
+     getAllCarsWithOutProvider,
      getAllCarsWithProvider,
      getAllCarsForAdmin,
      getAllUnpaginatedCars,
