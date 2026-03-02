@@ -126,13 +126,13 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
           payload.slugForSaudiCarPlateNumber = generateSlug(payload.plateNumberForSaudi);
           console.log('🚀 ~ payload.plateNumberForSaudi.slug:', payload.slugForSaudiCarPlateNumber);
           // find saudi car exist by number
-          const isExistCar = await Car.findOne({
-               slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber,
-               carType: CLIENT_CAR_TYPE.SAUDI,
-          });
-          if (isExistCar) {
-               throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists by the slug.');
-          }
+          // const isExistCar = await Car.findOne({
+          //      slugForSaudiCarPlateNumber: payload.slugForSaudiCarPlateNumber,
+          //      carType: CLIENT_CAR_TYPE.SAUDI,
+          // });
+          // if (isExistCar) {
+          //      throw new AppError(StatusCodes.BAD_REQUEST, 'Car already exists by the slug.');
+          // }
      }
      if (payload.carType == CLIENT_CAR_TYPE.INTERNATIONAL) {
           // payload must include plateNumberForInternational
