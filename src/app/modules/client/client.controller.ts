@@ -97,8 +97,8 @@ const getClientById = catchAsync(async (req: Request, res: Response) => {
 
 const getClientByClientContact = catchAsync(async (req: Request, res: Response) => {
      const { contact } = req.params;
-     const { providerWorkShopId } = req.body;
-     const result = await clientService.getClientByClientContact(contact, providerWorkShopId);
+     // const { providerWorkShopId } = req.body;
+     const result = await clientService.getClientByClientContact(contact);
 
      sendResponse(res, {
           statusCode: 200,
