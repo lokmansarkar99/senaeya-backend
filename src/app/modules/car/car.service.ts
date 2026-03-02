@@ -218,11 +218,48 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
      return { meta, result };
 };
 
-const getAllCarsWithProvider = async (query: Record<string, any>,): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+const getAllCarsWithOutProvider = async (query: Record<string, any>,): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
      // const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
      const queryBuilder = new QueryBuilder(
           Car.find({
                // providerWorkShopId: providerWorkShopMongooseId,
+          })
+               .populate({
+                    path: 'client',
+                    populate: {
+                         path: 'clientId',
+                    },
+               })
+               .populate({
+                    path: 'model',
+                    select: 'title',
+               })
+               .populate({
+                    path: 'plateNumberForSaudi.symbol',
+                    select: 'title image',
+               })
+               .populate({
+                    path: 'brand',
+                    select: '_id image title',
+                    populate: {
+                         path: 'country',
+                         select: '_id image title',
+                    },
+               }),
+          query,
+     );
+     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     console.log('🚀 ~ getAllCars ~ result:', result);
+     const meta = await queryBuilder.countTotal();
+     return { meta, result };
+};
+
+
+const getAllCarsWithProvider = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
+     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
+     const queryBuilder = new QueryBuilder(
+          Car.find({
+               providerWorkShopId: providerWorkShopMongooseId,
           })
                .populate({
                     path: 'client',
@@ -400,6 +437,7 @@ const getCarById = async (id: string): Promise<ICar | null> => {
 export const carService = {
      createCar,
      getAllCars,
+     getAllCarsWithOutProvider,
      getAllCarsWithProvider,
      getAllUnpaginatedCars,
      updateCar,

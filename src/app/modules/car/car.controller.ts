@@ -25,10 +25,9 @@ const getAllCars = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
-const getAllCarsWithProvider = catchAsync(async (req: Request, res: Response) => {
+const getAllCarsWithOutProvider = catchAsync(async (req: Request, res: Response) => {
 
-     // const { providerWorkShopId } = req.body;
-     const result = await carService.getAllCarsWithProvider(req.query);
+     const result = await carService.getAllCarsWithOutProvider(req.query);
 
      sendResponse(res, {
           statusCode: 200,
@@ -38,7 +37,17 @@ const getAllCarsWithProvider = catchAsync(async (req: Request, res: Response) =>
      });
 });
 
+const getAllCarsWithProvider = catchAsync(async (req: Request, res: Response) => {
+     const { providerWorkShopId } = req.body;
+     const result = await carService.getAllCarsWithProvider(req.query, providerWorkShopId);
 
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Cars retrieved successfully',
+          data: result,
+     });
+});
 
 const getAllCarsForAdmin = catchAsync(async (req: Request, res: Response) => {
      const result = await carService.getAllCarsForAdmin(req.query);
@@ -113,6 +122,7 @@ const getCarById = catchAsync(async (req: Request, res: Response) => {
 export const carController = {
      createCar,
      getAllCars,
+     getAllCarsWithOutProvider
      getAllCarsWithProvider,
      getAllCarsForAdmin,
      getAllUnpaginatedCars,
