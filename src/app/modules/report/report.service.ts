@@ -180,6 +180,8 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           ...providerFilter,
      };
 
+     console.log(Invoice.find())
+
      // Expenses filtered by spendingDate within range (business date) and optional provider scope
      const expenseMatchBase: any = {
           spendingDate: { $gte: start, $lte: end },
@@ -235,6 +237,8 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           WorkShop.findById(providerWorkShopId).populate('ownerId', 'contact'),
      ]);
 
+
+
      if (!workshop) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found');
      }
@@ -246,7 +250,10 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      const totalAllIncomeRecorded = totalAllIncomeAgg[0]?.total || 0;
      const totalIncomeCollected = totalCollectedIncomeAgg[0]?.total || 0;
      const totalUnpaidPostpaidFinalCost = totalUnpaidPostpaidAmountAgg[0]?.total || 0;
+     // const totalUnpainSavedAmount = totalInvoiceSavedAmountAgg[0]?.total || 0;
+
      const totalExpenses = totalExpensesAgg[0]?.total || 0;
+
 
      const collectedFinancialBalance = totalIncomeCollected - totalExpenses;
      const recordedFinancialBalance = totalAllIncomeRecorded - totalExpenses;
