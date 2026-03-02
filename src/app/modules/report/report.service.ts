@@ -180,8 +180,6 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           ...providerFilter,
      };
 
-     console.log("CHECK ALL INVOICES 😐☠️💐🪷❇️", Invoice.findOne(invoiceMatchBase))
-
 
      // Expenses filtered by spendingDate within range (business date) and optional provider scope
      const expenseMatchBase: any = {
@@ -199,7 +197,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           totalAllIncomeAgg,
           totalCollectedIncomeAgg,
           totalUnpaidPostpaidAmountAgg,
-
+          totalUnpaidSavedAmountAgg,
           // Expenses total
           totalExpensesAgg,
 
@@ -228,6 +226,12 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
                { $group: { _id: null, total: { $sum: '$finalCost' } } },
           ]),
 
+          // total saved amount (discount) on unpaid invoices
+          Invoice.aggregate([
+               { $match: { ...invoiceMatchBase, paymentStatus: PaymentStatus.UNPAID } },
+               { $group: { _id: null, total: { $sum: '$finalDiscountInFlatAmount' } } },
+          ]),
+
           // total of expenses (sum of amount) within spendingDate range
           Expense.aggregate([{ $match: { ...expenseMatchBase } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
 
@@ -239,7 +243,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      ]);
 
 
-     console.log("totalUnpaidPostpaidAmountAgg:", totalUnpaidPostpaidAmountAgg);
+     console.log("totalUnpaidSavedAmountAgg 😐☠️💐🪷❇️", totalUnpaidSavedAmountAgg);
 
 
 
@@ -254,7 +258,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
      const totalAllIncomeRecorded = totalAllIncomeAgg[0]?.total || 0;
      const totalIncomeCollected = totalCollectedIncomeAgg[0]?.total || 0;
      const totalUnpaidPostpaidFinalCost = totalUnpaidPostpaidAmountAgg[0]?.total || 0;
-     // const totalUnpainSavedAmount = totalInvoiceSavedAmountAgg[0]?.total || 0;
+     const totalUnpaidSavedAmount = totalUnpaidSavedAmountAgg[0]?.total || 0;
 
      const totalExpenses = totalExpensesAgg[0]?.total || 0;
 
@@ -275,6 +279,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           totalAllIncomeRecorded: number;
           totalIncomeCollected: number;
           totalUnpaidPostpaidFinalCost: number;
+          totalUnpaidSavedAmount: number;
           totalExpenses: number;
           collectedFinancialBalance: number | undefined;
           recordedFinancialBalance: number | undefined;
@@ -289,6 +294,7 @@ const getAllReportsByCreatedDateRange = async (query: Record<string, any>, provi
           totalAllIncomeRecorded: income ? totalAllIncomeRecorded : undefined,
           totalIncomeCollected: income ? totalIncomeCollected : undefined,
           totalUnpaidPostpaidFinalCost: income ? totalUnpaidPostpaidFinalCost : undefined,
+          totalUnpaidSavedAmount: income ? totalUnpaidSavedAmount : undefined,
           totalExpenses: outlay ? totalExpenses : undefined,
           collectedFinancialBalance: income ? collectedFinancialBalance : undefined,
           recordedFinancialBalance: income ? recordedFinancialBalance : undefined,
