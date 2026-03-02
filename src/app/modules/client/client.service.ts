@@ -609,16 +609,16 @@ const getClienstByCarNumber = async (carNumber: string) => {
      return clients;
 };
 
-const getClienstByCarNumberWithProvider = async (carNumber: string, providerWorkShopId: string) => {
-     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId);
+const getClienstByCarNumberWithProvider = async (carNumber: string) => {
+     // const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId);
      const isExistCarByNumber = await Car.findOne({
           $or: [{ plateNumberForInternational: carNumber }, { slugForSaudiCarPlateNumber: carNumber }],
-          providerWorkShopId: providerWorkShopMongooseId,
+          // providerWorkShopId: providerWorkShopMongooseId,
      });
      if (!isExistCarByNumber) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Car not found');
      }
-     const clients = await Client.find({ cars: { $in: [isExistCarByNumber._id] }, providerWorkShopId: providerWorkShopMongooseId }).populate('clientId', 'name');
+     const clients = await Client.find({ cars: { $in: [isExistCarByNumber._id] } }).populate('clientId', 'name');
      if (!clients) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
      }
@@ -630,7 +630,7 @@ const getClienstByCarNumberWithProvider = async (carNumber: string, providerWork
 
      const expiredPostpaidInvoices = await Invoice.find({
           client: { $in: allClientIds },
-          providerWorkShopId: providerWorkShopMongooseId,
+          // providerWorkShopId: providerWorkShopMongooseId,
           paymentStatus: PaymentStatus.UNPAID,
           $or: [
                {
@@ -649,7 +649,7 @@ const getClienstByCarNumberWithProvider = async (carNumber: string, providerWork
      if (clientIdsWithPaymentIssues.length > 0) {
           // update manay allthe client to hasPaymentIssues true
           await Client.updateMany(
-               { _id: { $in: clientIdsWithPaymentIssues }, providerWorkShopId: providerWorkShopMongooseId },
+               { _id: { $in: clientIdsWithPaymentIssues } },
                {
                     $set: { hasPaymentIssues: true },
                },
@@ -657,7 +657,7 @@ const getClienstByCarNumberWithProvider = async (carNumber: string, providerWork
      } else {
           // update manay allthe client to hasPaymentIssues true
           await Client.updateMany(
-               { _id: { $in: clientIdsWithPaymentIssues }, providerWorkShopId: providerWorkShopMongooseId },
+               { _id: { $in: clientIdsWithPaymentIssues } },
                {
                     $set: { hasPaymentIssues: false },
                },

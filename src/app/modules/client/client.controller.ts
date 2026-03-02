@@ -145,8 +145,8 @@ const getClienstByCarNumber = catchAsync(async (req: Request, res: Response) => 
 
 const getClienstByCarNumberWithProvider = catchAsync(async (req: Request, res: Response) => {
      const { carNumber } = req.params;
-     const { providerWorkShopId } = req.body;
-     const result = await clientService.getClienstByCarNumberWithProvider(carNumber, providerWorkShopId);
+     // const { providerWorkShopId } = req.body;
+     const result = await clientService.getClienstByCarNumberWithProvider(carNumber);
 
      sendResponse(res, {
           statusCode: 200,
