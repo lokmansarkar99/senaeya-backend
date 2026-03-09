@@ -236,7 +236,7 @@ const updateClientDuringCreate = async (
      }
 
      if (payload.clientType === CLIENT_TYPE.WORKSHOP) {
-          let isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.WORKSHOP, providerWorkShopId: payload.providerWorkShopId });
+          let isExistClient = await Client.findOne({ _id: new mongoose.Types.ObjectId(payload.clientId), clientType: CLIENT_TYPE.WORKSHOP });
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Workshop not found');
           }
@@ -294,14 +294,14 @@ const updateClientDuringCreate = async (
           const isExistClient = await Client.findOne({
                _id: new mongoose.Types.ObjectId(payload.clientId),
                clientType: CLIENT_TYPE.USER,
-               providerWorkShopId: payload.providerWorkShopId,
+               // providerWorkShopId: payload.providerWorkShopId,
           });
           console.log('🚀 ~ updateClientDuringCreate ~ isExistClient:', isExistClient);
           if (!isExistClient) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Client not found');
           }
 
-          const userDetails = await User.findOne({ _id: isExistClient.clientId, providerWorkShopId: payload.providerWorkShopId, role: USER_ROLES.CLIENT });
+          const userDetails = await User.findOne({ _id: isExistClient.clientId, role: USER_ROLES.CLIENT });
           if (!userDetails) {
                throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
           }
