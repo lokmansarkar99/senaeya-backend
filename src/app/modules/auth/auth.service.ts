@@ -32,7 +32,9 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'deviceId is required when providing fcmToken');
      }
 
-     const isExistUser = await User.findOne({ contact }).select('+password');
+     const isExistUser = await User.findOne({
+     $or: [{ contact }, { email: contact }]
+}).select('+password');
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }

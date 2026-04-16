@@ -10,11 +10,22 @@ import { WorksCategories } from '../worksCategories/worksCategories.model';
 import { Work } from './work.model';
 import { WorkType } from './work.enum';
 
+const getOrCreateCategoryId = async (categoryInput: string) => {
+     if (!categoryInput) return undefined;
+     if (mongoose.Types.ObjectId.isValid(categoryInput)) {
+          const categoryObj = await WorksCategories.findById(categoryInput);
+          if (categoryObj) return categoryObj._id;
+     }
+     const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: categoryInput });
+     if (isExistWorkCategoryName) return isExistWorkCategoryName._id;
+     const createdWorkCategory = await WorksCategories.create({ workCategoryName: categoryInput });
+     return createdWorkCategory._id;
+};
+
 const createWork = async (payload: Iwork & { titleObj?: Iwork['title']; workCategoryName: string }): Promise<Iwork> => {
-     const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: payload.workCategoryName });
-     if (!isExistWorkCategoryName) {
-          const createdWorkCategory = await WorksCategories.create({ workCategoryName: payload.workCategoryName });
-          payload.workCategoryName = createdWorkCategory.workCategoryName;
+     const resolvedCategoryId = await getOrCreateCategoryId(payload.workCategoryName);
+     if (resolvedCategoryId) {
+          payload.workCategoryName = resolvedCategoryId as any;
      }
      if (payload.title) {
           delete payload.titleObj;
@@ -39,11 +50,7 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
 
      const structuredData = await Promise.all(
           xlxsToJsonParsedData.map(async (element: any) => {
-               const isExistWorkCategoryName = await WorksCategories.findOne({ workCategoryName: element.workCategoryName });
-               if (!isExistWorkCategoryName) {
-                    const createdWorkCategory = await WorksCategories.create({ workCategoryName: element.workCategoryName });
-                    element.workCategoryName = createdWorkCategory.workCategoryName;
-               }
+               const resolvedCategoryId = await getOrCreateCategoryId(element.workCategoryName);
                return {
                     title: {
                          ar: element.ar,
@@ -54,7 +61,7 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
                          ur: element.ur,
                     },
                     type: WorkType.SERVICE,
-                    workCategoryName: element.workCategoryName,
+                    workCategoryName: resolvedCategoryId,
                     code: element.code,
                };
           }),
@@ -108,14 +115,14 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
 };
 
 const getAllWorks = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: Iwork[] }> => {
-     const queryBuilder = new QueryBuilder(Work.find().sort({ code: 1 }), query);
+     const queryBuilder = new QueryBuilder(Work.find().populate('workCategoryName').sort({ code: 1 }), query);
      const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
 
 const getAllUnpaginatedWorks = async (): Promise<Iwork[]> => {
-     const result = await Work.find();
+     const result = await Work.find().populate('workCategoryName');
      return result;
 };
 
@@ -124,6 +131,12 @@ const updateWork = async (id: string, payload: Partial<Iwork & { titleObj?: Iwor
      if (!isExist) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.');
      }
+
+     if (payload.workCategoryName) {
+          const resolvedCategoryId = await getOrCreateCategoryId(payload.workCategoryName as string);
+          if (resolvedCategoryId) payload.workCategoryName = resolvedCategoryId as any;
+     }
+
      if (payload.title) {
           delete payload.titleObj;
           const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
@@ -156,7 +169,7 @@ const hardDeleteWork = async (id: string): Promise<Iwork | null> => {
 };
 
 const getWorkById = async (id: string): Promise<Iwork | null> => {
-     const result = await Work.findById(id);
+     const result = await Work.findById(id).populate('workCategoryName');
      return result;
 };
 

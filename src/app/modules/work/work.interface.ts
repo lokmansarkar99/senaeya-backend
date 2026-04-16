@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { WorkType } from './work.enum';
 
 export interface Iwork {
@@ -9,7 +10,7 @@ export interface Iwork {
           tl: string;
           en: string;
      };
-     workCategoryName: string;
+     workCategoryName: Types.ObjectId | string | Record<string, unknown>;
      type: WorkType.SERVICE;
      code: string;
      createdAt: Date;

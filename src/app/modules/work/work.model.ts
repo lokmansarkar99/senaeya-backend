@@ -15,7 +15,7 @@ const WorkSchema = new Schema<Iwork>(
                },
                required: true,
           },
-          workCategoryName: { type: String, required: true },
+          workCategoryName: { type: Schema.Types.ObjectId, ref: 'WorksCategories', required: true },
           type: { type: String, enum: Object.values(WorkType), required: true, default: WorkType.SERVICE },
           code: { type: String, required: true },
           isDeleted: { type: Boolean, default: false },
