@@ -7,7 +7,7 @@ import { calculateDiscount } from './coupon.utils';
 import { Package } from '../package/package.model';
 
 const createCoupon = async (couponData: Partial<ICoupon>, user: any) => {
-     const isExistPackage = await Package.findById({ _id: couponData.package });
+     const isExistPackage = await Package.findById(couponData.package);
 
      if (!isExistPackage) {
           throw new AppError(StatusCodes.BAD_REQUEST, `Package doesn't exit.`);
@@ -39,6 +39,7 @@ const updateCoupon = async (payload: Partial<ICoupon>, couponCode: string, user:
      console.log({ payload, couponCode });
 
      const currentDate = new Date();
+     currentDate.setUTCHours(0, 0, 0, 0);
 
      const coupon = await Coupon.findOne({ code: couponCode });
 
@@ -56,12 +57,13 @@ const updateCoupon = async (payload: Partial<ICoupon>, couponCode: string, user:
 };
 
 const getTryCouponByCode = async (packageId: string, couponCode: string) => {
-     const isExistPackage = await Package.findById({ _id: packageId });
+     const isExistPackage = await Package.findById(packageId);
 
      if (!isExistPackage) {
           throw new AppError(StatusCodes.BAD_REQUEST, `Package doesn't exit.`);
      }
      const currentDate = new Date();
+     currentDate.setUTCHours(0, 0, 0, 0);
 
      const coupon = await Coupon.findOne({ code: couponCode });
 

@@ -175,19 +175,25 @@ const createCarWithSession = async (payload: IcarCreate, session: any) => {
 };
 
 const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     // const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
-     // const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
-     // const arrayOfClientIds = searchedClients.map((client) => client._id);
-     // delete query.searchTerm;
-     // const carFilters = arrayOfClientIds
-     //      ? {
-     //             client: { $in: arrayOfClientIds },
-     //        }
-     //      : {};
+     let filterQuery: any = {};
+     if (query.searchTerm) {
+          const queryBuilderForClient = new QueryBuilder(Client.find().select('_id'), { searchTerm: query.searchTerm });
+          const searchedClients = await queryBuilderForClient.search(['contact']).modelQuery;
+          const arrayOfClientIds = searchedClients.map((client) => client._id);
+
+          const searchableFields = ['vin', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber'];
+          const orConditions: any[] = searchableFields.map((field) => ({
+               [field]: { $regex: query.searchTerm, $options: 'i' },
+          }));
+          if (arrayOfClientIds.length > 0) {
+               orConditions.push({ client: { $in: arrayOfClientIds } });
+          }
+          filterQuery.$or = orConditions;
+          delete query.searchTerm;
+     }
+
      const queryBuilder = new QueryBuilder(
-          Car.find({
-               // ...carFilters,
-          })
+          Car.find(filterQuery)
                .populate({
                     path: 'client',
                     populate: {
@@ -212,18 +218,31 @@ const getAllCars = async (query: Record<string, any>): Promise<{ meta: { total: 
                }),
           query,
      );
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
-     console.log('🚀 ~ getAllCars ~ result:', result);
+     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
 
 const getAllCarsWithOutProvider = async (query: Record<string, any>,): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     // const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
+     let filterQuery: any = {};
+     if (query.searchTerm) {
+          const queryBuilderForClient = new QueryBuilder(Client.find().select('_id'), { searchTerm: query.searchTerm });
+          const searchedClients = await queryBuilderForClient.search(['contact']).modelQuery;
+          const arrayOfClientIds = searchedClients.map((client) => client._id);
+
+          const searchableFields = ['vin', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber'];
+          const orConditions: any[] = searchableFields.map((field) => ({
+               [field]: { $regex: query.searchTerm, $options: 'i' },
+          }));
+          if (arrayOfClientIds.length > 0) {
+               orConditions.push({ client: { $in: arrayOfClientIds } });
+          }
+          filterQuery.$or = orConditions;
+          delete query.searchTerm;
+     }
+
      const queryBuilder = new QueryBuilder(
-          Car.find({
-               // providerWorkShopId: providerWorkShopMongooseId,
-          })
+          Car.find(filterQuery)
                .populate({
                     path: 'client',
                     populate: {
@@ -248,18 +267,33 @@ const getAllCarsWithOutProvider = async (query: Record<string, any>,): Promise<{
                }),
           query,
      );
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
 
 
 const getAllCarsWithProvider = async (query: Record<string, any>, providerWorkShopId: string): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId)
+     const providerWorkShopMongooseId = new mongoose.Types.ObjectId(providerWorkShopId);
+     let filterQuery: any = { providerWorkShopId: providerWorkShopMongooseId };
+     if (query.searchTerm) {
+          const queryBuilderForClient = new QueryBuilder(Client.find().select('_id'), { searchTerm: query.searchTerm });
+          const searchedClients = await queryBuilderForClient.search(['contact']).modelQuery;
+          const arrayOfClientIds = searchedClients.map((client) => client._id);
+
+          const searchableFields = ['vin', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber'];
+          const orConditions: any[] = searchableFields.map((field) => ({
+               [field]: { $regex: query.searchTerm, $options: 'i' },
+          }));
+          if (arrayOfClientIds.length > 0) {
+               orConditions.push({ client: { $in: arrayOfClientIds } });
+          }
+          filterQuery.$or = orConditions;
+          delete query.searchTerm;
+     }
+
      const queryBuilder = new QueryBuilder(
-          Car.find({
-               providerWorkShopId: providerWorkShopMongooseId,
-          })
+          Car.find(filterQuery)
                .populate({
                     path: 'client',
                     populate: {
@@ -284,26 +318,31 @@ const getAllCarsWithProvider = async (query: Record<string, any>, providerWorkSh
                }),
           query,
      );
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
-     console.log('🚀 ~ getAllCars ~ result:', result);
+     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
 
 const getAllCarsForAdmin = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICar[] }> => {
-     const queryBuilderForClient = new QueryBuilder(Client.find({ clientType: CLIENT_TYPE.USER }).select('_id').populate('clientId').populate('cars'), query);
-     const searchedClients = await queryBuilderForClient.search(['contact']).filter().sort().paginate().fields().modelQuery;
-     const arrayOfClientIds = searchedClients.map((client) => client._id);
-     delete query.searchTerm;
-     const carFilters = arrayOfClientIds
-          ? {
-               client: { $in: arrayOfClientIds },
+     let filterQuery: any = {};
+     if (query.searchTerm) {
+          const queryBuilderForClient = new QueryBuilder(Client.find().select('_id'), { searchTerm: query.searchTerm });
+          const searchedClients = await queryBuilderForClient.search(['contact']).modelQuery;
+          const arrayOfClientIds = searchedClients.map((client) => client._id);
+
+          const searchableFields = ['vin', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber'];
+          const orConditions: any[] = searchableFields.map((field) => ({
+               [field]: { $regex: query.searchTerm, $options: 'i' },
+          }));
+          if (arrayOfClientIds.length > 0) {
+               orConditions.push({ client: { $in: arrayOfClientIds } });
           }
-          : {};
+          filterQuery.$or = orConditions;
+          delete query.searchTerm;
+     }
+
      const queryBuilder = new QueryBuilder(
-          Car.find({
-               ...carFilters,
-          })
+          Car.find(filterQuery)
                .populate({
                     path: 'client',
                     populate: {
@@ -328,7 +367,7 @@ const getAllCarsForAdmin = async (query: Record<string, any>): Promise<{ meta: {
                }),
           query,
      );
-     const result = await queryBuilder.filter().sort().paginate().fields().search(['vin', 'model', 'year', 'description', 'plateNumberForInternational', 'slugForSaudiCarPlateNumber']).modelQuery;
+     const result = await queryBuilder.filter().sort().paginate().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
      return { meta, result };
 };
