@@ -254,8 +254,22 @@ InvoiceSchema.pre('validate', async function (next) {
      }
 
      // ── 3. Validate & Calculate Works ────────────────────────────────────────
-     if (payload.worksList) {
-          const worksIds = payload.worksList.map((work) => new Types.ObjectId(work.work));
+     if (payload.worksList && payload.worksList.length > 0) {
+          const worksIds: any[] = [];
+          for (let i = 0; i < payload.worksList.length; i++) {
+               const workItem = payload.worksList[i];
+               if (Types.ObjectId.isValid(workItem.work)) {
+                    worksIds.push(new Types.ObjectId(workItem.work));
+               } else {
+                    const foundWork = await Work.findOne({ code: workItem.work });
+                    if (!foundWork) {
+                         throw new AppError(StatusCodes.BAD_REQUEST, `Invalid work ID or code: ${workItem.work}`);
+                    }
+                    worksIds.push(foundWork._id);
+                    workItem.work = foundWork._id as any;
+               }
+          }
+          
           isExistWorks = await Work.find({ _id: { $in: worksIds } });
           if (!isExistWorks || isExistWorks.length !== payload.worksList.length) {
                throw new AppError(StatusCodes.NOT_FOUND, 'Work not found.*');
