@@ -26,13 +26,24 @@ const createManyWorksByXLXS = catchAsync(async (req: Request, res: Response) => 
 });
 
 const getAllWorks = catchAsync(async (req: Request, res: Response) => {
-     const result = await workService.getAllWorks(req.query);
+     const { result } = await workService.getAllWorks(req.query);
+
+     const formattedResult = result.map((work: any) => {
+          const doc = work.toObject ? work.toObject() : work;
+          return {
+               ...doc,
+               type: doc.type ? doc.type.toLowerCase() : doc.type,
+               workCategoryName: doc.workCategoryName?.workCategoryName || doc.workCategoryName,
+          };
+     });
 
      sendResponse(res, {
           statusCode: 200,
           success: true,
-          message: 'Works retrieved successfully',
-          data: result,
+          message: 'Works list fetched successfully',
+          data: {
+               result: formattedResult,
+          },
      });
 });
 

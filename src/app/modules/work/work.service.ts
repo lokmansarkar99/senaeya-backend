@@ -30,7 +30,7 @@ const createWork = async (payload: Iwork & { titleObj?: Iwork['title']; workCate
      if (payload.title) {
           delete payload.titleObj;
           const [titleObj]: [Iwork['title']] = await Promise.all([buildTranslatedField(payload.title as any)]);
-          payload.title = titleObj;
+          payload.title = titleObj; 
      } else if (payload.titleObj) {
           payload.title = payload.titleObj;
      }
