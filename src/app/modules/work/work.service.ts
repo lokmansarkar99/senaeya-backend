@@ -115,6 +115,17 @@ const createManyWorksByXLXS = async (payload: Iwork & { document: string }): Pro
 };
 
 const getAllWorks = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: Iwork[] }> => {
+     if (query.workCategoryName) {
+          if (!mongoose.Types.ObjectId.isValid(query.workCategoryName as string)) {
+               const categoryObj = await WorksCategories.findOne({ workCategoryName: query.workCategoryName });
+               if (categoryObj) {
+                    query.workCategoryName = categoryObj._id;
+               } else {
+                    // Prevent CastError and return empty results for non-existent category name
+                    query.workCategoryName = new mongoose.Types.ObjectId();
+               }
+          }
+     }
      const queryBuilder = new QueryBuilder(Work.find().populate('workCategoryName').sort({ code: 1 }), query);
      const result = await queryBuilder.filter().sort().fields().modelQuery;
      const meta = await queryBuilder.countTotal();
