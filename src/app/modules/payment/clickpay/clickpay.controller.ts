@@ -27,7 +27,7 @@ const initiatePayment = catchAsync(async (req: Request, res: Response) => {
                throw new Error('Coupon not found for this package');
           }
           toBePaidAmount = isExistCoupon.discountedPrice;
-          flatDiscountedAmount = isExistCoupon.discountedPrice;
+          flatDiscountedAmount = isExistCoupon.discountAmount;
      }
      // checke already subscribed and not expired
      const isExistSubscription = await Subscription.findOne({

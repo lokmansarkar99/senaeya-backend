@@ -65,10 +65,14 @@ const getTryCouponByCode = async (packageId: string, couponCode: string) => {
      const currentDate = new Date();
      currentDate.setUTCHours(0, 0, 0, 0);
 
-     const coupon = await Coupon.findOne({ code: couponCode });
+     const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
 
      if (!coupon) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Coupon not found.');
+     }
+
+     if (coupon.package.toString() !== packageId.toString()) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Coupon is not valid for this package.');
      }
 
      if (!coupon.isActive) {
