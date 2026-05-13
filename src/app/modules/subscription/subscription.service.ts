@@ -159,10 +159,6 @@ const createSubscriptionByPackageIdForWorkshop = async (
           workshop.subscribedPackage = new Types.ObjectId(packageId);
           await workshop.save({ session });
 
-          if (couponCode) {
-               // Increment coupon usage count
-               await Coupon.updateOne({ code: couponCode.trim().toUpperCase() }, { $inc: { usedCount: 1 } }, { session });
-          }
 
           // Calculate subscription duration in days
           const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
@@ -273,6 +269,11 @@ const createSubscriptionByPackageIdForWorkshop = async (
 
           await session.commitTransaction();
           session.endSession();
+
+          if (couponCode) {
+               // Increment coupon usage count
+               await Coupon.updateOne({ code: couponCode.trim().toUpperCase() }, { $inc: { usedCount: 1 } });
+          }
 
           return subscription;
      } catch (error: any) {
