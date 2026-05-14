@@ -270,11 +270,6 @@ const createSubscriptionByPackageIdForWorkshop = async (
           await session.commitTransaction();
           session.endSession();
 
-          if (couponCode) {
-               // Increment coupon usage count
-               await Coupon.updateOne({ code: couponCode.trim().toUpperCase() }, { $inc: { usedCount: 1 } });
-          }
-
           return subscription;
      } catch (error: any) {
           console.log('🚀 ~ createSubscriptionByPackageIdForWorkshop ~ error:', error);
