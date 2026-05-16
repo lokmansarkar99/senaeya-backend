@@ -100,10 +100,6 @@ const getTryCouponByCode = async (packageId: string, couponCode: string) => {
      const discountedPrice = Number(isExistPackage.price) - discountAmount;
      console.log('🚀 ~ getTryCouponByCode ~ discountedPrice:', discountedPrice);
 
-     // Increment the usage counter directly when applied
-     await Coupon.updateOne({ _id: coupon._id }, { $inc: { usedCount: 1 } });
-     coupon.usedCount = (coupon.usedCount || 0) + 1; // update local object to reflect the change
-
      return { coupon, discountedPrice, discountAmount };
 };
 

@@ -159,6 +159,10 @@ const createSubscriptionByPackageIdForWorkshop = async (
           workshop.subscribedPackage = new Types.ObjectId(packageId);
           await workshop.save({ session });
 
+          // Increment coupon usedCount here (upon successful subscription creation)
+          if (couponCode) {
+               await Coupon.updateOne({ code: couponCode }, { $inc: { usedCount: 1 } }, { session });
+          }
 
           // Calculate subscription duration in days
           const extendedDaysCount = Math.round((new Date(payload.currentPeriodEnd).getTime() - new Date(payload.currentPeriodStart).getTime()) / 86400000);
